@@ -1,0 +1,899 @@
+{
+  "metadata": {
+    "total": 40,
+    "fecha_extraccion": "2026-01-03 20:23:19",
+    "fuentes": [
+      "https://www.momentaboutique.com/experiencias",
+      "https://www.momentaboutique.com/experiencias-medellin"
+    ]
+  },
+  "experiencias": [
+    {
+      "title": "Cena Clandestina en La Cocina de la Recocha",
+      "description": "Momenta Admin10/07/25Momenta Admin10/07/25Taller de Scrapbook¿Cuándo fue la última vez que te detuviste a celebrar tu propia historia?En este taller de scrapbook, tú decides: crear un álbum con esos momentos que te hacen sonreír, o un mapa de sueños que te inspire cada mañana.Min. 2 persona(s) | En tu casa en Bogotá o en el taller | 3 horasDesde 150,000 COP**Leer más",
+      "url": "https://www.momentaboutique.com/experiencias/cena-clandestina-la-cocina-de-la-recocha",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/c18732cf-8414-4419-b3b0-279b9fcfea4b/image-asset.jpg",
+      "categories": [
+        "En tu casa",
+        "Corporativo",
+        "Para grupos",
+        "Para Niños",
+        "En Bogotá",
+        "Manualidad",
+        "Para parejas",
+        "Individual",
+        "Cocina",
+        "Bienestar",
+        "Ver todo",
+        "Gastronómico",
+        "Fiesta",
+        "Belleza y Autocuidado",
+        "Cerca a Bogotá",
+        "Aventura",
+        "Para niños"
+      ],
+      "price": {
+        "amount": "143000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 4,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Kintsugi",
+      "description": "En tu casa,Corporativo,Para grupos,Para Niños,En Bogotá,ManualidadMomenta Admin28/11/25En tu casa,Corporativo,Para grupos,Para Niños,En Bogotá,ManualidadMomenta Admin28/11/25",
+      "url": "https://www.momentaboutique.com/experiencias/ceramicakintsugi",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1740685878707-B1VG2MGJU9O5DK3D6RNL/WhatsApp+Image+2025-02-27+at+11.42.44_e0269e7c.jpg",
+      "categories": [
+        "En tu casa",
+        "Corporativo",
+        "Para grupos",
+        "Para Niños",
+        "En Bogotá",
+        "Manualidad"
+      ],
+      "price": {
+        "amount": "143000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 4,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Pasta, Serenata y Vino",
+      "description": "Para grupos,Para parejas,Individual,Cocina,Corporativo,En tu casa,En BogotáMomenta Admin25/11/25Para grupos,Para parejas,Individual,Cocina,Corporativo,En tu casa,En BogotáMomenta Admin25/11/25",
+      "url": "https://www.momentaboutique.com/experiencias/tallerdepastaymusicaenvivo",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1716269893063-N626O7ILRPS99JRYI30J/Captura+de+Pantalla+2024-05-20+a+la%28s%29+11.35.08+p.%C2%A0m..png",
+      "categories": [
+        "Para grupos",
+        "Para parejas",
+        "Individual",
+        "Cocina",
+        "Corporativo",
+        "En tu casa",
+        "En Bogotá"
+      ],
+      "price": {
+        "amount": "190000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Masaje Piedras Volcánicas en Casa",
+      "description": "Individual,Para parejas,En tu casa,Bienestar,Ver todoMomenta Admin30/10/25Individual,Para parejas,En tu casa,Bienestar,Ver todoMomenta Admin30/10/25",
+      "url": "https://www.momentaboutique.com/experiencias/masajepiedrasvolcanicas",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698074285852-7YQO8GLUQS24W2REZZNL/image-asset.jpeg",
+      "categories": [
+        "Individual",
+        "Para parejas",
+        "En tu casa",
+        "Bienestar",
+        "Ver todo"
+      ],
+      "price": {
+        "amount": "198000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": null,
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Joyería Artesanal",
+      "description": "Aquí el fuego no solo transforma metales: funde historias, memorias y promesas.",
+      "url": "https://www.momentaboutique.com/experiencias/experiencia-hpjh3-938dm",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1753836347236-L63CODXZ9AGUOEAITJMZ/WhatsApp+Image+2025-07-29+at+1.06.54+PM+%281%29.jpeg",
+      "categories": [],
+      "price": {
+        "amount": "250000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "5 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Scrapbook",
+      "description": "Momenta Admin10/07/25Momenta Admin10/07/25Taller de Scrapbook¿Cuándo fue la última vez que te detuviste a celebrar tu propia historia?En este taller de scrapbook, tú decides: crear un álbum con esos momentos que te hacen sonreír, o un mapa de sueños que te inspire cada mañana.Min. 2 persona(s) | En tu casa en Bogotá o en el taller | 3 horasDesde 150,000 COP**Leer más",
+      "url": "https://www.momentaboutique.com/experiencias/experiencia-hpjh3-938dm-djaw3",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1752085172647-032ST598XHWHCJJEFCWR/_IMG8846.jpg",
+      "categories": [],
+      "price": {
+        "amount": "150000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Cata Cervecera",
+      "description": "En Bogotá,En tu casa,Corporativo,Para grupos,GastronómicoMomenta Admin7/04/25En Bogotá,En tu casa,Corporativo,Para grupos,GastronómicoMomenta Admin7/04/25",
+      "url": "https://www.momentaboutique.com/experiencias/catadecerveza-masnk",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1711026856758-T9LIHH8AUM0F88BRJC1Y/image-asset.jpeg",
+      "categories": [
+        "En Bogotá",
+        "En tu casa",
+        "Corporativo",
+        "Para grupos",
+        "Gastronómico"
+      ],
+      "price": {
+        "amount": "132000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 5,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Cata de Licores Ancestrales Colombianos",
+      "description": "Corporativo,Para grupos,Para parejas,En Bogotá,Fiesta,GastronómicoMomenta Admin2/04/25Corporativo,Para grupos,Para parejas,En Bogotá,Fiesta,GastronómicoMomenta Admin2/04/25",
+      "url": "https://www.momentaboutique.com/experiencias/catadelicoresancestrales-6fwgt",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1743606397267-CARDP5JNGCYY0Q2YXAA6/LicoresAncestrales5.jpg",
+      "categories": [
+        "Corporativo",
+        "Para grupos",
+        "Para parejas",
+        "En Bogotá",
+        "Fiesta",
+        "Gastronómico"
+      ],
+      "price": {
+        "amount": "159000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1.5 horas",
+      "min_people": 2,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Cata de Café y Postres",
+      "description": "Corporativo,Para grupos,Para parejas,En Bogotá,GastronómicoMomenta Admin2/04/25Corporativo,Para grupos,Para parejas,En Bogotá,GastronómicoMomenta Admin2/04/25",
+      "url": "https://www.momentaboutique.com/experiencias/catadecafe-6fwgt-l6ym8",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1743200349674-4SNDICQ5080RJRBW2VQE/Cata+.jpg",
+      "categories": [
+        "Corporativo",
+        "Para grupos",
+        "Para parejas",
+        "En Bogotá",
+        "Gastronómico"
+      ],
+      "price": {
+        "amount": "121000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 2,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Master Class de Sushi y Coctelería",
+      "description": "Cocina,Corporativo,Para grupos,En Bogotá,GastronómicoMomenta Admin9/03/25Cocina,Corporativo,Para grupos,En Bogotá,GastronómicoMomenta Admin9/03/25",
+      "url": "https://www.momentaboutique.com/experiencias/masterclasssushi",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1741667672781-NL9WSCHDWHQWNHH1TK37/WhatsApp+Image+2025-03-10+at+11.28.55+PM+%283%29.jpeg",
+      "categories": [
+        "Cocina",
+        "Corporativo",
+        "Para grupos",
+        "En Bogotá",
+        "Gastronómico"
+      ],
+      "price": {
+        "amount": "176000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 4,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Automaquillaje",
+      "description": "Corporativo,Para grupos,En Bogotá,Individual,Belleza y AutocuidadoMomenta Admin12/02/25Corporativo,Para grupos,En Bogotá,Individual,Belleza y AutocuidadoMomenta Admin12/02/25",
+      "url": "https://www.momentaboutique.com/experiencias/makeupybrunch",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1738520330517-UTFQFOVHYKJ56VS8OI6B/mak.JPG",
+      "categories": [
+        "Corporativo",
+        "Para grupos",
+        "En Bogotá",
+        "Individual",
+        "Belleza y Autocuidado"
+      ],
+      "price": {
+        "amount": "352000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "4.5 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Manualidades En Neusa",
+      "description": "Para grupos,Para parejas,Corporativo,Manualidad,Cerca a BogotáMomenta Admin19/12/24Para grupos,Para parejas,Corporativo,Manualidad,Cerca a BogotáMomenta Admin19/12/24",
+      "url": "https://www.momentaboutique.com/experiencias/manualidadesneusa",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1734611489603-LHCGC4WSM6GREXZFPVBC/Captura+de+pantalla+2024-12-19+072936.png",
+      "categories": [
+        "Para grupos",
+        "Para parejas",
+        "Corporativo",
+        "Manualidad",
+        "Cerca a Bogotá"
+      ],
+      "price": {
+        "amount": "110000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 2,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Cocina En Neusa",
+      "description": "Para grupos,Cocina,Para parejas,Corporativo,Gastronómico,Para NiñosMomenta Admin18/12/24Para grupos,Cocina,Para parejas,Corporativo,Gastronómico,Para NiñosMomenta Admin18/12/24",
+      "url": "https://www.momentaboutique.com/experiencias/culinariosneusa",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1734528674070-QKG5BY3FVR3LT7XS3YBL/DSC07121.jpeg",
+      "categories": [
+        "Para grupos",
+        "Cocina",
+        "Para parejas",
+        "Corporativo",
+        "Gastronómico",
+        "Para Niños"
+      ],
+      "price": {
+        "amount": "110000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 2,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Yoga Facial",
+      "description": "En tu casa,Corporativo,Para grupos,En Bogotá,Bienestar,Individual,Belleza y AutocuidadoMomenta Admin7/11/24En tu casa,Corporativo,Para grupos,En Bogotá,Bienestar,Individual,Belleza y AutocuidadoMomenta Admin7/11/24",
+      "url": "https://www.momentaboutique.com/experiencias/beautyparty",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1730781828671-GWC7K6N08EO6J2J5BSSU/Tarde+de+amigas.jpeg",
+      "categories": [
+        "En tu casa",
+        "Corporativo",
+        "Para grupos",
+        "En Bogotá",
+        "Bienestar",
+        "Individual",
+        "Belleza y Autocuidado"
+      ],
+      "price": {
+        "amount": "149000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1.5 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Tamalitos Mexicanos",
+      "description": "Cocina,Corporativo,En Bogotá,Para grupos,GastronómicoMomenta Admin25/10/24Cocina,Corporativo,En Bogotá,Para grupos,GastronómicoMomenta Admin25/10/24",
+      "url": "https://www.momentaboutique.com/experiencias/alamexicanatamalitos",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1729860828618-HTMJYHK56PLRGDBL4VE3/55a0e18e-4a7c-44d4-bfc1-6c6779c50250.jpg",
+      "categories": [
+        "Cocina",
+        "Corporativo",
+        "En Bogotá",
+        "Para grupos",
+        "Gastronómico"
+      ],
+      "price": {
+        "amount": "242000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "4 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Wellness Day Pass",
+      "description": "Para grupos,Para parejas,En Bogotá,Bienestar,IndividualMomenta Admin22/10/24Para grupos,Para parejas,En Bogotá,Bienestar,IndividualMomenta Admin22/10/24",
+      "url": "https://www.momentaboutique.com/experiencias/wellness-day-pass",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1729548301279-SAM732OPLE2Z3UVHH5QX/WELLNESS.jpg",
+      "categories": [
+        "Para grupos",
+        "Para parejas",
+        "En Bogotá",
+        "Bienestar",
+        "Individual"
+      ],
+      "price": {
+        "amount": "290000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Cocina Saludable",
+      "description": "Bienestar,Cocina,En Bogotá,En tu casa,Para gruposMomenta Admin18/10/24Bienestar,Cocina,En Bogotá,En tu casa,Para gruposMomenta Admin18/10/24",
+      "url": "https://www.momentaboutique.com/experiencias/nutricionywellness",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1727818272027-F5VEFTSX6VAMHE5LOPKR/DSC03586.jpg",
+      "categories": [
+        "Bienestar",
+        "Cocina",
+        "En Bogotá",
+        "En tu casa",
+        "Para grupos"
+      ],
+      "price": {
+        "amount": "143000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Hot yoga & Brunch",
+      "description": "Cocina,Bienestar,En Bogotá,Individual,Para gruposMomenta Admin25/07/24Cocina,Bienestar,En Bogotá,Individual,Para gruposMomenta Admin25/07/24",
+      "url": "https://www.momentaboutique.com/experiencias/hot-yoga-brunch",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1729629005719-ULLCFGDNV7SM72W8S9WL/IMG_1448.JPEG.jpg",
+      "categories": [
+        "Cocina",
+        "Bienestar",
+        "En Bogotá",
+        "Individual",
+        "Para grupos"
+      ],
+      "price": {
+        "amount": "115000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Parrillero en Casa",
+      "description": "En tu casa,Cocina,Corporativo,Para grupos,En BogotáMomenta Admin24/07/24En tu casa,Cocina,Corporativo,Para grupos,En BogotáMomenta Admin24/07/24",
+      "url": "https://www.momentaboutique.com/experiencias/parrilleroencasa",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1721831062238-4JZDYAYP75R8HW9XZXK8/pexels-igrejapreta-2491273.jpg",
+      "categories": [
+        "En tu casa",
+        "Cocina",
+        "Corporativo",
+        "Para grupos",
+        "En Bogotá"
+      ],
+      "price": {
+        "amount": "154000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 10,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Vidrio y Anillos",
+      "description": "Para parejas,Individual,En Bogotá,ManualidadMomenta Admin24/07/24Para parejas,Individual,En Bogotá,ManualidadMomenta Admin24/07/24",
+      "url": "https://www.momentaboutique.com/experiencias/tallerdevidrio",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1708433678202-F02G909DUL2VQNOFP79Z/Captura+de+Pantalla+2024-02-20+a+la%28s%29+7.51.50+a.%C2%A0m..png",
+      "categories": [
+        "Para parejas",
+        "Individual",
+        "En Bogotá",
+        "Manualidad"
+      ],
+      "price": {
+        "amount": "220000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Gift Card Momenta",
+      "description": "Para cualquiera | En donde tú quieras | Lo que tú decidas",
+      "url": "https://www.momentaboutique.com/experiencias/giftcard",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1700358932296-RMGYKZ9QK1KLMH06T6T7/Gift+Card.png",
+      "categories": [],
+      "price": {
+        "amount": "150000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": null,
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Cake Party",
+      "description": "En tu casa,Cocina,Corporativo,Para grupos,En Bogotá,ManualidadMomenta Admin30/03/24En tu casa,Cocina,Corporativo,Para grupos,En Bogotá,ManualidadMomenta Admin30/03/24",
+      "url": "https://www.momentaboutique.com/experiencias/cakeparty",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1719517066875-YSFE58JBGL6LZZTLZ9TI/WhatsApp+Image+2024-06-27+at+1.28.56+PM.jpeg",
+      "categories": [
+        "En tu casa",
+        "Cocina",
+        "Corporativo",
+        "Para grupos",
+        "En Bogotá",
+        "Manualidad"
+      ],
+      "price": {
+        "amount": "137500",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 4,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Coctelería",
+      "description": "En tu casa,Cocina,Corporativo,Para gruposMomenta Admin28/03/24En tu casa,Cocina,Corporativo,Para gruposMomenta Admin28/03/24",
+      "url": "https://www.momentaboutique.com/experiencias/tallerdecocteleria",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1716471006059-2H68L0QZA57LKBJ6PURX/Captura+de+Pantalla+2024-05-23+a+la%28s%29+8.05.18+a.%C2%A0m..png",
+      "categories": [
+        "En tu casa",
+        "Cocina",
+        "Corporativo",
+        "Para grupos"
+      ],
+      "price": {
+        "amount": "132000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 5,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Clase de Polo",
+      "description": "En Bogotá,Para grupos,Individual,Para parejas,Corporativo,AventuraMomenta Admin27/03/24En Bogotá,Para grupos,Individual,Para parejas,Corporativo,AventuraMomenta Admin27/03/24",
+      "url": "https://www.momentaboutique.com/experiencias/clasedepolo",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1714171099464-G1TEB6RDI9XG56UAZW03/IMG_3228.PNG",
+      "categories": [
+        "En Bogotá",
+        "Para grupos",
+        "Individual",
+        "Para parejas",
+        "Corporativo",
+        "Aventura"
+      ],
+      "price": {
+        "amount": "154000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Cena Clandestina en La Cocina de la Recocha",
+      "description": "Cocina,Para grupos,Para parejas,Individual,En Bogotá,Ver todo,FiestaMomenta Admin26/03/24Cocina,Para grupos,Para parejas,Individual,En Bogotá,Ver todo,FiestaMomenta Admin26/03/24",
+      "url": "https://www.momentaboutique.com/experiencias/cena-clandestina-la-cocina-de-la-recocha",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698284010886-QMQO3H4D2FMBZRMR6MPU/cena+cla+1+.png",
+      "categories": [
+        "Cocina",
+        "Para grupos",
+        "Para parejas",
+        "Individual",
+        "En Bogotá",
+        "Ver todo",
+        "Fiesta"
+      ],
+      "price": null,
+      "duration": "4 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Cerámica y Vino",
+      "description": "En Bogotá,Cerca a Bogotá,Manualidad,Para grupos,Corporativo,IndividualMomenta Admin25/03/24En Bogotá,Cerca a Bogotá,Manualidad,Para grupos,Corporativo,IndividualMomenta Admin25/03/24",
+      "url": "https://www.momentaboutique.com/experiencias/ceramicayvinop",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1700870949831-LJ0DUNWXMHV224RPACOM/Captura+de+Pantalla+2023-11-24+a+la%28s%29+6.36.41+p.%C2%A0m..png",
+      "categories": [
+        "En Bogotá",
+        "Cerca a Bogotá",
+        "Manualidad",
+        "Para grupos",
+        "Corporativo",
+        "Individual"
+      ],
+      "price": {
+        "amount": "137500",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Masaje Relajante en Casa",
+      "description": "Para parejas,Individual,Bienestar,En tu casa,Ver todoMomenta Admin22/03/24Para parejas,Individual,Bienestar,En tu casa,Ver todoMomenta Admin22/03/24",
+      "url": "https://www.momentaboutique.com/experiencias/masajerelajante",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698288608933-DNOEMF1YXPI53HDJ28UC/image-asset.jpeg",
+      "categories": [
+        "Para parejas",
+        "Individual",
+        "Bienestar",
+        "En tu casa",
+        "Ver todo"
+      ],
+      "price": {
+        "amount": "154000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": null,
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Tarot con Amigas",
+      "description": "Para grupos,En tu casa,Bienestar,Fiesta,Ver todoMomenta Admin1/12/23Para grupos,En tu casa,Bienestar,Fiesta,Ver todoMomenta Admin1/12/23",
+      "url": "https://www.momentaboutique.com/experiencias/tarotyparche",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1697938202518-S0ZBNT40W7CKLW0D9COT/image-asset.jpeg",
+      "categories": [
+        "Para grupos",
+        "En tu casa",
+        "Bienestar",
+        "Fiesta",
+        "Ver todo"
+      ],
+      "price": {
+        "amount": "880000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Taller de Sushi en Casa",
+      "description": "Cocina,Para grupos,Para niños,Para parejas,En Bogotá,En tu casaMomenta Admin30/11/23Cocina,Para grupos,Para niños,Para parejas,En Bogotá,En tu casaMomenta Admin30/11/23",
+      "url": "https://www.momentaboutique.com/experiencias/experiencia-zrblz",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1704927091331-CPI77305VB3RATYWOWSD/Captura+de+Pantalla+2024-01-10+a+la%28s%29+5.48.21+p.%C2%A0m..png",
+      "categories": [
+        "Cocina",
+        "Para grupos",
+        "Para niños",
+        "Para parejas",
+        "En Bogotá",
+        "En tu casa"
+      ],
+      "price": {
+        "amount": "110000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "4 horas",
+      "min_people": null,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Vuelo Parapente sobre Guatavita",
+      "description": "Aventura,Para grupos,Individual,Cerca a Bogotá,Ver todo,Para parejasMomenta Admin26/10/23Aventura,Para grupos,Individual,Cerca a Bogotá,Ver todo,Para parejasMomenta Admin26/10/23",
+      "url": "https://www.momentaboutique.com/experiencias/parapente-volando-sobre-magic-guatavita",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698094120367-W0660ZIXMF8BUXCNT9AJ/image-asset.jpeg",
+      "categories": [
+        "Aventura",
+        "Para grupos",
+        "Individual",
+        "Cerca a Bogotá",
+        "Ver todo",
+        "Para parejas"
+      ],
+      "price": {
+        "amount": "276000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": null,
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Hot Yoga & Aromaterapia",
+      "description": "Individual,Para grupos,En Bogotá,Bienestar,Ver todoMomenta Admin26/10/23Individual,Para grupos,En Bogotá,Bienestar,Ver todoMomenta Admin26/10/23",
+      "url": "https://www.momentaboutique.com/experiencias/hotyoga",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1697939023832-GSTHWQ4TARD7Z4JHTFM3/image-asset.jpeg",
+      "categories": [
+        "Individual",
+        "Para grupos",
+        "En Bogotá",
+        "Bienestar",
+        "Ver todo"
+      ],
+      "price": {
+        "amount": "219000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 1,
+      "location": "Bogotá",
+      "source_page": "https://www.momentaboutique.com/experiencias"
+    },
+    {
+      "title": "Sesión Personalizada de Pilates",
+      "description": "Manualidad,Para grupos,Corporativo,Individual,En Medellín,Gastronómico,BienestarMomenta Admin15/04/25Manualidad,Para grupos,Corporativo,Individual,En Medellín,Gastronómico,BienestarMomenta Admin15/04/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/sesiondepilates",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/e7583222-8956-40c7-a3f2-c7013a56ec9d/vivian-k-dupe.jpeg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Individual",
+        "En Medellín",
+        "Bienestar",
+        "Amigas",
+        "Corporativo",
+        "Gastronómico",
+        "Para parejas"
+      ],
+      "price": {
+        "amount": "150000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 4,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Collage, Vinilos y Vino",
+      "description": "Un parche diferente para conectar con tu artista interior, brinda un espacio para expresar emociones a través del papel, las tijeras. La música y el vino.",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/collagevinilosyvino",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1745417601705-M5ABDVVD5IAMKU8R44Z8/IMG_7415.JPEG",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Individual",
+        "En Medellín"
+      ],
+      "price": {
+        "amount": "150000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 4,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Taller de Kintsugi",
+      "description": "El arte de reconstruirnos, reconoce la fragilidad del ser y dale una nueva oportunidad a una pieza cerámica rota, también puedes traer tus piezas rotas.",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/tallerdekintsugi",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1745414458316-457OETTB0VO5TLVV8RUH/HP-BDA-17.jpg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Individual",
+        "En Medellín"
+      ],
+      "price": {
+        "amount": "99000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 1,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Crea tu propio Anillo",
+      "description": "Manualidad,Para grupos,Individual,En MedellínMomenta Admin23/04/25Manualidad,Para grupos,Individual,En MedellínMomenta Admin23/04/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/creatupropioanillo",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1745413363285-1V0LDJERAJ3SSEZ2X1BN/anilllo.jpeg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Individual",
+        "En Medellín"
+      ],
+      "price": {
+        "amount": "350000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "3 horas",
+      "min_people": 1,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Sesión Personalizada de Pilates",
+      "description": "Para grupos,En Medellín,Bienestar,AmigasMomenta Admin16/04/25Para grupos,En Medellín,Bienestar,AmigasMomenta Admin16/04/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/sesiondepilates",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1744827455035-RA3V5F4QRXMVISQCCD1A/ccccc.png",
+      "categories": [
+        "Para grupos",
+        "En Medellín",
+        "Bienestar",
+        "Amigas"
+      ],
+      "price": {
+        "amount": "900000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 1,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Sesión de Reiki",
+      "description": "Manualidad,Para grupos,Corporativo,Individual,En Medellín,BienestarMomenta Admin15/04/25Manualidad,Para grupos,Corporativo,Individual,En Medellín,BienestarMomenta Admin15/04/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/sesiondereiki",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1744827743249-3M7MBFKQ8EL0I6V5V1U2/unsplash-image-WAm_HaI4W2E.jpg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Corporativo",
+        "Individual",
+        "En Medellín",
+        "Bienestar"
+      ],
+      "price": {
+        "amount": "230000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "1 horas",
+      "min_people": 1,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Crea tu propia Vela y Cerámica",
+      "description": "Manualidad,Para grupos,Corporativo,En Medellín,Individual,BienestarMomenta Admin15/04/25Manualidad,Para grupos,Corporativo,En Medellín,Individual,BienestarMomenta Admin15/04/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/velasyceramica",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1744721620164-QQTIYF8CW0DX1MFX3GWJ/unsplash-image-phciP_BC8CA.jpg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Corporativo",
+        "En Medellín",
+        "Individual",
+        "Bienestar"
+      ],
+      "price": {
+        "amount": "135000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 4,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Yoga y Brunch",
+      "description": "Manualidad,Para grupos,Corporativo,Individual,En Medellín,Gastronómico,BienestarMomenta Admin15/04/25Manualidad,Para grupos,Corporativo,Individual,En Medellín,Gastronómico,BienestarMomenta Admin15/04/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/yogaybrunch",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1744721000817-KPN4BRGZWY2OG5QDAW2E/unsplash-image-YJdCZba0TYE.jpg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Corporativo",
+        "Individual",
+        "En Medellín",
+        "Gastronómico",
+        "Bienestar"
+      ],
+      "price": {
+        "amount": "111000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 8,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    },
+    {
+      "title": "Taller de Cerámica",
+      "description": "Manualidad,Para grupos,Corporativo,Individual,En Medellín,Para parejasMomenta Admin31/03/25Manualidad,Para grupos,Corporativo,Individual,En Medellín,Para parejasMomenta Admin31/03/25",
+      "url": "https://www.momentaboutique.com/experiencias-medellin/tallerceramicamedellin",
+      "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1745507576286-JIG8IV8P2RMXAZOJRVUR/Sinigual-37.jpg",
+      "categories": [
+        "Manualidad",
+        "Para grupos",
+        "Corporativo",
+        "Individual",
+        "En Medellín",
+        "Para parejas"
+      ],
+      "price": {
+        "amount": "109000",
+        "currency": "COP",
+        "unit": "por persona"
+      },
+      "duration": "2 horas",
+      "min_people": 1,
+      "location": "Medellín",
+      "source_page": "https://www.momentaboutique.com/experiencias-medellin"
+    }
+  ]
+}
