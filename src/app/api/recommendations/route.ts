@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { recommendationRequestSchema } from '@/lib/intelligence/schema';
 import { generateAIRecommendations, getModelName } from '@/lib/intelligence/ai-service';
 import type { RecommendationResponse } from '@/lib/intelligence/types';
-import experiencesData from '../../../../data/experiences.json';
+import { getAllExperiences } from '@/lib/db/experiences';
 
 /**
  * API Route: POST /api/recommendations
@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
     }
 
     const { userContext } = validation.data;
-    const { experiencesPool } = experiencesData;
+
+    // Fetch experiences from database
+    const experiencesPool = await getAllExperiences();
 
     // Generate recommendations using AI (with automatic fallback)
     const recommendations = await generateAIRecommendations(

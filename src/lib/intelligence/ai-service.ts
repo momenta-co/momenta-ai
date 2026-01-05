@@ -77,19 +77,27 @@ export async function generateAIRecommendations(
 
 /**
  * Map AI response to our Recommendation type
+ * Handles index-based IDs (exp-0, exp-1, etc.) returned by the AI
  */
 function mapAIResponseToRecommendations(
   aiResponse: AIRecommendationResponse,
   experiences: Experience[]
 ): Recommendation[] {
-  const experienceMap = new Map(experiences.map(exp => [exp.id, exp]));
-
   return aiResponse.recommendations
     .map(aiRec => {
-      const experience = experienceMap.get(aiRec.experienceId);
+      // Parse index from experienceId (format: "exp-0", "exp-1", etc.)
+      const match = aiRec.experienceId.match(/^exp-(\d+)$/);
+
+      if (!match) {
+        console.warn(`Invalid experience ID format: ${aiRec.experienceId}`);
+        return null;
+      }
+
+      const index = parseInt(match[1], 10);
+      const experience = experiences[index];
 
       if (!experience) {
-        console.warn(`Experience ${aiRec.experienceId} not found in pool`);
+        console.warn(`Experience at index ${index} not found in pool (ID: ${aiRec.experienceId})`);
         return null;
       }
 

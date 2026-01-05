@@ -58,7 +58,7 @@ USER CONTEXT:
 AVAILABLE EXPERIENCES:
 ${experiences.map((exp, idx) => `
 ${idx + 1}. ${exp.title}
-   - ID: ${exp.id} (IMPORTANT: Use this exact ID in your response)
+   - Experience ID: exp-${idx} (IMPORTANT: Use this exact ID format in your response)
    - Categories: ${exp.categories.join(', ')}
    - Price: ${exp.price ? `${parseInt(exp.price.amount).toLocaleString('es-CO')} ${exp.price.currency}` : 'Price not available'}
    - Duration: ${exp.duration || 'Not specified'}
@@ -73,7 +73,7 @@ OUTPUT FORMAT (JSON):
 {
   "recommendations": [
     {
-      "experienceId": "string (use the exact experience ID)",
+      "experienceId": "string (use the exact experience ID like 'exp-0', 'exp-1', etc.)",
       "scoreBreakdown": {
         "occasion": number (0-100),
         "relation": number (0-100),
