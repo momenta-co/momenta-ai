@@ -41,3 +41,4 @@ next-env.d.ts
 # Dev environment
 /data
 /vibe_engineering
+/src/generated/prisma
