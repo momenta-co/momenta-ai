@@ -24,11 +24,15 @@ interface AudioVisualizerData {
 // Luminous center, soft edges, ethereal glow
 // ============================================
 
-// MONSTERA - Vertex Shader (original sphere waves + leaf deformation)
+// MONSTERA - Vertex Shader (original sphere waves + leaf deformation + voice reactivity)
 const monsteraVertexShader = `
   uniform float uTime;
   uniform float uAmplitude;
   uniform float uBreathing;
+  uniform float uVoiceAmplitude;    // Voice volume (0-1)
+  uniform float uVoiceBass;         // Low frequencies
+  uniform float uVoiceMid;          // Mid frequencies
+  uniform float uVoiceHigh;         // High frequencies
   varying vec3 vNormal;
   varying vec3 vPosition;
   varying vec3 vWorldPosition;
@@ -101,7 +105,7 @@ const monsteraVertexShader = `
     vPosition = leafPos;
 
     // ========================================
-    // WAVE DISPLACEMENT (same as original sphere)
+    // WAVE DISPLACEMENT (with voice reactivity)
     // ========================================
     float displacement = 0.0;
 
@@ -109,19 +113,45 @@ const monsteraVertexShader = `
     vec3 source2 = getWaveSource(1, uTime);
     vec3 source3 = getWaveSource(2, uTime);
 
-    // Organic curved waves - flowing, no linear artifacts
-    displacement += rippleWave(pos, source1, uTime, 1.8, 0.4, 1.2) * 0.06;
-    displacement += rippleWave(pos, source2, uTime, 1.4, 0.35, 1.0) * 0.05;
-    displacement += rippleWave(pos, source3, uTime, 2.0, 0.5, 1.4) * 0.04;
+    // Base organic curved waves
+    float baseWaveSpeed = 0.4 + uVoiceAmplitude * 0.6;  // Speed up with voice
+    displacement += rippleWave(pos, source1, uTime, 1.8, baseWaveSpeed, 1.2) * 0.06;
+    displacement += rippleWave(pos, source2, uTime, 1.4, baseWaveSpeed * 0.9, 1.0) * 0.05;
+    displacement += rippleWave(pos, source3, uTime, 2.0, baseWaveSpeed * 1.2, 1.4) * 0.04;
+
+    // ========================================
+    // VOICE-REACTIVE WAVES
+    // ========================================
+    // Bass frequencies - slow, large waves from bottom
+    vec3 bassSource = vec3(0.0, -1.0, 0.0);
+    float bassWave = rippleWave(pos, bassSource, uTime * 1.5, 1.2, 0.8, 0.8);
+    displacement += bassWave * uVoiceBass * 0.15;
+
+    // Mid frequencies - medium waves from sides
+    vec3 midSource1 = vec3(sin(uTime * 0.5), 0.0, cos(uTime * 0.5));
+    vec3 midSource2 = vec3(-sin(uTime * 0.5), 0.0, -cos(uTime * 0.5));
+    float midWave = rippleWave(pos, midSource1, uTime * 2.0, 2.5, 1.2, 1.0);
+    midWave += rippleWave(pos, midSource2, uTime * 2.0, 2.5, 1.2, 1.0);
+    displacement += midWave * uVoiceMid * 0.12;
+
+    // High frequencies - fast, small ripples from top
+    vec3 highSource = vec3(0.0, 1.0, 0.0);
+    float highWave = rippleWave(pos, highSource, uTime * 3.0, 4.0, 2.0, 1.5);
+    highWave += sin(pos.x * 8.0 + uTime * 4.0) * sin(pos.z * 8.0 - uTime * 3.5) * 0.5;
+    displacement += highWave * uVoiceHigh * 0.08;
+
+    // Overall voice amplitude boost
+    displacement *= (1.0 + uVoiceAmplitude * 1.5);
 
     // Organic noise for natural curved variation
     float noise = organicNoise(pos, uTime);
-    displacement += (noise - 0.5) * 0.02;
+    displacement += (noise - 0.5) * 0.02 * (1.0 + uVoiceAmplitude);
 
-    // Breathing
+    // Breathing - more intense when voice active
     float breathing = sin(uTime * 0.8) * 0.5 + 0.5;
     breathing = breathing * breathing;
-    float breathScale = 1.0 + breathing * uBreathing * 0.08;
+    float voiceBreathBoost = 1.0 + uVoiceAmplitude * 0.5;
+    float breathScale = 1.0 + breathing * uBreathing * 0.08 * voiceBreathBoost;
 
     displacement *= uAmplitude;
     vDisplacement = displacement;
@@ -286,6 +316,16 @@ function MonsteraLeaf({
   const frameRef = useRef<number>(0);
   const targetIntensity = useRef(intensity);
 
+  // Audio data refs for smooth animation
+  const audioDataRef = useRef<AudioVisualizerData>({ volume: 0, frequencies: [] });
+  const smoothedAudioRef = useRef({
+    volume: 0,
+    bass: 0,
+    mid: 0,
+    high: 0
+  });
+  const isListeningRef = useRef(isListening);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -344,6 +384,11 @@ function MonsteraLeaf({
         uColorEdge: { value: colorEdge },
         uColorMid: { value: colorMid },
         uColorCenter: { value: colorCenter },
+        // Voice reactive uniforms
+        uVoiceAmplitude: { value: 0 },
+        uVoiceBass: { value: 0 },
+        uVoiceMid: { value: 0 },
+        uVoiceHigh: { value: 0 },
       },
       side: THREE.DoubleSide,
       transparent: true,
@@ -358,6 +403,9 @@ function MonsteraLeaf({
     // ANIMATION LOOP
     // ========================================
     let time = 0;
+    const smoothingFactor = 0.15; // How quickly values respond (higher = faster)
+    const decayFactor = 0.92;     // How quickly values decay when voice stops
+
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
 
@@ -368,14 +416,68 @@ function MonsteraLeaf({
         mat.uniforms.uTime.value = time;
 
         // Smooth amplitude transitions - gentler waves
-        const targetAmplitude = isListening ? 0.6 : 0.4;
+        const listening = isListeningRef.current;
+        const targetAmplitude = listening ? 0.6 : 0.4;
         const currentAmplitude = mat.uniforms.uAmplitude.value;
         mat.uniforms.uAmplitude.value += (targetAmplitude - currentAmplitude) * 0.03;
 
         // Breathing intensity
-        const targetBreathing = isListening ? 1.5 : 1.0;
+        const targetBreathing = listening ? 1.5 : 1.0;
         const currentBreathing = mat.uniforms.uBreathing.value;
         mat.uniforms.uBreathing.value += (targetBreathing - currentBreathing) * 0.02;
+
+        // ========================================
+        // VOICE REACTIVE ANIMATION
+        // ========================================
+        const audio = audioDataRef.current;
+        const smoothed = smoothedAudioRef.current;
+
+        if (audio.frequencies && audio.frequencies.length > 0) {
+          // Calculate frequency bands from audio data
+          const freqCount = audio.frequencies.length;
+
+          // Bass: first 1/4 of frequencies
+          const bassEnd = Math.floor(freqCount / 4);
+          let bassSum = 0;
+          for (let i = 0; i < bassEnd; i++) {
+            bassSum += audio.frequencies[i] || 0;
+          }
+          const targetBass = bassSum / bassEnd;
+
+          // Mid: middle 1/2 of frequencies
+          const midStart = bassEnd;
+          const midEnd = Math.floor(freqCount * 3 / 4);
+          let midSum = 0;
+          for (let i = midStart; i < midEnd; i++) {
+            midSum += audio.frequencies[i] || 0;
+          }
+          const targetMid = midSum / (midEnd - midStart);
+
+          // High: last 1/4 of frequencies
+          let highSum = 0;
+          for (let i = midEnd; i < freqCount; i++) {
+            highSum += audio.frequencies[i] || 0;
+          }
+          const targetHigh = highSum / (freqCount - midEnd);
+
+          // Smooth transitions for all values
+          smoothed.volume += (audio.volume - smoothed.volume) * smoothingFactor;
+          smoothed.bass += (targetBass - smoothed.bass) * smoothingFactor;
+          smoothed.mid += (targetMid - smoothed.mid) * smoothingFactor;
+          smoothed.high += (targetHigh - smoothed.high) * smoothingFactor;
+        } else {
+          // Decay values when no audio
+          smoothed.volume *= decayFactor;
+          smoothed.bass *= decayFactor;
+          smoothed.mid *= decayFactor;
+          smoothed.high *= decayFactor;
+        }
+
+        // Update shader uniforms
+        mat.uniforms.uVoiceAmplitude.value = smoothed.volume;
+        mat.uniforms.uVoiceBass.value = smoothed.bass;
+        mat.uniforms.uVoiceMid.value = smoothed.mid;
+        mat.uniforms.uVoiceHigh.value = smoothed.high;
       }
 
       renderer.render(scene, camera);
@@ -407,14 +509,22 @@ function MonsteraLeaf({
     };
   }, []);
 
-  // Update intensity based on listening state and audio
+  // Update refs for the animation loop (refs allow animation loop to access current values)
   useEffect(() => {
+    isListeningRef.current = isListening;
+
+    if (audioData) {
+      audioDataRef.current = audioData;
+    }
+
     if (isListening && audioData) {
       targetIntensity.current = 0.3 + audioData.volume * 0.8;
     } else if (isListening) {
       targetIntensity.current = 0.5;
     } else {
       targetIntensity.current = intensity;
+      // Clear audio data when not listening
+      audioDataRef.current = { volume: 0, frequencies: [] };
     }
   }, [isListening, audioData, intensity]);
 
@@ -530,6 +640,7 @@ export default function AIChatVoice() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number>(0);
+  const isListeningRef = useRef(false); // Ref for animation loop access
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -538,7 +649,7 @@ export default function AIChatVoice() {
 
   // Audio analysis for visualization
   const analyzeAudio = useCallback(() => {
-    if (!analyserRef.current) return;
+    if (!analyserRef.current || !isListeningRef.current) return;
 
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
     analyserRef.current.getByteFrequencyData(dataArray);
@@ -556,10 +667,11 @@ export default function AIChatVoice() {
 
     setAudioData({ volume, frequencies });
 
-    if (isListening) {
+    // Use ref to check if still listening (ref is always current)
+    if (isListeningRef.current) {
       animationFrameRef.current = requestAnimationFrame(analyzeAudio);
     }
-  }, [isListening]);
+  }, []);
 
   // Start voice recording
   const startListening = async () => {
@@ -574,6 +686,8 @@ export default function AIChatVoice() {
       const source = audioContextRef.current.createMediaStreamSource(stream);
       source.connect(analyserRef.current);
 
+      // Set ref BEFORE starting analysis loop (ref is synchronous)
+      isListeningRef.current = true;
       setIsListening(true);
       analyzeAudio();
     } catch (error) {
@@ -583,6 +697,9 @@ export default function AIChatVoice() {
 
   // Stop voice recording
   const stopListening = () => {
+    // Set ref FIRST to stop the analysis loop
+    isListeningRef.current = false;
+
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach(track => track.stop());
     }
