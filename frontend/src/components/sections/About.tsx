@@ -46,7 +46,7 @@ export function About() {
               </p>
               <div className="mt-4 flex items-center gap-2">
                 <div className="w-8 h-0.5 bg-sage" />
-                <span className="text-sm text-charcoal/60">Momenta Concierge</span>
+                <span className="text-sm text-charcoal/60">Momenta</span>
               </div>
             </div>
           </div>
@@ -60,7 +60,7 @@ export function About() {
               Creemos en el arte de conectar con propósito
             </h2>
             <p className="mt-6 text-sage-light/80 text-lg leading-relaxed">
-              En Momenta Concierge, cada detalle es una declaración de intención.
+              En Momenta, cada detalle es una declaración de intención.
               Nos inspira una estética atemporal, una elegancia silenciosa y una
               forma de crear que privilegia lo esencial sobre lo excesivo.
             </p>

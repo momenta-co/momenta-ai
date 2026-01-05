@@ -3,7 +3,7 @@ import experiencesData from "@/data/experiences.json";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Experiencias | Momenta Concierge",
+  title: "Experiencias | Momenta",
   description:
     "Explora nuestra colección de experiencias curadas en Colombia. Desde talleres gastronómicos hasta aventuras inolvidables.",
 };

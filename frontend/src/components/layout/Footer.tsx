@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram, Mail, Phone, MapPin } from "lucide-react";
 
 const footerLinks = {
@@ -31,9 +32,14 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block">
-              <span className="font-serif text-3xl text-cream">
-                Momenta <span className="italic">Concierge</span>
-              </span>
+              <Image
+                src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
+                alt="Momenta"
+                width={160}
+                height={45}
+                className="h-8 w-auto brightness-0 invert"
+                unoptimized
+              />
             </Link>
             <p className="mt-4 text-sage-light/80 max-w-sm leading-relaxed">
               Creemos en el arte de conectar con propósito. En los momentos que
@@ -131,7 +137,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-columbia/20 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sage-light/60 text-sm">
-            © {new Date().getFullYear()} Momenta Concierge. Todos los derechos
+            © {new Date().getFullYear()} Momenta. Todos los derechos
             reservados.
           </p>
           <p className="text-sage-light/40 text-xs">

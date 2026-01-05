@@ -11,7 +11,7 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "Momenta Concierge | Experiencias Curadas en Colombia",
+  title: "Momenta | Experiencias Curadas en Colombia",
   description:
     "Descubre experiencias únicas y personalizadas en Colombia. Desde talleres gastronómicos hasta aventuras inolvidables. Quiet Luxury Meets Unexpected Joy.",
   keywords: [
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
     "bienestar",
     "gastronomía",
   ],
-  authors: [{ name: "Momenta Concierge" }],
+  authors: [{ name: "Momenta" }],
   openGraph: {
     type: "website",
     locale: "es_CO",
     url: "https://www.momentaboutique.com",
-    siteName: "Momenta Concierge",
-    title: "Momenta Concierge | Experiencias Curadas en Colombia",
+    siteName: "Momenta",
+    title: "Momenta | Experiencias Curadas en Colombia",
     description:
       "Descubre experiencias únicas y personalizadas en Colombia. Quiet Luxury Meets Unexpected Joy.",
     images: [
@@ -38,13 +38,13 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Momenta Concierge",
+        alt: "Momenta",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Momenta Concierge | Experiencias Curadas en Colombia",
+    title: "Momenta | Experiencias Curadas en Colombia",
     description:
       "Descubre experiencias únicas y personalizadas en Colombia. Quiet Luxury Meets Unexpected Joy.",
     images: ["/og-image.jpg"],

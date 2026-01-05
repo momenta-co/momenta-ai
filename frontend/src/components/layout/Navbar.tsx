@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, X } from "lucide-react";
@@ -39,13 +40,16 @@ export function Navbar() {
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-serif text-2xl text-charcoal tracking-tight">
-              Momenta
-            </span>
-            <span className="font-serif text-2xl text-charcoal italic">
-              Concierge
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
+              alt="Momenta"
+              width={140}
+              height={40}
+              className="h-7 w-auto"
+              priority
+              unoptimized
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -84,14 +88,16 @@ export function Navbar() {
                   <Link
                     href="/"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2"
+                    className="flex items-center"
                   >
-                    <span className="font-serif text-2xl text-charcoal">
-                      Momenta
-                    </span>
-                    <span className="font-serif text-2xl text-charcoal italic">
-                      Concierge
-                    </span>
+                    <Image
+                      src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
+                      alt="Momenta"
+                      width={140}
+                      height={40}
+                      className="h-7 w-auto"
+                      unoptimized
+                    />
                   </Link>
 
                   <nav className="flex flex-col gap-4">

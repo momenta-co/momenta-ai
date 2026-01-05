@@ -14,7 +14,7 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Corporativo | Momenta Concierge",
+  title: "Corporativo | Momenta",
   description:
     "Experiencias de team building y eventos corporativos diseñados para fortalecer equipos y crear conexiones significativas.",
 };

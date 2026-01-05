@@ -5,9 +5,9 @@ import { ArrowRight, Star, Heart, Users, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Nosotros | Momenta Concierge",
+  title: "Nosotros | Momenta",
   description:
-    "Conoce la historia detrás de Momenta Concierge. Creemos en el arte de conectar con propósito.",
+    "Conoce la historia detrás de Momenta. Creemos en el arte de conectar con propósito.",
 };
 
 const values = [
@@ -100,7 +100,7 @@ export default function NosotrosPage() {
                   pregunta en mente: &quot;¿Esto dejará una huella?&quot;
                 </p>
                 <p>
-                  Hoy, Momenta Concierge es más que una plataforma de
+                  Hoy, Momenta es más que una plataforma de
                   experiencias. Somos arquitectos de momentos, curadores de
                   conexiones y guardianes de lo esencial sobre lo excesivo.
                 </p>
