@@ -22,7 +22,7 @@ const categories = [
     description:
       "Sabores que conectan. Momentos que perduran. Descubre el arte culinario colombiano.",
     image:
-      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1743200349674-4SNDICQ5080RJRBW2VQE/Cata+.jpg",
+      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1743200349674-4SNDICQ5080RJRBW2VQE/Cata+.jpg?format=2500w",
     experiences: ["Cata de Café", "Taller de Sushi", "Cena Clandestina"],
   },
   {
@@ -32,7 +32,7 @@ const categories = [
     description:
       "Conecta con tu artista interior. Crea algo único con tus propias manos.",
     image:
-      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1700870949831-LJ0DUNWXMHV224RPACOM/Captura+de+Pantalla+2023-11-24+a+la%28s%29+6.36.41+p.%C2%A0m..png",
+      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1700870949831-LJ0DUNWXMHV224RPACOM/Captura+de+Pantalla+2023-11-24+a+la%28s%29+6.36.41+p.%C2%A0m..png?format=2500w",
     experiences: ["Cerámica y Vino", "Taller de Kintsugi", "Joyería Artesanal"],
   },
   {
@@ -42,7 +42,7 @@ const categories = [
     description:
       "Espacios para reconectar contigo mismo. Rituales de autocuidado y paz interior.",
     image:
-      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1729548301279-SAM732OPLE2Z3UVHH5QX/WELLNESS.jpg",
+      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1729548301279-SAM732OPLE2Z3UVHH5QX/WELLNESS.jpg?format=2500w",
     experiences: ["Hot Yoga", "Masaje en Casa", "Wellness Day Pass"],
   },
   {
@@ -52,7 +52,7 @@ const categories = [
     description:
       "Más que un destino, un sentimiento que permanece. Experiencias que elevan.",
     image:
-      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698094120367-W0660ZIXMF8BUXCNT9AJ/image-asset.jpeg",
+      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698094120367-W0660ZIXMF8BUXCNT9AJ/image-asset.jpeg?format=2500w",
     experiences: ["Parapente Guatavita", "Clase de Polo", "Escapadas"],
   },
   {
@@ -62,7 +62,7 @@ const categories = [
     description:
       "Transforma tu equipo con experiencias que inspiran conexión y creatividad.",
     image:
-      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1741667672781-NL9WSCHDWHQWNHH1TK37/WhatsApp+Image+2025-03-10+at+11.28.55+PM+%283%29.jpeg",
+      "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1741667672781-NL9WSCHDWHQWNHH1TK37/WhatsApp+Image+2025-03-10+at+11.28.55+PM+%283%29.jpeg?format=2500w",
     experiences: ["Team Building", "Talleres Creativos", "Catas Empresariales"],
   },
 ];
@@ -141,7 +141,11 @@ export function Categories() {
               src={category.image}
               alt={category.name}
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={95}
+              priority
               className="object-cover transition-all duration-500"
+              unoptimized
             />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" />
             {/* Tags */}
