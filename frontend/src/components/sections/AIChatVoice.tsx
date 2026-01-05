@@ -19,14 +19,13 @@ interface AudioVisualizerData {
 }
 
 // ============================================
-// AETHER - Living Digital Voice
-// Water-drop ripple effect wrapping around sphere
-// Luminous center, dark edges, ethereal glow
+// MONSTERA LEAF - Living Digital Voice
+// Original sphere animation deformed into leaf shape
+// Luminous center, soft edges, ethereal glow
 // ============================================
 
-// AETHER SPHERE - Vertex Shader with WAVE-based displacement
-// Creates concentric ripples like water drops on a still surface
-const aetherVertexShader = `
+// MONSTERA - Vertex Shader (original sphere waves + leaf deformation)
+const monsteraVertexShader = `
   uniform float uTime;
   uniform float uAmplitude;
   uniform float uBreathing;
@@ -37,10 +36,10 @@ const aetherVertexShader = `
 
   #define PI 3.14159265359
 
-  // Wave source points that slowly move around the sphere
+  // Wave source points that slowly move around
   vec3 getWaveSource(int index, float time) {
-    float angle1 = time * 0.15 + float(index) * 2.094; // 2π/3 offset
-    float angle2 = time * 0.1 + float(index) * 1.571;  // π/2 offset
+    float angle1 = time * 0.15 + float(index) * 2.094;
+    float angle2 = time * 0.1 + float(index) * 1.571;
     return normalize(vec3(
       sin(angle1) * cos(angle2),
       sin(angle2) * 0.7,
@@ -48,89 +47,102 @@ const aetherVertexShader = `
     ));
   }
 
-  // Calculate geodesic (surface) distance between two points on unit sphere
+  // Geodesic distance on sphere
   float sphericalDistance(vec3 p1, vec3 p2) {
     return acos(clamp(dot(normalize(p1), normalize(p2)), -1.0, 1.0));
   }
 
-  // Single ripple wave from a source point
+  // Organic curved ripple wave - smoother, no linear artifacts
   float rippleWave(vec3 pos, vec3 source, float time, float frequency, float speed, float decay) {
     float dist = sphericalDistance(pos, source);
-    float wave = sin(dist * frequency - time * speed);
-    // Smooth decay based on distance
-    float envelope = exp(-dist * decay);
+
+    // Use smoothstep-based wave instead of pure sin for softer curves
+    float phase = dist * frequency - time * speed;
+    float wave = sin(phase) * 0.7 + sin(phase * 0.5 + 0.5) * 0.3;
+
+    // Smooth envelope with gradual falloff
+    float envelope = smoothstep(PI, 0.0, dist) * exp(-dist * decay * 0.5);
+
     return wave * envelope;
   }
 
+  // Organic noise for natural variation
+  float organicNoise(vec3 p, float time) {
+    float n = sin(p.x * 2.3 + time * 0.3) * sin(p.y * 2.1 - time * 0.4) * sin(p.z * 1.9 + time * 0.2);
+    n += sin(p.x * 1.1 - p.y * 1.3 + time * 0.5) * 0.5;
+    return n * 0.5 + 0.5;
+  }
+
+  // Subtle leaf silhouette deformation
+  // Keeps ethereal sphere quality with hint of leaf shape
+  vec3 deformToLeaf(vec3 pos) {
+    vec3 p = pos;
+
+    // Gentle vertical stretch (oval shape)
+    p.y *= 1.18;
+
+    // Soft heart indent at top
+    float topFade = smoothstep(0.5, 0.9, p.y);
+    p.y -= topFade * 0.08 * (1.0 - abs(p.x) * 1.2);
+
+    // Gentle point at bottom
+    float bottomFade = smoothstep(-0.3, -0.85, p.y);
+    float taper = bottomFade * 0.35;
+    p.x *= (1.0 - taper);
+    p.z *= (1.0 - taper * 0.5);
+
+    return normalize(p);
+  }
+
   void main() {
-    vec3 pos = normalize(position);
-    vPosition = position;
+    // Deform to leaf shape first
+    vec3 leafPos = deformToLeaf(position);
+    vec3 pos = normalize(leafPos);
+    vPosition = leafPos;
 
     // ========================================
-    // MULTI-LAYER RIPPLE SYSTEM
+    // WAVE DISPLACEMENT (same as original sphere)
     // ========================================
     float displacement = 0.0;
 
-    // Primary ripple sources (3 waves emanating from moving points)
     vec3 source1 = getWaveSource(0, uTime);
     vec3 source2 = getWaveSource(1, uTime);
     vec3 source3 = getWaveSource(2, uTime);
 
-    // Layer 1: Slow, large waves (like a big drop)
-    displacement += rippleWave(pos, source1, uTime, 4.0, 1.2, 0.8) * 0.4;
-    displacement += rippleWave(pos, source2, uTime, 3.5, 1.0, 0.7) * 0.35;
+    // Organic curved waves - flowing, no linear artifacts
+    displacement += rippleWave(pos, source1, uTime, 1.8, 0.4, 1.2) * 0.06;
+    displacement += rippleWave(pos, source2, uTime, 1.4, 0.35, 1.0) * 0.05;
+    displacement += rippleWave(pos, source3, uTime, 2.0, 0.5, 1.4) * 0.04;
 
-    // Layer 2: Medium waves (secondary drops)
-    displacement += rippleWave(pos, source3, uTime, 6.0, 1.5, 1.0) * 0.25;
+    // Organic noise for natural curved variation
+    float noise = organicNoise(pos, uTime);
+    displacement += (noise - 0.5) * 0.02;
 
-    // Layer 3: Fast, fine ripples (surface tension effect)
-    vec3 source4 = getWaveSource(0, uTime * 1.5 + PI);
-    displacement += rippleWave(pos, source4, uTime * 1.3, 8.0, 2.0, 1.2) * 0.15;
-
-    // Layer 4: Very subtle high-frequency shimmer
-    displacement += sin(pos.x * 12.0 + uTime * 2.0) * sin(pos.y * 11.0 - uTime * 1.8) * 0.05;
-    displacement += sin(pos.z * 10.0 + uTime * 1.5) * sin(pos.x * 9.0 + uTime * 1.2) * 0.04;
-
-    // ========================================
-    // BREATHING ANIMATION
-    // ========================================
-    float breathing = sin(uTime * 0.8) * 0.5 + 0.5; // 0 to 1
-    breathing = breathing * breathing; // Ease in-out
+    // Breathing
+    float breathing = sin(uTime * 0.8) * 0.5 + 0.5;
+    breathing = breathing * breathing;
     float breathScale = 1.0 + breathing * uBreathing * 0.08;
 
-    // ========================================
-    // APPLY DISPLACEMENT
-    // ========================================
     displacement *= uAmplitude;
     vDisplacement = displacement;
 
-    vec3 newPosition = position * breathScale + normal * displacement;
+    vec3 leafNormal = normalize(leafPos);
+    vec3 newPosition = leafPos * breathScale + leafNormal * displacement;
 
-    // ========================================
-    // CALCULATE PERTURBED NORMAL
-    // ========================================
+    // Calculate normal
     float epsilon = 0.02;
-    vec3 tangent = normalize(cross(normal, vec3(0.0, 1.0, 0.0)));
-    if (length(tangent) < 0.01) tangent = normalize(cross(normal, vec3(1.0, 0.0, 0.0)));
-    vec3 bitangent = normalize(cross(normal, tangent));
+    vec3 tangent = normalize(cross(leafNormal, vec3(0.0, 1.0, 0.0)));
+    if (length(tangent) < 0.01) tangent = normalize(cross(leafNormal, vec3(1.0, 0.0, 0.0)));
+    vec3 bitangent = normalize(cross(leafNormal, tangent));
 
-    // Sample displacement at nearby points
-    vec3 p1 = normalize(position + tangent * epsilon);
-    vec3 p2 = normalize(position + bitangent * epsilon);
+    vec3 p1 = deformToLeaf(normalize(position + tangent * epsilon));
+    vec3 p2 = deformToLeaf(normalize(position + bitangent * epsilon));
 
-    float d1 = 0.0;
-    float d2 = 0.0;
+    float d1 = rippleWave(normalize(p1), source1, uTime, 1.8, 0.4, 1.2) * 0.06;
+    d1 += rippleWave(normalize(p1), source2, uTime, 1.4, 0.35, 1.0) * 0.05;
 
-    // Recalculate displacement for neighboring points
-    d1 += rippleWave(p1, source1, uTime, 4.0, 1.2, 0.8) * 0.4;
-    d1 += rippleWave(p1, source2, uTime, 3.5, 1.0, 0.7) * 0.35;
-    d1 += rippleWave(p1, source3, uTime, 6.0, 1.5, 1.0) * 0.25;
-    d1 += rippleWave(p1, source4, uTime * 1.3, 8.0, 2.0, 1.2) * 0.15;
-
-    d2 += rippleWave(p2, source1, uTime, 4.0, 1.2, 0.8) * 0.4;
-    d2 += rippleWave(p2, source2, uTime, 3.5, 1.0, 0.7) * 0.35;
-    d2 += rippleWave(p2, source3, uTime, 6.0, 1.5, 1.0) * 0.25;
-    d2 += rippleWave(p2, source4, uTime * 1.3, 8.0, 2.0, 1.2) * 0.15;
+    float d2 = rippleWave(normalize(p2), source1, uTime, 1.8, 0.4, 1.2) * 0.06;
+    d2 += rippleWave(normalize(p2), source2, uTime, 1.4, 0.35, 1.0) * 0.05;
 
     d1 *= uAmplitude;
     d2 *= uAmplitude;
@@ -145,11 +157,11 @@ const aetherVertexShader = `
   }
 `;
 
-// AETHER SPHERE - Fragment Shader (LUMINOUS, glowing center)
-const aetherFragmentShader = `
-  uniform vec3 uColorEdge;   // Edge color (dark sage)
-  uniform vec3 uColorMid;    // Mid tone (light sage)
-  uniform vec3 uColorCenter; // Center color (bright white/mint)
+// MONSTERA - Fragment Shader (same ethereal effect as sphere)
+const monsteraFragmentShader = `
+  uniform vec3 uColorEdge;
+  uniform vec3 uColorMid;
+  uniform vec3 uColorCenter;
   uniform float uTime;
   varying vec3 vNormal;
   varying vec3 vPosition;
@@ -160,72 +172,46 @@ const aetherFragmentShader = `
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(cameraPosition - vWorldPosition);
 
-    // ========================================
-    // FRESNEL - View-dependent glow
-    // ========================================
+    // Fresnel - same as original sphere
     float fresnel = dot(viewDir, normal);
     fresnel = clamp(fresnel, 0.0, 1.0);
 
-    // Center is where we look straight at the sphere
     float centerIntensity = pow(fresnel, 0.8);
-
-    // Edges are where we look at grazing angles
     float edgeIntensity = 1.0 - fresnel;
 
-    // ========================================
-    // LUMINOUS CENTER EFFECT
-    // ========================================
-    // The key: center should GLOW brightly
+    // Luminous center
     float innerGlow = pow(fresnel, 1.5);
     float coreGlow = pow(fresnel, 3.0);
 
-    // ========================================
-    // COLOR GRADIENT - Bright center, soft edges
-    // ========================================
-    // Smooth gradient from center to edge
-    float gradientPos = pow(fresnel, 0.6); // Bias toward brighter center
+    // Color gradient
+    float gradientPos = pow(fresnel, 0.6);
 
-    // Three-point gradient: edge -> mid -> center
     vec3 baseColor;
     if (gradientPos < 0.5) {
-      // Edge to mid transition
       baseColor = mix(uColorEdge, uColorMid, gradientPos * 2.0);
     } else {
-      // Mid to center transition
       baseColor = mix(uColorMid, uColorCenter, (gradientPos - 0.5) * 2.0);
     }
 
-    // ========================================
-    // LIGHTING
-    // ========================================
+    // Lighting
     vec3 lightDir = normalize(vec3(1.0, 2.0, 3.0));
     float diffuse = max(dot(normal, lightDir), 0.0) * 0.3 + 0.7;
 
-    // Subtle specular highlights
     vec3 halfDir = normalize(lightDir + viewDir);
     float specular = pow(max(dot(normal, halfDir), 0.0), 60.0) * 0.5;
 
-    // ========================================
-    // FINAL COLOR COMPOSITION
-    // ========================================
+    // Final color
     vec3 color = baseColor * diffuse;
-
-    // Add STRONG inner luminosity - this is key for the Aether look
     color += uColorCenter * innerGlow * 0.7;
-    color += vec3(1.0) * coreGlow * 0.5; // Pure white at very center
-
-    // Specular highlight
+    color += vec3(1.0) * coreGlow * 0.5;
     color += vec3(1.0) * specular;
 
-    // Subtle wave-based shimmer
+    // Shimmer
     float shimmer = sin(vDisplacement * 20.0 + uTime * 2.5) * 0.5 + 0.5;
     shimmer *= innerGlow;
     color += uColorCenter * shimmer * 0.1;
 
-    // ========================================
-    // OPACITY - Soft fade at edges
-    // ========================================
-    // Wider fade range for softer edges
+    // Soft alpha - same as original sphere
     float alpha = smoothstep(0.0, 0.3, fresnel);
 
     gl_FragColor = vec4(color, alpha);
@@ -279,10 +265,11 @@ const glassFragmentShader = `
   }
 `;
 
+
 // ============================================
-// THREE.JS BLOB COMPONENT
+// THREE.JS MONSTERA LEAF COMPONENT
 // ============================================
-function OrganicBlob({
+function MonsteraLeaf({
   intensity = 0.3,
   isListening = false,
   audioData
@@ -295,8 +282,7 @@ function OrganicBlob({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const innerBlobRef = useRef<THREE.Mesh | null>(null);
-  const outerSphereRef = useRef<THREE.Mesh | null>(null);
+  const leafRef = useRef<THREE.Mesh | null>(null);
   const frameRef = useRef<number>(0);
   const targetIntensity = useRef(intensity);
 
@@ -307,9 +293,9 @@ function OrganicBlob({
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // Static camera, front-facing with subtle perspective
+    // Camera - front-facing
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    camera.position.z = 4;
+    camera.position.z = 3.5;
     cameraRef.current = camera;
 
     // Renderer
@@ -324,48 +310,49 @@ function OrganicBlob({
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Ambient light + one soft directional light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(2, 3, 4);
+    directionalLight.position.set(1, 2, 4);
     scene.add(directionalLight);
 
-    // ========================================
-    // AETHER COLORS - Soft luminous palette
-    // ========================================
-    const colorEdge = new THREE.Color('#6db88a');   // Soft sage edge (lighter)
-    const colorMid = new THREE.Color('#a5e0c0');    // Light mint mid
-    const colorCenter = new THREE.Color('#f0fffa'); // Very bright mint-white center
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    backLight.position.set(-1, -1, -2);
+    scene.add(backLight);
 
     // ========================================
-    // AETHER SPHERE (animated with ripple waves)
+    // MOMENTA BRAND COLORS - Sage palette from website
     // ========================================
-    const aetherGeometry = new THREE.IcosahedronGeometry(1.0, 128); // Very high poly for smooth waves
+    const colorEdge = new THREE.Color('#8fb89a');   // sage-dark
+    const colorMid = new THREE.Color('#b3d0bb');    // sage (main brand color)
+    const colorCenter = new THREE.Color('#e8f4ec'); // Very light sage/cream center
 
-    const aetherMaterial = new THREE.ShaderMaterial({
-      vertexShader: aetherVertexShader,
-      fragmentShader: aetherFragmentShader,
+    // ========================================
+    // ICOSAHEDRON GEOMETRY - smooth with more subdivisions
+    // ========================================
+    const leafGeometry = new THREE.IcosahedronGeometry(1, 64);
+
+    const leafMaterial = new THREE.ShaderMaterial({
+      vertexShader: monsteraVertexShader,
+      fragmentShader: monsteraFragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uAmplitude: { value: 0.12 },
+        uAmplitude: { value: 0.4 },
         uBreathing: { value: 1.0 },
         uColorEdge: { value: colorEdge },
         uColorMid: { value: colorMid },
         uColorCenter: { value: colorCenter },
       },
+      side: THREE.DoubleSide,
       transparent: true,
-      side: THREE.FrontSide,  // Front only for clean edges
-      depthWrite: false,     // Disable depth write for proper transparency
+      depthWrite: false,
     });
 
-    const aetherSphere = new THREE.Mesh(aetherGeometry, aetherMaterial);
-    scene.add(aetherSphere);
-    innerBlobRef.current = aetherSphere;
-
-    // No glass container - pure water effect
-    outerSphereRef.current = null;
+    const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+    scene.add(leaf);
+    leafRef.current = leaf;
 
     // ========================================
     // ANIMATION LOOP
@@ -374,15 +361,14 @@ function OrganicBlob({
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
 
-      time += 0.012; // Slightly slower for smoother ripples
+      time += 0.012; // Same speed as original sphere
 
-      // Update Aether shader uniforms
-      if (innerBlobRef.current) {
-        const mat = innerBlobRef.current.material as THREE.ShaderMaterial;
+      if (leafRef.current) {
+        const mat = leafRef.current.material as THREE.ShaderMaterial;
         mat.uniforms.uTime.value = time;
 
-        // Smooth amplitude transitions
-        const targetAmplitude = isListening ? 0.18 : 0.12;
+        // Smooth amplitude transitions - gentler waves
+        const targetAmplitude = isListening ? 0.6 : 0.4;
         const currentAmplitude = mat.uniforms.uAmplitude.value;
         mat.uniforms.uAmplitude.value += (targetAmplitude - currentAmplitude) * 0.03;
 
@@ -390,10 +376,6 @@ function OrganicBlob({
         const targetBreathing = isListening ? 1.5 : 1.0;
         const currentBreathing = mat.uniforms.uBreathing.value;
         mat.uniforms.uBreathing.value += (targetBreathing - currentBreathing) * 0.02;
-
-        // Very subtle rotation
-        innerBlobRef.current.rotation.y += 0.001;
-        innerBlobRef.current.rotation.x += 0.0003;
       }
 
       renderer.render(scene, camera);
@@ -417,8 +399,8 @@ function OrganicBlob({
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(frameRef.current);
       renderer.dispose();
-      aetherGeometry.dispose();
-      aetherMaterial.dispose();
+      leafGeometry.dispose();
+      leafMaterial.dispose();
       if (containerRef.current?.contains(renderer.domElement)) {
         containerRef.current.removeChild(renderer.domElement);
       }
@@ -428,7 +410,6 @@ function OrganicBlob({
   // Update intensity based on listening state and audio
   useEffect(() => {
     if (isListening && audioData) {
-      // React to audio volume
       targetIntensity.current = 0.3 + audioData.volume * 0.8;
     } else if (isListening) {
       targetIntensity.current = 0.5;
@@ -719,9 +700,9 @@ export default function AIChatVoice() {
 
         {/* Main chat container */}
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left: Organic Blob */}
+          {/* Left: Monstera Leaf */}
           <div className="order-2 lg:order-1 flex flex-col items-center">
-            <OrganicBlob
+            <MonsteraLeaf
               intensity={isListening ? 0.5 : 0.3}
               isListening={isListening}
               audioData={audioData}
