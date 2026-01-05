@@ -880,17 +880,13 @@ export default function AIChatVoice() {
               <div className="px-6 py-4 border-b border-sage-light/30 bg-gradient-to-r from-sage-light/20 to-transparent">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sage to-sage-dark flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 8V4H8" />
-                      <rect width="16" height="12" x="4" y="8" rx="2" />
-                      <path d="M2 14h2" />
-                      <path d="M20 14h2" />
-                      <path d="M15 13v2" />
-                      <path d="M9 13v2" />
+                    <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-charcoal font-medium font-sans">Momenta AI</h3>
+                    <h3 className="text-charcoal font-medium font-sans">Momenta Friend</h3>
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 bg-sage rounded-full animate-pulse" />
                       <span className="text-xs text-warm-gray">Siempre disponible</span>
