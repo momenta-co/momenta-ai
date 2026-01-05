@@ -642,9 +642,9 @@ export default function AIChatVoice() {
   const animationFrameRef = useRef<number>(0);
   const isListeningRef = useRef(false); // Ref for animation loop access
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change (only within chat container)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [messages, isTyping]);
 
   // Audio analysis for visualization
