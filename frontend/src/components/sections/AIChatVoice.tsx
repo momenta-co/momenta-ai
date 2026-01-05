@@ -113,11 +113,10 @@ const monsteraVertexShader = `
     vec3 source2 = getWaveSource(1, uTime);
     vec3 source3 = getWaveSource(2, uTime);
 
-    // Base organic curved waves
-    float baseWaveSpeed = 0.4 + uVoiceAmplitude * 0.6;  // Speed up with voice
-    displacement += rippleWave(pos, source1, uTime, 1.8, baseWaveSpeed, 1.2) * 0.06;
-    displacement += rippleWave(pos, source2, uTime, 1.4, baseWaveSpeed * 0.9, 1.0) * 0.05;
-    displacement += rippleWave(pos, source3, uTime, 2.0, baseWaveSpeed * 1.2, 1.4) * 0.04;
+    // Base organic curved waves - INCREASED INTENSITY for more visible movement
+    displacement += rippleWave(pos, source1, uTime, 1.8, 0.4, 1.2) * 0.12;
+    displacement += rippleWave(pos, source2, uTime, 1.4, 0.35, 1.0) * 0.10;
+    displacement += rippleWave(pos, source3, uTime, 2.0, 0.5, 1.4) * 0.08;
 
     // ========================================
     // VOICE-REACTIVE WAVES
@@ -140,18 +139,19 @@ const monsteraVertexShader = `
     highWave += sin(pos.x * 8.0 + uTime * 4.0) * sin(pos.z * 8.0 - uTime * 3.5) * 0.5;
     displacement += highWave * uVoiceHigh * 0.08;
 
-    // Overall voice amplitude boost
-    displacement *= (1.0 + uVoiceAmplitude * 1.5);
+    // Voice amplitude boost - only when actually speaking
+    if (uVoiceAmplitude > 0.05) {
+      displacement *= (1.0 + uVoiceAmplitude * 1.2);
+    }
 
     // Organic noise for natural curved variation
     float noise = organicNoise(pos, uTime);
-    displacement += (noise - 0.5) * 0.02 * (1.0 + uVoiceAmplitude);
+    displacement += (noise - 0.5) * 0.03;
 
-    // Breathing - more intense when voice active
+    // Breathing animation
     float breathing = sin(uTime * 0.8) * 0.5 + 0.5;
     breathing = breathing * breathing;
-    float voiceBreathBoost = 1.0 + uVoiceAmplitude * 0.5;
-    float breathScale = 1.0 + breathing * uBreathing * 0.08 * voiceBreathBoost;
+    float breathScale = 1.0 + breathing * uBreathing * 0.10;
 
     displacement *= uAmplitude;
     vDisplacement = displacement;
