@@ -3,47 +3,68 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Momenta Brand Fonts */
-@font-face {
-  font-family: 'Gordita';
-  src: url('/fonts/Gordita-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Gordita';
-  src: url('/fonts/Gordita-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Gordita';
-  src: url('/fonts/Gordita-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Gordita', system-ui, sans-serif;
-  --font-serif: 'Times New Roman', Georgia, serif;
-  --font-display: 'Bricolage Grotesque', var(--font-sans);
 
-  /* Momenta Brand Colors - Current Website Palette */
-  --color-sage: #b3d0bb;
-  --color-sage-light: #d4e5d8;
-  --color-sage-dark: #8fb89a;
-  --color-charcoal: #2d2d2d;
-  --color-warm-gray: #6b6b6b;
-  --color-cream: #faf9f6;
-  --color-white: #ffffff;
-  --color-beige: #f5f3ef;
+  /* Momenta Typography */
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+  --font-serif: var(--font-lora), Georgia, serif;
+
+  /* ================================
+     MOMENTA DESIGN SYSTEM COLORS
+     Based on Figma Style Guide
+     ================================ */
+
+  /* Neutral (Hue 220) - Backgrounds, surfaces, text */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-100: #F7F8FA;
+  --color-neutral-200: #EEF0F4;
+  --color-neutral-300: #E2E5EB;
+  --color-neutral-700: #6B7280;
+  --color-neutral-800: #4B5563;
+  --color-neutral-900: #374151;
+  --color-neutral-1000: #1F2937;
+
+  /* Primary (Hue 220) - Navy/Dark Blue - Main actions */
+  --color-primary-100: #E8EDF5;
+  --color-primary-700: #1E3A5F;
+  --color-primary-800: #162D4D;
+  --color-primary-900: #0F203A;
+
+  /* Secondary (Hue 260) - Gold/Yellow - Highlights */
+  --color-secondary-100: #FEF9E7;
+  --color-secondary-700: #D4A72C;
+  --color-secondary-800: #B8922A;
+  --color-secondary-900: #9A7A24;
+
+  /* Success (Hue 160) - Green/Teal */
+  --color-success-100: #E6F5F0;
+  --color-success-700: #2D9B78;
+  --color-success-800: #258569;
+  --color-success-900: #1E6F58;
+
+  /* Warning (Hue 40) - Orange/Amber */
+  --color-warning-100: #FEF3E2;
+  --color-warning-700: #C27520;
+  --color-warning-800: #A86518;
+  --color-warning-900: #8E5514;
+
+  /* Danger (Hue 355) - Red */
+  --color-danger-100: #FEECEC;
+  --color-danger-700: #C43C3C;
+  --color-danger-800: #A83232;
+  --color-danger-900: #8C2828;
+
+  /* Legacy color aliases - mapped to new design system */
+  --color-sage: var(--color-primary-700);
+  --color-sage-light: var(--color-primary-100);
+  --color-sage-dark: var(--color-primary-800);
+  --color-charcoal: var(--color-neutral-1000);
+  --color-warm-gray: var(--color-neutral-700);
+  --color-cream: var(--color-neutral-100);
+  --color-white: var(--color-neutral-0);
+  --color-beige: var(--color-neutral-200);
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -85,72 +106,73 @@
 
 :root {
   --radius: 0.5rem;
-  /* Momenta Brand - Light Theme (matching momentaboutique.com) */
-  --background: #faf9f6;
-  --foreground: #2d2d2d;
-  --card: #ffffff;
-  --card-foreground: #2d2d2d;
-  --popover: #ffffff;
-  --popover-foreground: #2d2d2d;
-  --primary: #2d2d2d;
-  --primary-foreground: #ffffff;
-  --secondary: #f5f3ef;
-  --secondary-foreground: #2d2d2d;
-  --muted: #f5f3ef;
-  --muted-foreground: #6b6b6b;
-  --accent: #b3d0bb;
-  --accent-foreground: #2d2d2d;
-  --destructive: #DC2626;
-  --border: #e5e5e5;
-  --input: #f5f3ef;
-  --ring: #b3d0bb;
-  --chart-1: #2d2d2d;
-  --chart-2: #b3d0bb;
-  --chart-3: #d4e5d8;
-  --chart-4: #8fb89a;
-  --chart-5: #6b6b6b;
-  --sidebar: #faf9f6;
-  --sidebar-foreground: #2d2d2d;
-  --sidebar-primary: #2d2d2d;
-  --sidebar-primary-foreground: #faf9f6;
-  --sidebar-accent: #d4e5d8;
-  --sidebar-accent-foreground: #2d2d2d;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #b3d0bb;
+
+  /* Momenta Brand - Light Theme */
+  --background: #F7F8FA;
+  --foreground: #1F2937;
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2937;
+  --primary: #1E3A5F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #D4A72C;
+  --secondary-foreground: #1F2937;
+  --muted: #EEF0F4;
+  --muted-foreground: #6B7280;
+  --accent: #1E3A5F;
+  --accent-foreground: #FFFFFF;
+  --destructive: #C43C3C;
+  --border: #E2E5EB;
+  --input: #EEF0F4;
+  --ring: #1E3A5F;
+  --chart-1: #1E3A5F;
+  --chart-2: #2D9B78;
+  --chart-3: #D4A72C;
+  --chart-4: #C27520;
+  --chart-5: #6B7280;
+  --sidebar: #F7F8FA;
+  --sidebar-foreground: #1F2937;
+  --sidebar-primary: #1E3A5F;
+  --sidebar-primary-foreground: #F7F8FA;
+  --sidebar-accent: #E8EDF5;
+  --sidebar-accent-foreground: #1F2937;
+  --sidebar-border: #E2E5EB;
+  --sidebar-ring: #1E3A5F;
 }
 
 .dark {
-  --background: #2d2d2d;
-  --foreground: #faf9f6;
-  --card: #3d3d3d;
-  --card-foreground: #faf9f6;
-  --popover: #3d3d3d;
-  --popover-foreground: #faf9f6;
-  --primary: #faf9f6;
-  --primary-foreground: #2d2d2d;
-  --secondary: #3d3d3d;
-  --secondary-foreground: #faf9f6;
-  --muted: #3d3d3d;
-  --muted-foreground: #a0a0a0;
-  --accent: #b3d0bb;
-  --accent-foreground: #2d2d2d;
+  --background: #1F2937;
+  --foreground: #F7F8FA;
+  --card: #374151;
+  --card-foreground: #F7F8FA;
+  --popover: #374151;
+  --popover-foreground: #F7F8FA;
+  --primary: #F7F8FA;
+  --primary-foreground: #1E3A5F;
+  --secondary: #D4A72C;
+  --secondary-foreground: #1F2937;
+  --muted: #374151;
+  --muted-foreground: #9CA3AF;
+  --accent: #D4A72C;
+  --accent-foreground: #1F2937;
   --destructive: #EF4444;
-  --border: #4d4d4d;
-  --input: #3d3d3d;
-  --ring: #b3d0bb;
-  --chart-1: #faf9f6;
-  --chart-2: #b3d0bb;
-  --chart-3: #d4e5d8;
-  --chart-4: #8fb89a;
-  --chart-5: #a0a0a0;
-  --sidebar: #2d2d2d;
-  --sidebar-foreground: #faf9f6;
-  --sidebar-primary: #faf9f6;
-  --sidebar-primary-foreground: #2d2d2d;
-  --sidebar-accent: #3d3d3d;
-  --sidebar-accent-foreground: #faf9f6;
-  --sidebar-border: #4d4d4d;
-  --sidebar-ring: #b3d0bb;
+  --border: #4B5563;
+  --input: #374151;
+  --ring: #D4A72C;
+  --chart-1: #F7F8FA;
+  --chart-2: #2D9B78;
+  --chart-3: #D4A72C;
+  --chart-4: #C27520;
+  --chart-5: #9CA3AF;
+  --sidebar: #1F2937;
+  --sidebar-foreground: #F7F8FA;
+  --sidebar-primary: #F7F8FA;
+  --sidebar-primary-foreground: #1F2937;
+  --sidebar-accent: #374151;
+  --sidebar-accent-foreground: #F7F8FA;
+  --sidebar-border: #4B5563;
+  --sidebar-ring: #2D9B78;
 }
 
 @layer base {
@@ -159,12 +181,110 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Gordita', system-ui, sans-serif;
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
   }
+
+  /* Typography - Lora for headings */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Times New Roman', Georgia, serif;
-    font-weight: 400;
-    letter-spacing: -0.02em;
+    font-family: var(--font-lora), Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* Display - 64px */
+  .text-display {
+    font-family: var(--font-lora), Georgia, serif;
+    font-size: 64px;
+    line-height: 126%;
+    letter-spacing: -2%;
+    font-weight: 500;
+  }
+
+  /* H1 - 48px */
+  h1, .text-h1 {
+    font-size: 48px;
+    line-height: 126%;
+    letter-spacing: -1.5%;
+  }
+
+  /* H2 - 40px */
+  h2, .text-h2 {
+    font-size: 40px;
+    line-height: 126%;
+    letter-spacing: -1.5%;
+  }
+
+  /* H3 - 32px */
+  h3, .text-h3 {
+    font-size: 32px;
+    line-height: 126%;
+    letter-spacing: -0.5%;
+    font-weight: 600;
+  }
+
+  /* H4 - 24px */
+  h4, .text-h4 {
+    font-size: 24px;
+    line-height: 126%;
+    letter-spacing: -0.5%;
+    font-weight: 600;
+  }
+
+  /* H5 - 20px */
+  h5, .text-h5 {
+    font-size: 20px;
+    line-height: 126%;
+    letter-spacing: -0.5%;
+    font-weight: 600;
+  }
+
+  /* Body styles - DM Sans */
+  .text-body1 {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    font-size: 18px;
+    line-height: 160%;
+    letter-spacing: -1%;
+    font-weight: 500;
+  }
+
+  .text-body2 {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 160%;
+    letter-spacing: -1%;
+    font-weight: 500;
+  }
+
+  .text-button {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: -1%;
+    font-weight: 500;
+  }
+
+  .text-subtitle {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: -1%;
+    font-weight: 500;
+  }
+
+  .text-body3 {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 160%;
+    letter-spacing: -1%;
+    font-weight: 500;
+  }
+
+  .text-caption {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 100%;
+    letter-spacing: -1%;
+    font-weight: 500;
   }
 }
 
@@ -179,12 +299,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #b3d0bb;
+  background: #1E3A5F;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8fb89a;
+  background: #162D4D;
 }
 
 /* Smooth Scroll */
@@ -194,6 +314,6 @@ html {
 
 /* Text Selection */
 ::selection {
-  background: #b3d0bb60;
-  color: #2d2d2d;
+  background: #1E3A5F40;
+  color: #1F2937;
 }

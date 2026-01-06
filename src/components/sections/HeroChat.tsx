@@ -266,9 +266,10 @@ function VoiceSphere({
     directionalLight.position.set(1, 2, 4);
     scene.add(directionalLight);
 
-    const colorEdge = new THREE.Color('#8fb89a');
-    const colorMid = new THREE.Color('#b3d0bb');
-    const colorCenter = new THREE.Color('#e8f4ec');
+    // Momenta soft cream/gold tones
+    const colorEdge = new THREE.Color('#E8DFC0');    // soft beige
+    const colorMid = new THREE.Color('#FFFAE8');     // light cream
+    const colorCenter = new THREE.Color('#FFFFFF');  // white center
 
     const leafGeometry = new THREE.IcosahedronGeometry(1, 64);
     const leafMaterial = new THREE.ShaderMaterial({
