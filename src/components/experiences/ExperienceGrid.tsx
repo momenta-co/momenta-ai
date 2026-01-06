@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { ExperienceCard } from "./ExperienceCard";
 import { CategoryFilter } from "./CategoryFilter";
 import type { Experience } from "@/types/experience";
@@ -15,13 +16,35 @@ interface ExperienceGridProps {
 
 const ITEMS_PER_PAGE = 9;
 
+// Mapeo de IDs de categoría (URL) a nombres de categoría (datos)
+const categoryMap: Record<string, string> = {
+  gastronomico: "Gastronómico",
+  manualidad: "Manualidad",
+  bienestar: "Bienestar",
+  aventura: "Aventura",
+  corporativo: "Corporativo",
+  cocina: "Cocina",
+};
+
 export function ExperienceGrid({
   experiences,
   showFilters = true,
   limit,
   showLoadMore = false,
 }: ExperienceGridProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>("Ver todo");
+  const searchParams = useSearchParams();
+  const catParam = searchParams.get("cat");
+
+  // Mapear el parámetro de URL al nombre de categoría
+  const initialCategory = catParam ? (categoryMap[catParam] || "Ver todo") : "Ver todo";
+
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+
+  // Actualizar cuando cambie el parámetro de URL
+  useEffect(() => {
+    const newCategory = catParam ? (categoryMap[catParam] || "Ver todo") : "Ver todo";
+    setSelectedCategory(newCategory);
+  }, [catParam]);
   const [selectedLocation, setSelectedLocation] = useState<string>("Todas");
   const [visibleCount, setVisibleCount] = useState(limit || ITEMS_PER_PAGE);
 
