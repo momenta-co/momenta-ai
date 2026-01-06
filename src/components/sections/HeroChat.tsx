@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
-import { Plus, Mic, Send } from 'lucide-react';
+import { Mic, Send, Square } from 'lucide-react';
 
 // ============================================
 // TYPES
@@ -561,14 +561,6 @@ export default function HeroChat() {
               ${isFocused ? 'border-sage shadow-sage/10' : 'border-sage-light/40'}
             `}
           >
-            {/* Plus button */}
-            <button
-              className="flex-shrink-0 w-10 h-10 rounded-xl bg-sage-light/30 hover:bg-sage-light/50 flex items-center justify-center transition-colors"
-              aria-label="Agregar"
-            >
-              <Plus className="w-5 h-5 text-sage-dark" strokeWidth={2} />
-            </button>
-
             {/* Input with rotating placeholder */}
             <div className="flex-1 relative">
               <input
@@ -607,10 +599,11 @@ export default function HeroChat() {
               `}
               aria-label={isListening ? 'Detener' : 'Hablar'}
             >
-              {isListening && (
-                <span className="absolute inset-0 rounded-xl bg-sage-dark/30 animate-ping" />
+              {isListening ? (
+                <Square className="w-4 h-4" strokeWidth={2} fill="currentColor" />
+              ) : (
+                <Mic className="w-5 h-5" strokeWidth={2} />
               )}
-              <Mic className="w-5 h-5 relative z-10" strokeWidth={2} />
             </button>
 
             {/* Send button */}
@@ -630,15 +623,6 @@ export default function HeroChat() {
               <Send className="w-5 h-5" strokeWidth={2} />
             </button>
           </div>
-
-          {/* Listening indicator */}
-          {isListening && (
-            <div className="text-center mt-4 animate-in fade-in">
-              <span className="text-sm text-sage-dark font-medium">
-                Escuchando...
-              </span>
-            </div>
-          )}
         </div>
       </div>
     </section>
