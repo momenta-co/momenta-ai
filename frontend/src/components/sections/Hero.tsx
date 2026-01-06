@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const cyclingWords = [
-  "curadas",
   "personalizadas",
   "únicas",
   "memorables",
@@ -45,12 +44,6 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-        {/* Badge */}
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-cream/10 backdrop-blur-sm border border-cream/20 px-4 py-2">
-          <Star className="h-4 w-4 text-sage fill-sage" />
-          <span className="text-sm text-cream/90">Quiet Luxury Meets Unexpected Joy</span>
-        </div>
-
         {/* Main Heading */}
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-cream leading-tight">
           Experiencias que se sienten

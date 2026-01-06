@@ -135,13 +135,9 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-columbia/20 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="border-t border-columbia/20 py-6 flex items-center justify-center">
           <p className="text-sage-light/60 text-sm">
-            © {new Date().getFullYear()} Momenta. Todos los derechos
-            reservados.
-          </p>
-          <p className="text-sage-light/40 text-xs">
-            Quiet Luxury Meets Unexpected Joy
+            © {new Date().getFullYear()} Momenta. Todos los derechos reservados.
           </p>
         </div>
       </div>

@@ -13,7 +13,7 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: "Momenta | Experiencias Curadas en Colombia",
   description:
-    "Descubre experiencias únicas y personalizadas en Colombia. Desde talleres gastronómicos hasta aventuras inolvidables. Quiet Luxury Meets Unexpected Joy.",
+    "Descubre experiencias únicas y personalizadas en Colombia. Desde talleres gastronómicos hasta aventuras inolvidables.",
   keywords: [
     "experiencias Colombia",
     "talleres Bogotá",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "Momenta",
     title: "Momenta | Experiencias Curadas en Colombia",
     description:
-      "Descubre experiencias únicas y personalizadas en Colombia. Quiet Luxury Meets Unexpected Joy.",
+      "Descubre experiencias únicas y personalizadas en Colombia.",
     images: [
       {
         url: "/og-image.jpg",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Momenta | Experiencias Curadas en Colombia",
     description:
-      "Descubre experiencias únicas y personalizadas en Colombia. Quiet Luxury Meets Unexpected Joy.",
+      "Descubre experiencias únicas y personalizadas en Colombia.",
     images: ["/og-image.jpg"],
   },
   robots: {
