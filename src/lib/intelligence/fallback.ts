@@ -114,42 +114,46 @@ function calculateScoring(
 }
 
 /**
- * Generate generic reasons based on scoring
+ * Generate a conversational paragraph explaining why this experience was chosen
  */
 function generateReasons(
   experience: Experience,
   scoreBreakdown: ScoringBreakdown,
   userContext: UserContext
-): string[] {
-  const reasons: string[] = [];
+): string {
+  const sentences: string[] = [];
 
-  if (scoreBreakdown.occasion > 75) {
-    reasons.push(`Perfecto para ${userContext.occasion.toLowerCase()}`);
+  // Start with the strongest match
+  if (scoreBreakdown.occasion > 75 && scoreBreakdown.relation > 75) {
+    sentences.push(`Elegí esta experiencia porque es perfecta para ${userContext.occasion.toLowerCase()} ${userContext.withWho.toLowerCase()}.`);
+  } else if (scoreBreakdown.occasion > 75) {
+    sentences.push(`Elegí esta experiencia porque encaja perfectamente con ${userContext.occasion.toLowerCase()}.`);
+  } else if (scoreBreakdown.relation > 75) {
+    sentences.push(`Esta experiencia es ideal para disfrutar ${userContext.withWho.toLowerCase()}.`);
+  } else {
+    sentences.push(`Esta experiencia podría ser una buena opción para tu momento.`);
   }
 
-  if (scoreBreakdown.relation > 75) {
-    reasons.push(`Ideal para disfrutar ${userContext.withWho.toLowerCase()}`);
-  }
-
+  // Add mood or category context
   if (scoreBreakdown.mood > 75) {
-    reasons.push(`Encaja con tu estado de ánimo ${userContext.mood.toLowerCase()}`);
+    sentences.push(`Es una experiencia que se alinea con tu estado de ánimo ${userContext.mood.toLowerCase()}.`);
+  } else if (experience.categories.length > 0) {
+    sentences.push(`Es una experiencia de ${experience.categories[0].toLowerCase()} que podría interesarte.`);
   }
 
-  if (scoreBreakdown.budget > 75) {
-    reasons.push(`Dentro de tu presupuesto`);
+  // Add budget context if relevant
+  if (scoreBreakdown.budget > 85) {
+    sentences.push(`Además, está dentro de tu presupuesto.`);
+  } else if (scoreBreakdown.budget < 50) {
+    sentences.push(`Ten en cuenta que está un poco por encima de tu presupuesto, pero podría valer la pena.`);
   }
 
-  // Add at least one category-based reason
-  if (experience.categories.length > 0) {
-    reasons.push(`Experiencia de ${experience.categories[0].toLowerCase()}`);
+  // Ensure we have at least 2 sentences
+  if (sentences.length < 2) {
+    sentences.push(`Es una opción recomendada en ${userContext.city}.`);
   }
 
-  // Ensure at least 2 reasons
-  if (reasons.length < 2) {
-    reasons.push(`Recomendado en ${userContext.city}`);
-  }
-
-  return reasons.slice(0, 4); // Max 4 reasons
+  return sentences.join(' ');
 }
 
 /**

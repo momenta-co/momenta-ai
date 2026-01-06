@@ -42,7 +42,7 @@ export interface ScoringBreakdown {
 export interface Recommendation {
   experience: Experience;
   scoreBreakdown: ScoringBreakdown;
-  reasons: string[]; // Bullet points explaining "Why Momenta chose this"
+  reasons: string; // Paragraph (2-4 sentences) explaining "Why Momenta chose this"
 }
 
 // API Response Meta

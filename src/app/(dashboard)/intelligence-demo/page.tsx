@@ -185,10 +185,6 @@ export default function IntelligenceDemoPage() {
                         </div>
                       </div>
 
-                      <p className="text-gray-600 text-sm mb-4">
-                        {rec.experience.description.substring(0, 150)}...
-                      </p>
-
                       <div className="flex gap-2 mb-4 flex-wrap">
                         {rec.experience.categories.slice(0, 4).map((cat) => (
                           <span key={cat} className="px-2 py-1 bg-gray-100 text-xs rounded">
@@ -196,6 +192,10 @@ export default function IntelligenceDemoPage() {
                           </span>
                         ))}
                       </div>
+
+                      <p className="text-gray-600 text-sm mb-4">
+                        {rec.reasons}
+                      </p>
 
                       <div className="grid grid-cols-4 gap-2 mb-4 text-sm">
                         <div>
@@ -215,24 +215,6 @@ export default function IntelligenceDemoPage() {
                           <div className="font-semibold">{rec.scoreBreakdown.budget}</div>
                         </div>
                       </div>
-
-                      <button
-                        onClick={() => toggleReasons(rec.experience.id)}
-                        className="text-blue-600 text-sm font-medium hover:underline"
-                      >
-                        {expandedReasons.has(rec.experience.id) ? '▼' : '▶'} Por qué Momenta eligió esto
-                      </button>
-
-                      {expandedReasons.has(rec.experience.id) && (
-                        <ul className="mt-3 space-y-1 text-sm">
-                          {rec.reasons.map((reason, idx) => (
-                            <li key={idx} className="flex items-start">
-                              <span className="text-blue-600 mr-2">•</span>
-                              <span>{reason}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
                     </div>
                   </div>
                 </div>

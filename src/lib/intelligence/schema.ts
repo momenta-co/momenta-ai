@@ -40,7 +40,7 @@ export const scoringBreakdownSchema = z.object({
 export const recommendationSchema = z.object({
   experience: experienceSchema,
   scoreBreakdown: scoringBreakdownSchema,
-  reasons: z.array(z.string()).min(1, 'At least one reason is required'),
+  reasons: z.string().min(10, 'Reasons must be a paragraph (2-4 sentences)'),
 });
 
 // API Request Schema

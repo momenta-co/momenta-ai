@@ -17,7 +17,7 @@ const aiRecommendationSchema = z.object({
         budget: z.number().min(0).max(100),
         total: z.number().min(0).max(100),
       }),
-      reasons: z.array(z.string()).min(2).max(4),
+      reasons: z.string().min(10), // Paragraph format (2-4 sentences)
     })
   ).min(3).max(5),
 });
