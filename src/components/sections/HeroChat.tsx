@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Mic, Send, Square, Clock, MapPin } from 'lucide-react';
-import experiencesData from '@/data/experiences.json';
+import { useAIChat, type ChatMessage } from '@/hooks/useAIChat';
 import type { Experience } from '@/types/experience';
 
 // ============================================
@@ -17,65 +17,24 @@ interface AudioVisualizerData {
   frequencies: number[];
 }
 
-type MessageType = 'user' | 'assistant' | 'status' | 'carousel';
-
-interface ChatMessage {
-  id: string;
-  type: MessageType;
-  content: string;
-  experiences?: Experience[];
-  timestamp: Date;
+interface RecommendationData {
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  price: Experience['price'];
+  location: string;
+  duration: string | null;
+  categories: string[];
+  scoreBreakdown: {
+    occasion: number;
+    relation: number;
+    mood: number;
+    budget: number;
+    total: number;
+  };
+  reasons: string;
 }
-
-type ConversationPhase =
-  | 'initial'
-  | 'gathering-info'
-  | 'processing'
-  | 'showing-results';
-
-// ============================================
-// DUMMY FLOW DATA
-// ============================================
-const DUMMY_FOLLOW_UP_QUESTIONS = [
-  "¡Qué lindo! ¿Cuántas personas van a ir?",
-];
-
-// Predefined messages for voice simulation
-const DUMMY_VOICE_MESSAGE_1 = "Quiero sorprender a mi mamá con un día de relajación para su cumpleaños";
-const DUMMY_VOICE_MESSAGE_2 = "Vamos a ir unas 5 personas, incluyendo a mi mamá";
-
-const PROCESSING_STEPS = [
-  "Analizando tus preferencias...",
-  "Buscando experiencias de relajación cerca a Bogotá...",
-  "Filtrando por disponibilidad para grupos...",
-  "Seleccionando las mejores opciones para la ocasión...",
-];
-
-const FINAL_MESSAGE = "Basado en lo que compartiste, escogí unas ideas que son perfectas para celebrar a tu mamá. Tienen esa chispa de sorpresa y relajación que estás buscando:";
-
-// Get 5 wellness/relaxation experiences
-const getRecommendedExperiences = (): Experience[] => {
-  const allExperiences = experiencesData.experiencias as Experience[];
-
-  // Filter for wellness/relaxation experiences
-  const wellnessExperiences = allExperiences.filter(exp =>
-    exp.categories.includes('Bienestar') ||
-    exp.categories.includes('Belleza y Autocuidado') ||
-    exp.title.toLowerCase().includes('masaje') ||
-    exp.title.toLowerCase().includes('spa')
-  );
-
-  // If not enough wellness, add some group-friendly ones
-  const groupExperiences = allExperiences.filter(exp =>
-    exp.categories.includes('Para grupos') &&
-    !wellnessExperiences.includes(exp)
-  );
-
-  const combined = [...wellnessExperiences, ...groupExperiences];
-
-  // Return first 5 unique experiences
-  return combined.slice(0, 5);
-};
 
 // ============================================
 // ROTATING SUGGESTIONS
@@ -508,7 +467,7 @@ function UserMessage({ content }: { content: string }) {
   return (
     <div className="flex justify-end mb-4">
       <div className="max-w-[80%] bg-primary-700 text-white px-4 py-3 rounded-2xl rounded-br-md">
-        <p className="text-[15px]">{content}</p>
+        <p className="text-[15px] whitespace-pre-wrap">{content}</p>
       </div>
     </div>
   );
@@ -518,38 +477,41 @@ function AssistantMessage({ content }: { content: string }) {
   return (
     <div className="flex justify-start mb-4">
       <div className="max-w-[80%] bg-neutral-200 text-neutral-1000 px-4 py-3 rounded-2xl rounded-bl-md">
-        <p className="text-[15px]">{content}</p>
+        <p className="text-[15px] whitespace-pre-wrap">{content}</p>
       </div>
     </div>
   );
 }
 
-function StatusMessage({ content }: { content: string }) {
+function LoadingMessage() {
   return (
-    <div className="flex justify-center mb-3">
-      <div className="flex items-center gap-2 text-neutral-700 text-sm">
-        <div className="w-2 h-2 bg-secondary-700 rounded-full animate-pulse" />
-        <span>{content}</span>
+    <div className="flex justify-start mb-4">
+      <div className="bg-neutral-200 px-4 py-3 rounded-2xl rounded-bl-md">
+        <div className="flex gap-1">
+          <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
       </div>
     </div>
   );
 }
 
 // ============================================
-// ELEGANT EXPERIENCE RECOMMENDATIONS - GRID LAYOUT
+// ELEGANT EXPERIENCE RECOMMENDATIONS - GRID LAYOUT WITH AI REASONING
 // ============================================
-function ExperienceRecommendations({ experiences }: { experiences: Experience[] }) {
-  const formatPrice = (price: Experience['price']) => {
+function ExperienceRecommendations({ recommendations }: { recommendations: RecommendationData[] }) {
+  const formatPrice = (price: RecommendationData['price']) => {
     if (!price) return 'Consultar';
     const amount = parseInt(price.amount).toLocaleString('es-CO');
     return `$${amount}`;
   };
 
-  // Split experiences into rows: first 3, then remaining 2
-  const firstRow = experiences.slice(0, 3);
-  const secondRow = experiences.slice(3, 5);
+  // Split recommendations into rows: first 3, then remaining 2
+  const firstRow = recommendations.slice(0, 3);
+  const secondRow = recommendations.slice(3, 5);
 
-  const ExperienceCard = ({ experience, index }: { experience: Experience; index: number }) => (
+  const ExperienceCard = ({ recommendation, index }: { recommendation: RecommendationData; index: number }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -558,17 +520,18 @@ function ExperienceRecommendations({ experiences }: { experiences: Experience[] 
         delay: index * 0.08,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
+      className="flex flex-col"
     >
       <Link
-        href={experience.url}
+        href={recommendation.url}
         target="_blank"
-        className="group block bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden border border-neutral-200/60 hover:border-primary-700/30 transition-all duration-500 hover:shadow-lg hover:shadow-primary-700/5"
+        className="group block bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden border border-neutral-200/60 hover:border-primary-700/30 transition-all duration-500 hover:shadow-lg hover:shadow-primary-700/5 mb-2"
       >
         {/* Image with overlay */}
         <div className="relative h-[100px] sm:h-[120px] overflow-hidden">
           <Image
-            src={experience.image}
-            alt={experience.title}
+            src={recommendation.image}
+            alt={recommendation.title}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             unoptimized
@@ -584,7 +547,7 @@ function ExperienceRecommendations({ experiences }: { experiences: Experience[] 
           {/* Price badge */}
           <div className="absolute bottom-2 right-2 px-2 py-1 bg-white/95 backdrop-blur-sm rounded-full">
             <span className="text-xs font-semibold text-primary-700">
-              {formatPrice(experience.price)}
+              {formatPrice(recommendation.price)}
             </span>
           </div>
         </div>
@@ -592,23 +555,30 @@ function ExperienceRecommendations({ experiences }: { experiences: Experience[] 
         {/* Content - Compact */}
         <div className="p-3">
           <h3 className="font-serif text-sm sm:text-base text-neutral-900 leading-tight line-clamp-2 group-hover:text-primary-700 transition-colors duration-300">
-            {experience.title}
+            {recommendation.title}
           </h3>
 
           <div className="flex items-center gap-2 mt-2 text-[10px] sm:text-xs text-neutral-500">
-            {experience.duration && (
+            {recommendation.duration && (
               <span className="flex items-center gap-0.5">
                 <Clock className="w-3 h-3" />
-                {experience.duration}
+                {recommendation.duration}
               </span>
             )}
             <span className="flex items-center gap-0.5">
               <MapPin className="w-3 h-3" />
-              {experience.location}
+              {recommendation.location}
             </span>
           </div>
         </div>
       </Link>
+
+      {/* AI Reasoning - Why Momenta chose this */}
+      <div className="px-2">
+        <p className="text-xs text-neutral-700 leading-relaxed italic">
+          "{recommendation.reasons}"
+        </p>
+      </div>
     </motion.div>
   );
 
@@ -616,24 +586,26 @@ function ExperienceRecommendations({ experiences }: { experiences: Experience[] 
     <div className="w-full mb-4 px-2">
       {/* First row - 3 cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2 sm:mb-3">
-        {firstRow.map((experience, index) => (
-          <ExperienceCard key={experience.url} experience={experience} index={index} />
+        {firstRow.map((recommendation, index) => (
+          <ExperienceCard key={recommendation.url} recommendation={recommendation} index={index} />
         ))}
       </div>
 
       {/* Second row - 2 cards centered */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        <div className="col-start-1 col-span-1 sm:col-start-1">
-          {secondRow[0] && (
-            <ExperienceCard experience={secondRow[0]} index={3} />
-          )}
+      {secondRow.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="col-start-1 col-span-1 sm:col-start-1">
+            {secondRow[0] && (
+              <ExperienceCard recommendation={secondRow[0]} index={3} />
+            )}
+          </div>
+          <div className="col-start-2 col-span-1">
+            {secondRow[1] && (
+              <ExperienceCard recommendation={secondRow[1]} index={4} />
+            )}
+          </div>
         </div>
-        <div className="col-start-2 col-span-1">
-          {secondRow[1] && (
-            <ExperienceCard experience={secondRow[1]} index={4} />
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -642,18 +614,24 @@ function ExperienceRecommendations({ experiences }: { experiences: Experience[] 
 // MAIN HERO CHAT COMPONENT
 // ============================================
 export default function HeroChat() {
-  const [inputValue, setInputValue] = useState('');
+  // Custom AI chat hook - handles all conversation state
+  const { messages, input, setInput, handleSubmit, isLoading, error } = useAIChat({
+    api: '/api/chat',
+  });
+
+  // Log for debugging
+  useEffect(() => {
+    console.log('Messages:', messages);
+    console.log('isLoading:', isLoading);
+    if (error) console.error('Chat error:', error);
+  }, [messages, isLoading, error]);
+
+  // UI state
   const [isListening, setIsListening] = useState(false);
   const [audioData, setAudioData] = useState<AudioVisualizerData>({ volume: 0, frequencies: [] });
   const [isFocused, setIsFocused] = useState(false);
 
-  // Chat state
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [phase, setPhase] = useState<ConversationPhase>('initial');
-  const [currentStatus, setCurrentStatus] = useState<string>('');
-  const [isTyping, setIsTyping] = useState(false);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Refs
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -667,7 +645,7 @@ export default function HeroChat() {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
-  }, [messages, currentStatus]);
+  }, [messages, isLoading]);
 
   const analyzeAudio = useCallback(() => {
     if (!analyserRef.current || !isListeningRef.current) return;
@@ -724,12 +702,9 @@ export default function HeroChat() {
     setIsListening(false);
     setAudioData({ volume: 0, frequencies: [] });
 
-    // Simulate voice-to-text with predefined message based on conversation phase
-    if (phase === 'initial') {
-      setInputValue(DUMMY_VOICE_MESSAGE_1);
-    } else if (phase === 'gathering-info') {
-      setInputValue(DUMMY_VOICE_MESSAGE_2);
-    }
+    // TODO: Implement real voice-to-text
+    // For now, voice recording just activates the microphone visualization
+    // Users will need to type their message
   };
 
   const toggleVoice = () => {
@@ -740,85 +715,40 @@ export default function HeroChat() {
     }
   };
 
-  // Message counter for unique IDs
-  const messageCounterRef = useRef(0);
-
-  // Add message to chat
-  const addMessage = (type: MessageType, content: string, experiences?: Experience[]) => {
-    messageCounterRef.current += 1;
-    const newMessage: ChatMessage = {
-      id: `${Date.now()}-${messageCounterRef.current}`,
-      type,
-      content,
-      experiences,
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, newMessage]);
-  };
-
-  // Simulate typing delay
-  const typeMessage = async (type: MessageType, content: string, delay: number = 1000) => {
-    setIsTyping(true);
-    await new Promise(resolve => setTimeout(resolve, delay));
-    setIsTyping(false);
-    addMessage(type, content);
-  };
-
-  // Run processing animation
-  const runProcessingSteps = async () => {
-    setPhase('processing');
-
-    for (const step of PROCESSING_STEPS) {
-      setCurrentStatus(step);
-      await new Promise(resolve => setTimeout(resolve, 1200));
-    }
-
-    setCurrentStatus('');
-    setPhase('showing-results');
-
-    // Show final message
-    await typeMessage('assistant', FINAL_MESSAGE, 800);
-
-    // Show carousel
-    const experiences = getRecommendedExperiences();
-    addMessage('carousel', '', experiences);
-  };
-
-  // Handle dummy conversation flow
-  const handleDummyFlow = async (userMessage: string) => {
-    // Add user message
-    addMessage('user', userMessage);
-
-    if (phase === 'initial') {
-      // First message - ask follow-up question
-      setPhase('gathering-info');
-      await typeMessage('assistant', DUMMY_FOLLOW_UP_QUESTIONS[0], 1500);
-    } else if (phase === 'gathering-info') {
-      // Got the response, start processing
-      await runProcessingSteps();
-    }
-  };
-
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-
-    const message = inputValue;
-    setInputValue('');
+  // Handle form submission
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
 
     // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
 
-    handleDummyFlow(message);
+    handleSubmit(e);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  // Extract recommendations from tool calls in messages
+  const extractRecommendations = (): RecommendationData[] | null => {
+    // Look for the last message with tool results
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const message = messages[i];
+      if (message.role === 'assistant' && message.toolInvocations) {
+        for (const toolInvocation of message.toolInvocations) {
+          if (
+            toolInvocation.toolName === 'getRecommendations' &&
+            toolInvocation.state === 'result' &&
+            toolInvocation.result?.success
+          ) {
+            return toolInvocation.result.recommendations as RecommendationData[];
+          }
+        }
+      }
     }
+    return null;
   };
+
+  const recommendations = extractRecommendations();
 
   // Check if in chat mode (has messages)
   const inChatMode = messages.length > 0;
@@ -849,42 +779,37 @@ export default function HeroChat() {
       {inChatMode && (
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto py-6">
           <div className="max-w-2xl mx-auto px-4">
-            {messages.map((message) => {
-              switch (message.type) {
-                case 'user':
-                  return <UserMessage key={message.id} content={message.content} />;
-                case 'assistant':
-                  return <AssistantMessage key={message.id} content={message.content} />;
-                case 'carousel':
-                  return (
-                    <div key={message.id}>
-                      {message.experiences && (
-                        <ExperienceRecommendations experiences={message.experiences} />
-                      )}
-                    </div>
-                  );
-                default:
-                  return null;
+            {messages.map((message: ChatMessage) => {
+              // Only render user and assistant messages
+              if (message.role === 'user') {
+                return <UserMessage key={message.id} content={message.content} />;
               }
+
+              if (message.role === 'assistant') {
+                return <AssistantMessage key={message.id} content={message.content} />;
+              }
+
+              return null;
             })}
 
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex justify-start mb-4">
-                <div className="bg-neutral-200 px-4 py-3 rounded-2xl rounded-bl-md">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
+            {/* Loading indicator */}
+            {isLoading && <LoadingMessage />}
+
+            {/* Error message */}
+            {error && (
+              <div className="flex justify-center mb-4">
+                <div className="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
+                  <p className="text-sm">Error: {error.message}</p>
                 </div>
               </div>
             )}
 
-            {/* Status message */}
-            {currentStatus && <StatusMessage content={currentStatus} />}
-
-            <div ref={messagesEndRef} />
+            {/* Show recommendations if available */}
+            {recommendations && recommendations.length > 0 && (
+              <div className="mt-4">
+                <ExperienceRecommendations recommendations={recommendations} />
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -892,99 +817,106 @@ export default function HeroChat() {
       {/* Chat Input Bar - Always at bottom */}
       <div className="bg-neutral-100 px-4 py-4">
         <div className="max-w-2xl mx-auto">
-          <div
-            className={`
-              bg-white rounded-2xl
-              border-2 transition-all duration-300
-              shadow-lg shadow-neutral-1000/5
-              ${isFocused ? 'border-primary-700 shadow-primary-700/10' : 'border-neutral-300'}
-            `}
-          >
-            {/* Textarea row */}
-            <div className="relative px-4 pt-3 pb-2">
-              <textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  // Auto-resize textarea dynamically
-                  e.target.style.height = 'auto';
-                  e.target.style.height = e.target.scrollHeight + 'px';
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (inputValue.trim()) {
-                      handleSendMessage();
+          <form onSubmit={onSubmit}>
+            <div
+              className={`
+                bg-white rounded-2xl
+                border-2 transition-all duration-300
+                shadow-lg shadow-neutral-1000/5
+                ${isFocused ? 'border-primary-700 shadow-primary-700/10' : 'border-neutral-300'}
+              `}
+            >
+              {/* Textarea row */}
+              <div className="relative px-4 pt-3 pb-2">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    // Auto-resize textarea dynamically
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (input.trim() && !isLoading) {
+                        onSubmit(e as any);
+                      }
                     }
-                  }
-                }}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                rows={1}
-                className="
-                  w-full bg-transparent
-                  text-neutral-1000 text-[15px] leading-relaxed
-                  focus:outline-none
-                  placeholder-transparent
-                  resize-none overflow-hidden
-                "
-                style={{ minHeight: '28px' }}
-                placeholder="Escribe tu mensaje..."
-              />
-              {/* Rotating placeholder overlay */}
-              {!inputValue && !isFocused && !inChatMode && (
-                <div className="absolute inset-x-4 top-3 pointer-events-none">
-                  <RotatingPlaceholder />
-                </div>
-              )}
-              {!inputValue && !isFocused && inChatMode && (
-                <div className="absolute inset-x-4 top-3 pointer-events-none">
-                  <span className="text-neutral-700/50">Escribe tu mensaje...</span>
-                </div>
-              )}
-            </div>
-
-            {/* Buttons row */}
-            <div className="flex items-center justify-end gap-2 px-2 pb-2">
-              {/* Microphone button */}
-              <button
-                onClick={toggleVoice}
-                className={`
-                  flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
-                  transition-all duration-200
-                  ${isListening
-                    ? 'bg-primary-700 text-white'
-                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
-                  }
-                `}
-                aria-label={isListening ? 'Detener' : 'Hablar'}
-              >
-                {isListening ? (
-                  <Square className="w-4 h-4" strokeWidth={2} fill="currentColor" />
-                ) : (
-                  <Mic className="w-5 h-5" strokeWidth={2} />
+                  }}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  rows={1}
+                  disabled={isLoading}
+                  className="
+                    w-full bg-transparent
+                    text-neutral-1000 text-[15px] leading-relaxed
+                    focus:outline-none
+                    placeholder-transparent
+                    resize-none overflow-hidden
+                    disabled:opacity-50
+                  "
+                  style={{ minHeight: '28px' }}
+                  placeholder="Escribe tu mensaje..."
+                />
+                {/* Rotating placeholder overlay */}
+                {!input && !isFocused && !inChatMode && (
+                  <div className="absolute inset-x-4 top-3 pointer-events-none">
+                    <RotatingPlaceholder />
+                  </div>
                 )}
-              </button>
+                {!input && !isFocused && inChatMode && (
+                  <div className="absolute inset-x-4 top-3 pointer-events-none">
+                    <span className="text-neutral-700/50">Escribe tu mensaje...</span>
+                  </div>
+                )}
+              </div>
 
-              {/* Send button */}
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim()}
-                className="
-                  flex-shrink-0 w-10 h-10 rounded-xl
-                  bg-primary-700 text-white
-                  flex items-center justify-center
-                  hover:bg-primary-800
-                  disabled:opacity-30 disabled:cursor-not-allowed
-                  transition-all duration-200
-                "
-                aria-label="Enviar"
-              >
-                <Send className="w-5 h-5" strokeWidth={2} />
-              </button>
+              {/* Buttons row */}
+              <div className="flex items-center justify-end gap-2 px-2 pb-2">
+                {/* Microphone button */}
+                <button
+                  type="button"
+                  onClick={toggleVoice}
+                  disabled={isLoading}
+                  className={`
+                    flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
+                    transition-all duration-200
+                    disabled:opacity-50
+                    ${isListening
+                      ? 'bg-primary-700 text-white'
+                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
+                    }
+                  `}
+                  aria-label={isListening ? 'Detener' : 'Hablar'}
+                >
+                  {isListening ? (
+                    <Square className="w-4 h-4" strokeWidth={2} fill="currentColor" />
+                  ) : (
+                    <Mic className="w-5 h-5" strokeWidth={2} />
+                  )}
+                </button>
+
+                {/* Send button */}
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="
+                    flex-shrink-0 w-10 h-10 rounded-xl
+                    bg-primary-700 text-white
+                    flex items-center justify-center
+                    hover:bg-primary-800
+                    disabled:opacity-30 disabled:cursor-not-allowed
+                    transition-all duration-200
+                  "
+                  aria-label="Enviar"
+                >
+                  <Send className="w-5 h-5" strokeWidth={2} />
+                </button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </section>

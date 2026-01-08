@@ -21,7 +21,7 @@ export function buildSystemPrompt(): string {
     1. Analyze user context (occasion, who they're with, mood, budget, city) and think in terms of emotional context, intention, energy and connection.
     2. Evaluate available experiences from the Momenta catalog and prioritize experiences that feel right for the moment, not just objectively good. Always balance emotional fit with practical feasibility.
     3. Score each experience on how well it matches the user's context
-    4. Return the top 3-5 experiences with clear reasoning
+    4. Return the top 5 experiences with clear reasoning
 
     SCORING RULES:
     - Occasion Match (0-100): How well does the experience fit the occasion?
@@ -31,7 +31,7 @@ export function buildSystemPrompt(): string {
     - Total Score: Average of all dimensions
 
     OUTPUT REQUIREMENTS:
-    - Return top 3-5 recommendations sorted by total score
+    - Return top 5 recommendations sorted by total score
     - Every recommendation MUST include a field called "reasons".
     - "reasons" must be a short paragraph (2–4 sentences).
     - The tone must be warm, human, and reassuring — like a thoughtful friend with great taste.
