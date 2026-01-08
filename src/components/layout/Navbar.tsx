@@ -45,13 +45,13 @@ export function Navbar() {
         <div className="hidden md:grid md:grid-cols-3 md:items-center h-20">
           {/* Left - Catálogo Link */}
           <div className="flex items-center justify-start">
-            <Link
-              href="/experiencias"
+            <a
+              href="#experiencias"
               className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
             >
               Experiencias
               <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
-            </Link>
+            </a>
           </div>
 
           {/* Center - Logo */}
@@ -88,12 +88,12 @@ export function Navbar() {
         {/* Mobile Header */}
         <div className="flex md:hidden items-center justify-between h-16">
           {/* Left - Experiencias */}
-          <Link
-            href="/experiencias"
+          <a
+            href="#experiencias"
             className="text-[11px] font-medium tracking-[0.1em] uppercase text-charcoal/70"
           >
             Experiencias
-          </Link>
+          </a>
 
           {/* Center - Logo */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2" onClick={handleLogoClick}>
@@ -144,8 +144,14 @@ export function Navbar() {
 
                   {/* Mobile Navigation Links */}
                   <nav className="flex flex-col items-center gap-6">
+                    <a
+                      href="#experiencias"
+                      onClick={() => setIsOpen(false)}
+                      className="text-lg tracking-wide text-charcoal/80 hover:text-charcoal transition-colors duration-300"
+                    >
+                      Experiencias
+                    </a>
                     {[
-                      { name: "Experiencias", href: "/experiencias" },
                       { name: "Corporativo", href: "/corporativo" },
                       { name: "Nosotros", href: "/nosotros" },
                       { name: "Contacto", href: "/contacto" },
@@ -156,7 +162,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className="text-lg tracking-wide text-charcoal/80 hover:text-charcoal transition-colors duration-300"
                         style={{
-                          animationDelay: `${index * 50}ms`,
+                          animationDelay: `${(index + 1) * 50}ms`,
                         }}
                       >
                         {item.name}

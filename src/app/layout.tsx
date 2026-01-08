@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Lora, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 
 const lora = Lora({
   variable: "--font-lora",
@@ -73,7 +72,6 @@ export default function RootLayout({
       <body className={`${lora.variable} ${dmSans.variable} antialiased`}>
         <Navbar />
         <main>{children}</main>
-        <Footer />
       </body>
     </html>
   );

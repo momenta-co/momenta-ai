@@ -4,8 +4,8 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from 'framer-motion';
-import { Mic, Send, Square, ChevronLeft, ChevronRight, Heart, Clock, Users, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Mic, Send, Square, Clock, MapPin } from 'lucide-react';
 import experiencesData from '@/data/experiences.json';
 import type { Experience } from '@/types/experience';
 
@@ -37,11 +37,11 @@ type ConversationPhase =
 // DUMMY FLOW DATA
 // ============================================
 const DUMMY_FOLLOW_UP_QUESTIONS = [
-  "¡Qué lindo detalle! Para darte las mejores opciones, cuéntame: ¿tienes alguna idea de cuántas personas van a ir o es solo para tu mamá?",
+  "¡Qué lindo! ¿Cuántas personas van a ir?",
 ];
 
 // Predefined messages for voice simulation
-const DUMMY_VOICE_MESSAGE_1 = "Vamos a celebrar el cumpleaños de mi mamá el próximo fin de semana y queremos sorprenderla con un día de relajación cerca a Bogotá";
+const DUMMY_VOICE_MESSAGE_1 = "Quiero sorprender a mi mamá con un día de relajación para su cumpleaños";
 const DUMMY_VOICE_MESSAGE_2 = "Vamos a ir unas 5 personas, incluyendo a mi mamá";
 
 const PROCESSING_STEPS = [
@@ -536,219 +536,103 @@ function StatusMessage({ content }: { content: string }) {
 }
 
 // ============================================
-// STACKED CAROUSEL
+// ELEGANT EXPERIENCE RECOMMENDATIONS - GRID LAYOUT
 // ============================================
-function StackedCarousel({ experiences }: { experiences: Experience[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [exitDirection, setExitDirection] = useState<'left' | 'right'>('left');
-
-  // Motion values for drag - minimal rotation for clean look
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-2, 2]);
-
-  const goToNext = () => {
-    setExitDirection('left');
-    setCurrentIndex(prev => (prev + 1) % experiences.length); // Loop to start
-  };
-
-  const goToPrev = () => {
-    setExitDirection('right');
-    setCurrentIndex(prev => (prev - 1 + experiences.length) % experiences.length); // Loop to end
-  };
-
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 100;
-    const velocity = info.velocity.x;
-    const offset = info.offset.x;
-
-    if (offset < -threshold || velocity < -500) {
-      goToNext();
-    } else if (offset > threshold || velocity > 500) {
-      goToPrev();
-    }
-  };
-
+function ExperienceRecommendations({ experiences }: { experiences: Experience[] }) {
   const formatPrice = (price: Experience['price']) => {
-    if (!price) return 'Consultar precio';
+    if (!price) return 'Consultar';
     const amount = parseInt(price.amount).toLocaleString('es-CO');
-    return `$${amount} COP`;
+    return `$${amount}`;
   };
 
-  // Get visible cards (current + next 2 for stacking effect) with infinite loop support
-  const getVisibleCards = () => {
-    const cards = [];
-    for (let i = 0; i < 3; i++) {
-      const index = (currentIndex + i) % experiences.length;
-      cards.push({ experience: experiences[index], index, stackPosition: i });
-    }
-    return cards;
-  };
-  const visibleCards = getVisibleCards();
+  // Split experiences into rows: first 3, then remaining 2
+  const firstRow = experiences.slice(0, 3);
+  const secondRow = experiences.slice(3, 5);
 
-  return (
-    <div className="relative w-full mb-4">
-      {/* Stacked Cards Container */}
-      <div
-        className="relative h-[440px] w-full max-w-[320px] mx-auto"
-        style={{ marginBottom: '80px', perspective: '1000px' }}
+  const ExperienceCard = ({ experience, index }: { experience: Experience; index: number }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.5,
+        delay: index * 0.08,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+    >
+      <Link
+        href={experience.url}
+        target="_blank"
+        className="group block bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden border border-neutral-200/60 hover:border-primary-700/30 transition-all duration-500 hover:shadow-lg hover:shadow-primary-700/5"
       >
-        <AnimatePresence mode="popLayout">
-          {visibleCards.map(({ experience, index, stackPosition }) => {
-            const isTop = stackPosition === 0;
+        {/* Image with overlay */}
+        <div className="relative h-[100px] sm:h-[120px] overflow-hidden">
+          <Image
+            src={experience.image}
+            alt={experience.title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            unoptimized
+          />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-            return (
-              <motion.div
-                key={experience.url}
-                className="absolute inset-0 cursor-grab active:cursor-grabbing select-none"
-                style={{
-                  x: isTop ? x : 0,
-                  rotate: isTop ? rotate : 0,
-                  zIndex: 10 - stackPosition,
-                }}
-                initial={{
-                  scale: 1,
-                  y: 0,
-                  opacity: 0,
-                }}
-                animate={{
-                  scale: 1,
-                  y: 0,
-                  opacity: 1,
-                }}
-                exit={{
-                  x: exitDirection === 'left' ? -320 : 320,
-                  rotate: exitDirection === 'left' ? -3 : 3,
-                  opacity: 0,
-                  scale: 0.98,
-                }}
-                transition={{
-                  duration: 0.3,
-                  ease: [0.32, 0.72, 0, 1],
-                }}
-                drag={isTop ? 'x' : false}
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.4}
-                onDragEnd={isTop ? handleDragEnd : undefined}
-                whileDrag={{ cursor: 'grabbing' }}
-              >
-                <motion.div
-                  className="w-full h-full bg-white rounded-2xl overflow-hidden border border-neutral-200"
-                  style={{
-                    boxShadow: isTop
-                      ? '0 20px 40px -12px rgba(0, 0, 0, 0.15)'
-                      : '0 8px 20px -5px rgba(0, 0, 0, 0.08)',
-                  }}
-                  whileHover={isTop ? { scale: 1.01 } : {}}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* Image */}
-                  <div className="relative h-[220px] overflow-hidden">
-                    <Image
-                      src={experience.image}
-                      alt={experience.title}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                      draggable={false}
-                    />
-                    <button
-                      className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Heart className="w-4 h-4 text-neutral-700" strokeWidth={1.5} />
-                    </button>
-                    {/* Card counter */}
-                    <div className="absolute bottom-3 left-3 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs">
-                      {index + 1} / {experiences.length}
-                    </div>
-                  </div>
+          {/* Number indicator */}
+          <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+            <span className="text-[10px] font-semibold text-neutral-800">{index + 1}</span>
+          </div>
 
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="font-serif text-xl text-neutral-1000 line-clamp-2 mb-3">
-                      {experience.title}
-                    </h3>
-
-                    <div className="flex flex-wrap gap-3 mb-4">
-                      {experience.duration && (
-                        <span className="flex items-center gap-1.5 text-sm text-neutral-700">
-                          <Clock className="w-4 h-4" />
-                          {experience.duration}
-                        </span>
-                      )}
-                      {experience.min_people && (
-                        <span className="flex items-center gap-1.5 text-sm text-neutral-700">
-                          <Users className="w-4 h-4" />
-                          Min. {experience.min_people}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1.5 text-sm text-neutral-700">
-                        <MapPin className="w-4 h-4" />
-                        {experience.location}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-primary-700 font-semibold text-lg">
-                        {formatPrice(experience.price)}
-                      </span>
-                      <Link
-                        href={experience.url}
-                        target="_blank"
-                        className="px-4 py-2 bg-primary-700 text-white text-sm font-medium rounded-lg hover:bg-primary-800 transition-colors"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Ver más
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-center gap-4 mt-6">
-        <motion.button
-          onClick={goToPrev}
-          className="w-10 h-10 rounded-full bg-white border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 transition-colors shadow-sm"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ChevronLeft className="w-5 h-5 text-neutral-700" />
-        </motion.button>
-
-        {/* Dots indicator */}
-        <div className="flex gap-2">
-          {experiences.map((_, index) => (
-            <motion.button
-              key={index}
-              onClick={() => {
-                setExitDirection(index > currentIndex ? 'left' : 'right');
-                setCurrentIndex(index);
-              }}
-              className="h-2 rounded-full transition-colors"
-              initial={false}
-              animate={{
-                width: index === currentIndex ? 24 : 8,
-                backgroundColor: index === currentIndex ? '#4a7c59' : '#d1d5db',
-              }}
-              whileHover={{ scale: 1.2 }}
-              transition={{ duration: 0.2 }}
-            />
-          ))}
+          {/* Price badge */}
+          <div className="absolute bottom-2 right-2 px-2 py-1 bg-white/95 backdrop-blur-sm rounded-full">
+            <span className="text-xs font-semibold text-primary-700">
+              {formatPrice(experience.price)}
+            </span>
+          </div>
         </div>
 
-        <motion.button
-          onClick={goToNext}
-          className="w-10 h-10 rounded-full bg-white border border-neutral-300 flex items-center justify-center hover:bg-neutral-100 transition-colors shadow-sm"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ChevronRight className="w-5 h-5 text-neutral-700" />
-        </motion.button>
+        {/* Content - Compact */}
+        <div className="p-3">
+          <h3 className="font-serif text-sm sm:text-base text-neutral-900 leading-tight line-clamp-2 group-hover:text-primary-700 transition-colors duration-300">
+            {experience.title}
+          </h3>
+
+          <div className="flex items-center gap-2 mt-2 text-[10px] sm:text-xs text-neutral-500">
+            {experience.duration && (
+              <span className="flex items-center gap-0.5">
+                <Clock className="w-3 h-3" />
+                {experience.duration}
+              </span>
+            )}
+            <span className="flex items-center gap-0.5">
+              <MapPin className="w-3 h-3" />
+              {experience.location}
+            </span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+
+  return (
+    <div className="w-full mb-4 px-2">
+      {/* First row - 3 cards */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2 sm:mb-3">
+        {firstRow.map((experience, index) => (
+          <ExperienceCard key={experience.url} experience={experience} index={index} />
+        ))}
+      </div>
+
+      {/* Second row - 2 cards centered */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="col-start-1 col-span-1 sm:col-start-1">
+          {secondRow[0] && (
+            <ExperienceCard experience={secondRow[0]} index={3} />
+          )}
+        </div>
+        <div className="col-start-2 col-span-1">
+          {secondRow[1] && (
+            <ExperienceCard experience={secondRow[1]} index={4} />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -770,6 +654,7 @@ export default function HeroChat() {
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -777,9 +662,11 @@ export default function HeroChat() {
   const isListeningRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom within the messages container only
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages, currentStatus]);
 
   const analyzeAudio = useCallback(() => {
@@ -853,10 +740,14 @@ export default function HeroChat() {
     }
   };
 
+  // Message counter for unique IDs
+  const messageCounterRef = useRef(0);
+
   // Add message to chat
   const addMessage = (type: MessageType, content: string, experiences?: Experience[]) => {
+    messageCounterRef.current += 1;
     const newMessage: ChatMessage = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${messageCounterRef.current}`,
       type,
       content,
       experiences,
@@ -934,7 +825,7 @@ export default function HeroChat() {
 
   return (
     <section className={`
-      relative min-h-screen flex flex-col bg-neutral-100 overflow-hidden
+      relative h-screen flex flex-col bg-neutral-100
       ${inChatMode ? 'pt-20' : 'pt-20'}
     `}>
       {/* Initial Hero State */}
@@ -956,8 +847,8 @@ export default function HeroChat() {
 
       {/* Chat Messages Area */}
       {inChatMode && (
-        <div className="flex-1 overflow-y-auto px-4 py-6">
-          <div className="max-w-2xl mx-auto">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto py-6">
+          <div className="max-w-2xl mx-auto px-4">
             {messages.map((message) => {
               switch (message.type) {
                 case 'user':
@@ -965,9 +856,13 @@ export default function HeroChat() {
                 case 'assistant':
                   return <AssistantMessage key={message.id} content={message.content} />;
                 case 'carousel':
-                  return message.experiences ? (
-                    <StackedCarousel key={message.id} experiences={message.experiences} />
-                  ) : null;
+                  return (
+                    <div key={message.id}>
+                      {message.experiences && (
+                        <ExperienceRecommendations experiences={message.experiences} />
+                      )}
+                    </div>
+                  );
                 default:
                   return null;
               }
@@ -995,10 +890,7 @@ export default function HeroChat() {
       )}
 
       {/* Chat Input Bar - Always at bottom */}
-      <div className={`
-        ${inChatMode ? 'border-t border-neutral-300' : ''}
-        bg-neutral-100 px-4 py-4
-      `}>
+      <div className="bg-neutral-100 px-4 py-4">
         <div className="max-w-2xl mx-auto">
           <div
             className={`

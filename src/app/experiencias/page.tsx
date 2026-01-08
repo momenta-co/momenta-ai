@@ -3,6 +3,7 @@ import { ExperienceGrid } from "@/components/experiences/ExperienceGrid";
 import { Categories } from "@/components/sections/Categories";
 import { About } from "@/components/sections/About";
 import { CTA } from "@/components/sections/CTA";
+import { Footer } from "@/components/layout/Footer";
 import experiencesData from "@/data/experiences.json";
 import type { Metadata } from "next";
 
@@ -54,6 +55,9 @@ export default function ExperienciasPage() {
 
       {/* CTA */}
       <CTA />
+
+      {/* Footer */}
+      <Footer />
     </>
   );
 }
