@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +22,14 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Handle logo click - refresh if already on home page
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.location.reload();
+    }
+  };
 
   return (
     <header
@@ -35,13 +45,13 @@ export function Navbar() {
         <div className="hidden md:grid md:grid-cols-3 md:items-center h-20">
           {/* Left - Catálogo Link */}
           <div className="flex items-center justify-start">
-            <Link
-              href="/experiencias"
+            <a
+              href="#experiencias"
               className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
             >
               Experiencias
               <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
-            </Link>
+            </a>
           </div>
 
           {/* Center - Logo */}
@@ -49,6 +59,7 @@ export function Navbar() {
             <Link
               href="/"
               className="relative group"
+              onClick={handleLogoClick}
             >
               <Image
                 src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
@@ -77,15 +88,15 @@ export function Navbar() {
         {/* Mobile Header */}
         <div className="flex md:hidden items-center justify-between h-16">
           {/* Left - Experiencias */}
-          <Link
-            href="/experiencias"
+          <a
+            href="#experiencias"
             className="text-[11px] font-medium tracking-[0.1em] uppercase text-charcoal/70"
           >
             Experiencias
-          </Link>
+          </a>
 
           {/* Center - Logo */}
-          <Link href="/" className="absolute left-1/2 -translate-x-1/2">
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2" onClick={handleLogoClick}>
             <Image
               src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
               alt="Momenta"
@@ -133,8 +144,14 @@ export function Navbar() {
 
                   {/* Mobile Navigation Links */}
                   <nav className="flex flex-col items-center gap-6">
+                    <a
+                      href="#experiencias"
+                      onClick={() => setIsOpen(false)}
+                      className="text-lg tracking-wide text-charcoal/80 hover:text-charcoal transition-colors duration-300"
+                    >
+                      Experiencias
+                    </a>
                     {[
-                      { name: "Experiencias", href: "/experiencias" },
                       { name: "Corporativo", href: "/corporativo" },
                       { name: "Nosotros", href: "/nosotros" },
                       { name: "Contacto", href: "/contacto" },
@@ -145,7 +162,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className="text-lg tracking-wide text-charcoal/80 hover:text-charcoal transition-colors duration-300"
                         style={{
-                          animationDelay: `${index * 50}ms`,
+                          animationDelay: `${(index + 1) * 50}ms`,
                         }}
                       >
                         {item.name}
