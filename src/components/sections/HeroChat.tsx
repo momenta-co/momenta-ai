@@ -448,7 +448,7 @@ function RotatingTitleWord() {
         setCurrentIndex((prev) => (prev + 1) % titleWords.length);
         setIsAnimating(false);
       }, 400);
-    }, 3000);
+    }, 5000); // Synchronized with carousel
 
     return () => clearInterval(interval);
   }, []);
@@ -678,6 +678,42 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
 }
 
 // ============================================
+// CAROUSEL DATA
+// ============================================
+const carouselExperiences = [
+  {
+    title: "Taller de pintura",
+    description: "Creatividad artística · 2-4 personas · Fin de semana",
+    image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=900&q=80",
+  },
+  {
+    title: "Cena clandestina",
+    description: "Experiencia culinaria única · 8-12 personas · Viernes",
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80",
+  },
+  {
+    title: "Vuelo en parapente",
+    description: "Aventura extrema · 1 persona · Día soleado",
+    image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=900&q=80",
+  },
+  {
+    title: "Taller de scrapbook",
+    description: "Arte y recuerdos · 3-6 personas · Tarde",
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=900&q=80",
+  },
+  {
+    title: "Sesión de Spa",
+    description: "Relajación total · 2 personas · Sábado",
+    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=900&q=80",
+  },
+  {
+    title: "Taller de pasta fresca",
+    description: "Cocina italiana · 4-8 personas · Domingo",
+    image: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=900&q=80",
+  },
+];
+
+// ============================================
 // MAIN HERO CHAT COMPONENT
 // ============================================
 export default function HeroChat() {
@@ -697,6 +733,7 @@ export default function HeroChat() {
   const [isListening, setIsListening] = useState(false);
   const [audioData, setAudioData] = useState<AudioVisualizerData>({ volume: 0, frequencies: [] });
   const [isFocused, setIsFocused] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Refs
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -713,6 +750,15 @@ export default function HeroChat() {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  // Carousel auto-rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselExperiences.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const analyzeAudio = useCallback(() => {
     if (!analyserRef.current || !isListeningRef.current) return;
@@ -1001,7 +1047,7 @@ export default function HeroChat() {
             </motion.form>
           </div>
 
-          {/* Right Column - Featured Experience Card */}
+          {/* Right Column - Featured Experience Carousel */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -1009,37 +1055,56 @@ export default function HeroChat() {
             className="hidden lg:flex items-center h-full"
           >
             <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-2xl">
-              {/* Hero Image */}
-              <Image
-                src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=900&q=80"
-                alt="Spa Experience"
-                fill
-                className="object-cover"
-                priority
-                unoptimized
-              />
+              {/* Carousel Images */}
+              {carouselExperiences.map((experience, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: index === currentSlide ? 1 : 0 }}
+                  transition={{ duration: 0.7, ease: 'easeInOut' }}
+                  className="absolute inset-0"
+                  style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
+                >
+                  {/* Hero Image */}
+                  <Image
+                    src={experience.image}
+                    alt={experience.title}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                    unoptimized
+                  />
 
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-              {/* Content Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
-                <h2 className="text-[32px] font-serif font-normal mb-4 leading-tight">
-                  Un regalo que se recuerda
-                </h2>
-                <p className="text-base mb-7 opacity-90 font-light">
-                  Spa privado · 2 personas · Sábado
-                </p>
-                <button className="px-10 py-3.5 bg-primary-700/90 hover:bg-primary-700 backdrop-blur-sm rounded-full text-white font-medium transition-all duration-300 hover:scale-105 text-base">
-                  Descubrir
-                </button>
-              </div>
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+                    <h2 className="text-[32px] font-serif font-normal mb-4 leading-tight">
+                      {experience.title}
+                    </h2>
+                    <p className="text-base mb-7 opacity-90 font-light">
+                      {experience.description}
+                    </p>
+                    <button className="px-10 py-3.5 bg-primary-700/90 hover:bg-primary-700 backdrop-blur-sm rounded-full text-white font-medium transition-all duration-300 hover:scale-105 text-base">
+                      Descubrir
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
 
               {/* Pagination Dots */}
               <div className="absolute bottom-10 right-10 flex gap-2">
-                <div className="w-2 h-2 rounded-full bg-white" />
-                <div className="w-2 h-2 rounded-full bg-white/40" />
-                <div className="w-2 h-2 rounded-full bg-white/40" />
+                {carouselExperiences.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </motion.div>
