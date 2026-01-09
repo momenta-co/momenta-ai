@@ -5,18 +5,29 @@ import type { UserContext, Recommendation, RecommendationMeta } from '@/lib/inte
 
 export default function IntelligenceDemoPage() {
   const [userContext, setUserContext] = useState<UserContext>({
-    occasion: 'cumpleaños',
-    withWho: 'mama',
-    mood: 'relajado',
-    budget: 150000,
-    city: 'Bogotá'
+    // Prioridad 1 (Crítica)
+    fecha: 'este sábado',
+    ciudad: 'Bogotá',
+    personas: 2,
+    // Prioridad 2 (Alta)
+    tipoGrupo: 'pareja',
+    ocasion: 'aniversario',
+    categoria: undefined,
+    presupuesto: 'medio',
+    // Prioridad 3 (Media)
+    nivelEnergia: 'calm_mindful',
+    intencion: 'celebrar',
+    evitar: undefined,
+    // Prioridad 4 (Baja)
+    modalidad: undefined,
+    moodActual: undefined,
+    tipoConexion: undefined,
   });
 
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [meta, setMeta] = useState<RecommendationMeta | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [expandedReasons, setExpandedReasons] = useState<Set<string>>(new Set());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,18 +60,6 @@ export default function IntelligenceDemoPage() {
     }
   };
 
-  const toggleReasons = (experienceId: string) => {
-    setExpandedReasons(prev => {
-      const next = new Set(prev);
-      if (next.has(experienceId)) {
-        next.delete(experienceId);
-      } else {
-        next.add(experienceId);
-      }
-      return next;
-    });
-  };
-
   return (
     <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-6xl mx-auto">
@@ -69,65 +68,149 @@ export default function IntelligenceDemoPage() {
         {/* Form */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Cuéntanos qué buscas</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Ocasión</label>
-                <input
-                  type="text"
-                  value={userContext.occasion}
-                  onChange={(e) => setUserContext({ ...userContext, occasion: e.target.value })}
-                  placeholder="Ej: Cita romántica, Cumpleaños..."
-                  className="w-full px-3 py-2 border rounded-md"
-                  required
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
 
-              <div>
-                <label className="block text-sm font-medium mb-1">¿Con quién?</label>
-                <input
-                  type="text"
-                  value={userContext.withWho}
-                  onChange={(e) => setUserContext({ ...userContext, withWho: e.target.value })}
-                  placeholder="Ej: Pareja, Amigos, Solo/a..."
-                  className="w-full px-3 py-2 border rounded-md"
-                  required
-                />
+            {/* Prioridad 1 */}
+            <div className="border-l-4 border-red-500 pl-4">
+              <h3 className="text-sm font-bold text-red-600 mb-2">PRIORIDAD 1 (Crítica)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Ciudad</label>
+                  <select
+                    value={userContext.ciudad}
+                    onChange={(e) => setUserContext({ ...userContext, ciudad: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="Bogotá">Bogotá</option>
+                    <option value="Medellín">Medellín</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fecha</label>
+                  <input
+                    type="text"
+                    value={userContext.fecha}
+                    onChange={(e) => setUserContext({ ...userContext, fecha: e.target.value })}
+                    placeholder="este sábado, mañana..."
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Personas</label>
+                  <input
+                    type="number"
+                    value={userContext.personas}
+                    onChange={(e) => setUserContext({ ...userContext, personas: parseInt(e.target.value) || 1 })}
+                    min="1"
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Estado de ánimo</label>
-                <input
-                  type="text"
-                  value={userContext.mood}
-                  onChange={(e) => setUserContext({ ...userContext, mood: e.target.value })}
-                  placeholder="Ej: Relajado, Aventurero..."
-                  className="w-full px-3 py-2 border rounded-md"
-                  required
-                />
+            {/* Prioridad 2 */}
+            <div className="border-l-4 border-yellow-500 pl-4">
+              <h3 className="text-sm font-bold text-yellow-600 mb-2">PRIORIDAD 2 (Alta)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tipo de Grupo</label>
+                  <select
+                    value={userContext.tipoGrupo}
+                    onChange={(e) => setUserContext({ ...userContext, tipoGrupo: e.target.value as any })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="sola">Sola</option>
+                    <option value="pareja">Pareja</option>
+                    <option value="familia">Familia</option>
+                    <option value="amigos">Amigos</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Ocasión</label>
+                  <input
+                    type="text"
+                    value={userContext.ocasion || ''}
+                    onChange={(e) => setUserContext({ ...userContext, ocasion: e.target.value || undefined })}
+                    placeholder="cumpleaños, aniversario..."
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Categoría</label>
+                  <select
+                    value={userContext.categoria || ''}
+                    onChange={(e) => setUserContext({ ...userContext, categoria: e.target.value as any || undefined })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="">Cualquiera</option>
+                    <option value="gastronomia">Gastronomía</option>
+                    <option value="bienestar">Bienestar</option>
+                    <option value="arte_creatividad">Arte & Creatividad</option>
+                    <option value="aventura">Aventura</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Presupuesto</label>
+                  <select
+                    value={userContext.presupuesto || ''}
+                    onChange={(e) => setUserContext({ ...userContext, presupuesto: e.target.value as any || undefined })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="">No prioritario</option>
+                    <option value="bajo">Bajo (&lt;100k)</option>
+                    <option value="medio">Medio (100-250k)</option>
+                    <option value="alto">Alto (&gt;250k)</option>
+                  </select>
+                </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Presupuesto (COP)</label>
-                <input
-                  type="number"
-                  value={userContext.budget}
-                  onChange={(e) => setUserContext({ ...userContext, budget: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border rounded-md"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Ciudad</label>
-                <select
-                  value={userContext.city}
-                  onChange={(e) => setUserContext({ ...userContext, city: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-md"
-                >
-                  <option value="Bogotá">Bogotá</option>
-                  <option value="Medellín">Medellín</option>
-                </select>
+            {/* Prioridad 3 */}
+            <div className="border-l-4 border-green-500 pl-4">
+              <h3 className="text-sm font-bold text-green-600 mb-2">PRIORIDAD 3 (Media)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nivel de Energía</label>
+                  <select
+                    value={userContext.nivelEnergia || ''}
+                    onChange={(e) => setUserContext({ ...userContext, nivelEnergia: e.target.value as any || undefined })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="">Flexible</option>
+                    <option value="slow_cozy">Slow & Cozy (tranquilo)</option>
+                    <option value="calm_mindful">Calm & Mindful (íntimo)</option>
+                    <option value="uplifting">Uplifting (activo)</option>
+                    <option value="social">Social (fiesta)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Intención</label>
+                  <select
+                    value={userContext.intencion || ''}
+                    onChange={(e) => setUserContext({ ...userContext, intencion: e.target.value as any || undefined })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="">No especificada</option>
+                    <option value="invitar">Invitar</option>
+                    <option value="sorprender">Sorprender</option>
+                    <option value="compartir">Compartir</option>
+                    <option value="agradecer">Agradecer</option>
+                    <option value="celebrar">Celebrar</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Modalidad</label>
+                  <select
+                    value={userContext.modalidad || ''}
+                    onChange={(e) => setUserContext({ ...userContext, modalidad: e.target.value as any || undefined })}
+                    className="w-full px-3 py-2 border rounded-md"
+                  >
+                    <option value="">Flexible</option>
+                    <option value="indoor">Indoor</option>
+                    <option value="outdoor">Outdoor</option>
+                    <option value="stay_in">Stay-in (en casa)</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -207,7 +290,7 @@ export default function IntelligenceDemoPage() {
                           <div className="font-semibold">{rec.scoreBreakdown.relation}</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">Mood</div>
+                          <div className="text-gray-500">Energía</div>
                           <div className="font-semibold">{rec.scoreBreakdown.mood}</div>
                         </div>
                         <div>

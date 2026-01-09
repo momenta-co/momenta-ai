@@ -76,6 +76,8 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
         ]);
 
         let buffer = '';
+        // Track tool calls by ID to match with results
+        const toolCallsMap: Record<string, any> = {};
 
         while (true) {
           const { done, value } = await reader.read();
@@ -100,16 +102,13 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
               if (line.startsWith('0:')) {
                 const jsonStr = line.slice(2);
                 const content = JSON.parse(jsonStr);
-                console.log('Parsed content:', content);
 
                 if (typeof content === 'string') {
                   assistantMessageContent += content;
                 } else if (content && typeof content === 'object' && content.text) {
-                  // Handle object format {text: "..."}
                   assistantMessageContent += content.text;
                 }
 
-                // Update the assistant message
                 setMessages((prev) =>
                   prev.map((msg) =>
                     msg.id === assistantMessageId
@@ -118,26 +117,58 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
                   )
                 );
               }
-              // Tool call/result format
+              // AI SDK v6: Tool call - "9:" prefix
               else if (line.startsWith('9:')) {
-                const toolData = JSON.parse(line.slice(2));
-                console.log('Tool data:', toolData);
-                toolInvocations.push(toolData);
+                const toolCall = JSON.parse(line.slice(2));
+                console.log('Tool call:', toolCall);
 
-                // Update message with tool invocations
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, toolInvocations: [...toolInvocations] }
-                      : msg
-                  )
-                );
+                // Store tool call by ID
+                if (toolCall.toolCallId) {
+                  toolCallsMap[toolCall.toolCallId] = {
+                    toolCallId: toolCall.toolCallId,
+                    toolName: toolCall.toolName,
+                    args: toolCall.args,
+                    state: 'call',
+                  };
+
+                  // Update invocations
+                  toolInvocations = Object.values(toolCallsMap);
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === assistantMessageId
+                        ? { ...msg, toolInvocations: [...toolInvocations] }
+                        : msg
+                    )
+                  );
+                }
               }
-              // Handle plain text lines (fallback)
-              else if (!line.startsWith('data:') && !line.includes(':')) {
-                console.log('Plain text line:', line);
-                assistantMessageContent += line;
+              // AI SDK v6: Tool result - "a:" prefix
+              else if (line.startsWith('a:')) {
+                const toolResult = JSON.parse(line.slice(2));
+                console.log('Tool result:', toolResult);
 
+                // Match result with call by ID
+                if (toolResult.toolCallId && toolCallsMap[toolResult.toolCallId]) {
+                  toolCallsMap[toolResult.toolCallId] = {
+                    ...toolCallsMap[toolResult.toolCallId],
+                    state: 'result',
+                    result: toolResult.result,
+                  };
+
+                  // Update invocations
+                  toolInvocations = Object.values(toolCallsMap);
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === assistantMessageId
+                        ? { ...msg, toolInvocations: [...toolInvocations] }
+                        : msg
+                    )
+                  );
+                }
+              }
+              // Handle other formats or plain text
+              else if (!line.startsWith('data:') && !line.match(/^[0-9a-f]:/) ) {
+                assistantMessageContent += line;
                 setMessages((prev) =>
                   prev.map((msg) =>
                     msg.id === assistantMessageId
@@ -148,17 +179,6 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
               }
             } catch (e) {
               console.error('Failed to parse line:', line, e);
-              // Try treating it as plain text
-              if (!line.startsWith('0:') && !line.startsWith('9:')) {
-                assistantMessageContent += line;
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg.id === assistantMessageId
-                      ? { ...msg, content: assistantMessageContent }
-                      : msg
-                  )
-                );
-              }
             }
           }
         }
