@@ -136,6 +136,7 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
 
               // Process SSE data based on type
               if (jsonData) {
+                // Handle text deltas
                 if (jsonData.type === 'text-delta' && jsonData.delta) {
                   assistantMessageContent += jsonData.delta;
                   console.log('[useAIChat] Added text delta, total length:', assistantMessageContent.length);
@@ -148,16 +149,16 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
                     )
                   );
                 }
-                // Handle tool calls in SSE format
-                else if (jsonData.type === 'tool-call-start' || jsonData.type === 'tool-call') {
-                  console.log('[useAIChat] Tool call:', jsonData);
+                // Handle tool input start - AI SDK format
+                else if (jsonData.type === 'tool-input-start') {
+                  console.log('[useAIChat] Tool input start:', jsonData);
 
-                  const toolCallId = jsonData.toolCallId || jsonData.id;
+                  const toolCallId = jsonData.toolCallId;
                   if (toolCallId) {
                     toolCallsMap[toolCallId] = {
                       toolCallId: toolCallId,
-                      toolName: jsonData.toolName || jsonData.name,
-                      args: jsonData.args || jsonData.arguments,
+                      toolName: jsonData.toolName,
+                      args: {},
                       state: 'call',
                     };
 
@@ -171,19 +172,42 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
                     );
                   }
                 }
-                // Handle tool results in SSE format
-                else if (jsonData.type === 'tool-result' || jsonData.type === 'tool-call-result') {
-                  console.log('[useAIChat] Tool result:', jsonData);
+                // Handle tool input available - AI SDK format
+                else if (jsonData.type === 'tool-input-available') {
+                  console.log('[useAIChat] Tool input available:', jsonData);
 
-                  const toolCallId = jsonData.toolCallId || jsonData.id;
+                  const toolCallId = jsonData.toolCallId;
+                  if (toolCallId && toolCallsMap[toolCallId]) {
+                    toolCallsMap[toolCallId] = {
+                      ...toolCallsMap[toolCallId],
+                      args: jsonData.input || jsonData.args,
+                    };
+
+                    toolInvocations = Object.values(toolCallsMap);
+                    setMessages((prev) =>
+                      prev.map((msg) =>
+                        msg.id === assistantMessageId
+                          ? { ...msg, toolInvocations: [...toolInvocations] }
+                          : msg
+                      )
+                    );
+                  }
+                }
+                // Handle tool result - AI SDK format
+                else if (jsonData.type === 'tool-result' || jsonData.type === 'tool-output-available') {
+                  console.log('[useAIChat] Tool result/output:', jsonData);
+
+                  const toolCallId = jsonData.toolCallId;
                   if (toolCallId && toolCallsMap[toolCallId]) {
                     toolCallsMap[toolCallId] = {
                       ...toolCallsMap[toolCallId],
                       state: 'result',
-                      result: jsonData.result || jsonData.output,
+                      result: jsonData.output || jsonData.result,
                     };
 
                     toolInvocations = Object.values(toolCallsMap);
+                    console.log('[useAIChat] Updated tool invocations:', toolInvocations);
+
                     setMessages((prev) =>
                       prev.map((msg) =>
                         msg.id === assistantMessageId

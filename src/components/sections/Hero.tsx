@@ -146,21 +146,38 @@ export const Hero = () => {
 
   // Extract recommendations from tool calls in messages - memoized to prevent unnecessary recalculations
   const recommendations = useMemo((): RecommendationData[] | null => {
+    console.log('[Hero] Extracting recommendations from messages:', messages);
+
     // Look for the last message with tool results
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
+      console.log(`[Hero] Checking message ${i}:`, {
+        role: message.role,
+        hasToolInvocations: !!message.toolInvocations,
+        toolInvocations: message.toolInvocations
+      });
+
       if (message.role === 'assistant' && message.toolInvocations) {
         for (const toolInvocation of message.toolInvocations) {
+          console.log('[Hero] Tool invocation:', {
+            toolName: toolInvocation.toolName,
+            state: toolInvocation.state,
+            hasResult: !!toolInvocation.result,
+            result: toolInvocation.result
+          });
+
           if (
             toolInvocation.toolName === 'getRecommendations' &&
             toolInvocation.state === 'result' &&
             toolInvocation.result?.success
           ) {
+            console.log('[Hero] Found recommendations:', toolInvocation.result.recommendations);
             return toolInvocation.result.recommendations as RecommendationData[];
           }
         }
       }
     }
+    console.log('[Hero] No recommendations found');
     return null;
   }, [messages]);
 
