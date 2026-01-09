@@ -237,9 +237,9 @@ export default function VoiceSphere({ isListening = false, audioData }: VoiceSph
     directionalLight.position.set(1, 2, 4);
     scene.add(directionalLight);
 
-    // Light blue tones
-    const colorEdge = new THREE.Color('#B3E5FC');
-    const colorMid = new THREE.Color('#81D4FA');
+    // Sand tones
+    const colorEdge = new THREE.Color('#CEA984');
+    const colorMid = new THREE.Color('#EDC9AF');
     const colorCenter = new THREE.Color('#FFFFFF');
 
     const leafGeometry = new THREE.IcosahedronGeometry(1, 64);
