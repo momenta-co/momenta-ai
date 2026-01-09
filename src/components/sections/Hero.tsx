@@ -145,42 +145,21 @@ export const Hero = () => {
     handleSubmit(e);
   };
 
-  // Extract recommendations from tool calls in messages - memoized to prevent unnecessary recalculations
-  const recommendations = useMemo((): RecommendationData[] | null => {
-    console.log('[Hero] Extracting recommendations from messages:', messages);
-
-    // Look for the last message with tool results
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      console.log(`[Hero] Checking message ${i}:`, {
-        role: message.role,
-        hasToolInvocations: !!message.toolInvocations,
-        toolInvocations: message.toolInvocations
-      });
-
-      if (message.role === 'assistant' && message.toolInvocations) {
-        for (const toolInvocation of message.toolInvocations) {
-          console.log('[Hero] Tool invocation:', {
-            toolName: toolInvocation.toolName,
-            state: toolInvocation.state,
-            hasResult: !!toolInvocation.result,
-            result: toolInvocation.result
-          });
-
-          if (
-            toolInvocation.toolName === 'getRecommendations' &&
-            toolInvocation.state === 'result' &&
-            toolInvocation.result?.success
-          ) {
-            console.log('[Hero] Found recommendations:', toolInvocation.result.recommendations);
-            return toolInvocation.result.recommendations as RecommendationData[];
-          }
+  // Helper function to extract recommendations from a specific message
+  const getRecommendationsForMessage = useCallback((message: ChatMessage): RecommendationData[] | null => {
+    if (message.role === 'assistant' && message.toolInvocations) {
+      for (const toolInvocation of message.toolInvocations) {
+        if (
+          toolInvocation.toolName === 'getRecommendations' &&
+          toolInvocation.state === 'result' &&
+          toolInvocation.result?.success
+        ) {
+          return toolInvocation.result.recommendations as RecommendationData[];
         }
       }
     }
-    console.log('[Hero] No recommendations found');
     return null;
-  }, [messages]);
+  }, []);
 
   return (
     <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
@@ -257,10 +236,33 @@ export const Hero = () => {
                     }
 
                     if (message.role === 'assistant') {
-                      // Only show assistant message if it has content
-                      if (message.content && message.content.trim()) {
-                        return <AssistantMessage key={message.id} content={message.content} />;
-                      }
+                      const messageRecommendations = getRecommendationsForMessage(message);
+
+                      return (
+                        <React.Fragment key={message.id}>
+                          {/* Only show assistant message if it has content */}
+                          {message.content && message.content.trim() && (
+                            <AssistantMessage content={message.content} />
+                          )}
+
+                          {/* Show recommendations inline with this message */}
+                          {messageRecommendations && messageRecommendations.length > 0 && (
+                            <div className="mt-4 mb-4">
+                              <HorizontalSlider
+                                title="Experiencias perfectas para ti"
+                                items={messageRecommendations}
+                                keyExtractor={(rec) => rec.url}
+                                renderCard={(rec, index) => (
+                                  <ExperienceCard
+                                    recommendation={rec}
+                                    index={index}
+                                  />
+                                )}
+                              />
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
                     }
 
                     return null;
@@ -275,23 +277,6 @@ export const Hero = () => {
                       <div className="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
                         <p className="text-sm">Error: {error.message}</p>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Show recommendations if available */}
-                  {recommendations && recommendations.length > 0 && (
-                    <div className="mt-4">
-                      <HorizontalSlider
-                        title="Experiencias perfectas para ti"
-                        items={recommendations}
-                        keyExtractor={(rec) => rec.url}
-                        renderCard={(rec, index) => (
-                          <ExperienceCard
-                            recommendation={rec}
-                            index={index}
-                          />
-                        )}
-                      />
                     </div>
                   )}
                 </div>
