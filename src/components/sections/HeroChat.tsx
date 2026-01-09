@@ -6,8 +6,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Mic, Send, Square, Clock, MapPin } from 'lucide-react';
-import { useAIChat, type ChatMessage } from '@/hooks/useAIChat';
+import { useChat } from '@ai-sdk/react';
 import type { Experience } from '@/types/experience';
+import { ChatMessage } from '@/hooks/useAIChat';
 
 // ============================================
 // TYPES
@@ -717,17 +718,25 @@ const carouselExperiences = [
 // MAIN HERO CHAT COMPONENT
 // ============================================
 export default function HeroChat() {
-  // Custom AI chat hook - handles all conversation state
-  const { messages, input, setInput, handleSubmit, isLoading, error } = useAIChat({
-    api: '/api/chat',
-  });
+  // Official AI SDK chat hook - handles streaming and tools automatically
+  const { messages, status, error, sendMessage } = useChat();
+
+  // Input state (managed separately in v6)
+  const [input, setInput] = useState('');
+  const isLoading = status === 'submitted' || status === 'streaming';
 
   // Log for debugging
   useEffect(() => {
-    console.log('Messages:', messages);
-    console.log('isLoading:', isLoading);
-    if (error) console.error('Chat error:', error);
-  }, [messages, isLoading, error]);
+    console.log('[HeroChat] Messages:', JSON.stringify(messages, null, 2));
+    console.log('[HeroChat] Status:', status);
+    // Log message parts for debugging tool invocations
+    messages.forEach((msg, idx) => {
+      if (msg.parts) {
+        console.log(`[HeroChat] Message ${idx} parts:`, msg.parts);
+      }
+    });
+    if (error) console.error('[HeroChat] Error:', error);
+  }, [messages, status, error]);
 
   // UI state
   const [isListening, setIsListening] = useState(false);
@@ -829,31 +838,57 @@ export default function HeroChat() {
   };
 
   // Handle form submission
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
+
+    const message = input.trim();
+    setInput(''); // Clear input
 
     // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
 
-    handleSubmit(e);
+    // Send message using AI SDK
+    await sendMessage({ text: message });
   };
 
-  // Extract recommendations from tool calls in messages
+  // Extract recommendations from tool calls in messages (AI SDK v6 format)
   const extractRecommendations = (): RecommendationData[] | null => {
     // Look for the last message with tool results
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
-      if (message.role === 'assistant' && message.toolInvocations) {
-        for (const toolInvocation of message.toolInvocations) {
-          if (
-            toolInvocation.toolName === 'getRecommendations' &&
-            toolInvocation.state === 'result' &&
-            toolInvocation.result?.success
-          ) {
-            return toolInvocation.result.recommendations as RecommendationData[];
+      if (message.role === 'assistant' && message.parts) {
+        for (const part of message.parts) {
+          const partAny = part as any;
+
+          // Comprehensive logging for debugging tool parts
+          if (partAny.type?.includes('tool') || partAny.toolName || partAny.toolCallId) {
+            console.log('[HeroChat] Tool-related part:', {
+              type: partAny.type,
+              state: partAny.state,
+              toolName: partAny.toolName,
+              toolCallId: partAny.toolCallId,
+              hasResult: !!partAny.result,
+              hasOutput: !!partAny.output,
+              keys: Object.keys(partAny)
+            });
+          }
+
+          // AI SDK v6 format: type is 'tool-{toolName}'
+          // States: input-streaming -> input-available -> output-available
+          if (partAny.type === 'tool-getRecommendations') {
+            // Check for output-available state (tool execution completed)
+            if (partAny.state === 'output-available') {
+              // Result is in partAny.output (not partAny.result)
+              const output = partAny.output;
+              console.log('[HeroChat] Tool output-available, output:', output);
+              if (output?.success && output?.recommendations) {
+                console.log('[HeroChat] Found recommendations:', output.recommendations);
+                return output.recommendations as RecommendationData[];
+              }
+            }
           }
         }
       }
@@ -911,14 +946,23 @@ export default function HeroChat() {
                     scrollbarColor: '#CBD5E1 transparent'
                   }}
                 >
-                  {messages.map((message: ChatMessage) => {
+                  {messages.map((message) => {
+                    // Extract text content from parts (AI SDK v6 format)
+                    const textContent = message.parts
+                      ?.filter((part): part is { type: 'text'; text: string } => (part as any).type === 'text')
+                      .map((part) => part.text)
+                      .join('') || '';
+
                     // Only render user and assistant messages
                     if (message.role === 'user') {
-                      return <UserMessage key={message.id} content={message.content} />;
+                      return <UserMessage key={message.id} content={textContent} />;
                     }
 
                     if (message.role === 'assistant') {
-                      return <AssistantMessage key={message.id} content={message.content} />;
+                      // Only show assistant message if it has text content
+                      if (textContent) {
+                        return <AssistantMessage key={message.id} content={textContent} />;
+                      }
                     }
 
                     return null;

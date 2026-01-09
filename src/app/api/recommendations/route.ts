@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { recommendationRequestSchema } from '@/lib/intelligence/schema';
 import { generateAIRecommendations, getModelName } from '@/lib/intelligence/ai-service';
 import type { RecommendationResponse } from '@/lib/intelligence/types';
-import { getAllExperiences } from '@/lib/db/experiences';
+import { getExperiencesByCity } from '@/lib/db/experiences';
 
 /**
  * API Route: POST /api/recommendations
@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
     const { userContext } = validation.data;
 
-    // Fetch experiences from database
-    const experiencesPool = await getAllExperiences();
+    // Fetch experiences from database filtered by city
+    const experiencesPool = await getExperiencesByCity(userContext.ciudad);
 
     // Generate recommendations using AI (with automatic fallback)
     const recommendations = await generateAIRecommendations(

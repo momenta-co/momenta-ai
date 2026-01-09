@@ -1,12 +1,28 @@
 import { z } from 'zod';
 
-// User Context Schema
+// User Context Schema - Based on Priority Matrix
 export const userContextSchema = z.object({
-  occasion: z.string().min(1, 'Occasion is required'),
-  withWho: z.string().min(1, 'withWho is required'),
-  mood: z.string().min(1, 'Mood is required'),
-  budget: z.number().positive('Budget must be positive'),
-  city: z.string().min(1, 'City is required'),
+  // PRIORIDAD 1 (Crítica) - Requeridos
+  fecha: z.string().min(1, 'Fecha is required'),
+  ciudad: z.string().min(1, 'Ciudad is required'),
+  personas: z.number().min(1, 'Personas must be at least 1'),
+
+  // PRIORIDAD 2 (Alta)
+  tipoGrupo: z.enum(['sola', 'pareja', 'familia', 'amigos']),
+  categoria: z.enum(['gastronomia', 'bienestar', 'arte_creatividad', 'aventura', 'cultural']).optional(),
+  ocasion: z.string().optional(),
+  presupuesto: z.enum(['bajo', 'medio', 'alto', 'no_prioritario']).optional(),
+
+  // PRIORIDAD 3 (Media)
+  franjaHoraria: z.enum(['manana', 'tarde', 'noche', 'flexible']).optional(),
+  intencion: z.enum(['invitar', 'sorprender', 'compartir', 'agradecer', 'celebrar']).optional(),
+  nivelEnergia: z.enum(['slow_cozy', 'calm_mindful', 'uplifting', 'social']).optional(),
+  evitar: z.array(z.string()).optional(),
+
+  // PRIORIDAD 4 (Baja)
+  modalidad: z.enum(['indoor', 'outdoor', 'stay_in']).optional(),
+  moodActual: z.enum(['feliz', 'tranquila', 'bajita_energia', 'romantica']).optional(),
+  tipoConexion: z.enum(['conmigo_misma', 'pareja', 'amigos_cercanos', 'grupo_amplio']).optional(),
 });
 
 // Experience Schema

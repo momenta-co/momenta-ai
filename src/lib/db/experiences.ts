@@ -21,10 +21,10 @@ function transformDbExperience(dbExp: any): Experience {
   // Calculate price from min/max
   const price = dbExp.price_min
     ? {
-        amount: dbExp.price_min.toString(),
-        currency: 'COP',
-        unit: 'por persona',
-      }
+      amount: dbExp.price_min.toString(),
+      currency: 'COP',
+      unit: 'por persona',
+    }
     : null;
 
   return {
@@ -60,5 +60,76 @@ export async function getAllExperiences(): Promise<Experience[]> {
   } catch (error) {
     console.error('Error fetching experiences from database:', error);
     throw new Error('Failed to fetch experiences from database');
+  }
+}
+
+/**
+ * Fetch experiences by city or location tag
+ * @param city - City name (e.g., "Bogotá", "Medellín") or "Cerca a Bogotá"
+ * @returns Array of Experience objects for that city/location
+ */
+export async function getExperiencesByCity(city: string): Promise<Experience[]> {
+  try {
+    // Handle "Cerca a Bogotá" as a tag filter
+    const isCercaBogota = city.toLowerCase().includes('cerca') && city.toLowerCase().includes('bogot');
+
+    if (isCercaBogota) {
+      // Filter by tag "Cerca a Bogotá"
+      const experiences = await prisma.experiences.findMany({
+        where: {
+          status: 'active',
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+      });
+
+      // Filter experiences that have "Cerca a Bogotá" tag
+      const filteredExperiences = experiences.filter((exp: any) => {
+        const tags = Array.isArray(exp.tags) ? exp.tags : [];
+        return tags.some((tag: string) =>
+          tag.toLowerCase().includes('cerca') && tag.toLowerCase().includes('bogot')
+        );
+      });
+
+      return filteredExperiences.map(transformDbExperience);
+    }
+
+    // Standard city filter
+    const experiences = await prisma.experiences.findMany({
+      where: {
+        city: {
+          contains: city,
+          mode: 'insensitive',
+        },
+        status: 'active',
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+
+    return experiences.map(transformDbExperience);
+  } catch (error) {
+    console.error('Error fetching experiences by city:', error);
+    throw new Error(`Failed to fetch experiences for city: ${city}`);
+  }
+}
+
+/**
+ * Fetch experience by ID
+ * @param id - Experience ID
+ * @returns Experience object or null
+ */
+export async function getExperienceById(id: string): Promise<Experience | null> {
+  try {
+    const experience = await prisma.experiences.findUnique({
+      where: { id },
+    });
+
+    return experience ? transformDbExperience(experience) : null;
+  } catch (error) {
+    console.error('Error fetching experience by ID:', error);
+    throw new Error(`Failed to fetch experience with ID: ${id}`);
   }
 }
