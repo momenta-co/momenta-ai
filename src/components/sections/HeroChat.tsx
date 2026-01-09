@@ -293,9 +293,9 @@ function VoiceSphere({
     directionalLight.position.set(1, 2, 4);
     scene.add(directionalLight);
 
-    // Momenta soft cream/gold tones
-    const colorEdge = new THREE.Color('#E8DFC0');
-    const colorMid = new THREE.Color('#FFFAE8');
+    // Light blue tones
+    const colorEdge = new THREE.Color('#B3E5FC');
+    const colorMid = new THREE.Color('#81D4FA');
     const colorCenter = new THREE.Color('#FFFFFF');
 
     const leafGeometry = new THREE.IcosahedronGeometry(1, 64);
@@ -684,32 +684,32 @@ const carouselExperiences = [
   {
     title: "Taller de pintura",
     description: "Creatividad artística · 2-4 personas · Fin de semana",
-    image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=900&q=80",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/f065395e-683c-4686-9213-81ebacd1c014",
   },
   {
     title: "Cena clandestina",
     description: "Experiencia culinaria única · 8-12 personas · Viernes",
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/d4f65285-17ed-4e65-a2a2-21dddbc09e84",
   },
   {
     title: "Vuelo en parapente",
     description: "Aventura extrema · 1 persona · Día soleado",
-    image: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=900&q=80",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/9a332c9e-19e3-444a-8249-72c1651f615b",
   },
   {
     title: "Taller de scrapbook",
     description: "Arte y recuerdos · 3-6 personas · Tarde",
-    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=900&q=80",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/59e7ec82-5a94-4cc1-8675-d2c2277544c0",
   },
   {
     title: "Sesión de Spa",
     description: "Relajación total · 2 personas · Sábado",
-    image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=900&q=80",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/5d973ac0-5852-4218-a546-23f2043b28d8",
   },
   {
     title: "Taller de pasta fresca",
     description: "Cocina italiana · 4-8 personas · Domingo",
-    image: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=900&q=80",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/ff6930dc-ad0f-4f54-b281-ca30ea5c2fe4",
   },
 ];
 
@@ -1099,9 +1099,8 @@ export default function HeroChat() {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
-                    }`}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+                      }`}
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
