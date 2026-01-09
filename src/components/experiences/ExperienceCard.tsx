@@ -27,10 +27,17 @@ export function ExperienceCard({
     }).format(parseInt(price.amount));
   };
 
-  const slug = experience.url.split("/").pop();
+  // Check if URL is external
+  const isExternalUrl = experience.url.startsWith('http://') ||
+                        experience.url.startsWith('https://');
+  const href = isExternalUrl ? experience.url : experience.url;
 
   return (
-    <Link href={`/experiencias/${slug}`} className="h-full">
+    <Link
+      href={href}
+      className="h-full"
+      {...(isExternalUrl ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
       <Card
         className={cn(
           "group overflow-hidden border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col p-0",

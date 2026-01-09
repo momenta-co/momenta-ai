@@ -17,19 +17,16 @@ function transformToFeedExperience(dbExp: any): Experience {
 
   const price = dbExp.price_min
     ? {
-        amount: dbExp.price_min.toString(),
-        currency: 'COP',
-        unit: 'per_person',
-      }
+      amount: dbExp.price_min.toString(),
+      currency: 'COP',
+      unit: 'per_person',
+    }
     : null;
-
-  // Use slug from database, fallback to id if not available
-  const urlSlug = dbExp.slug || dbExp.id;
 
   return {
     title: dbExp.title,
     description: dbExp.description_short || '',
-    url: `/experiencias/${urlSlug}`,
+    url: dbExp.source_url || `/experiencias/${dbExp.slug || dbExp.id}`,
     image: dbExp.image_url || '',
     categories: tags,
     price,
@@ -62,6 +59,18 @@ async function getDiverseExperiences(limit: number): Promise<any[]> {
       status: 'active',
       image_url: { not: null },
       slug: { not: null }, // Only experiences with slugs
+    },
+    select: {
+      id: true,
+      title: true,
+      description_short: true,
+      city: true,
+      price_min: true,
+      duration_minutes: true,
+      tags: true,
+      image_url: true,
+      slug: true,
+      source_url: true,
     },
     orderBy: {
       created_at: 'desc',
@@ -152,6 +161,18 @@ export async function getStressReliefExperiences(limit: number = 10): Promise<Ex
         status: 'active',
         image_url: { not: null },
         slug: { not: null },
+      },
+      select: {
+        id: true,
+        title: true,
+        description_short: true,
+        city: true,
+        price_min: true,
+        duration_minutes: true,
+        tags: true,
+        image_url: true,
+        slug: true,
+        source_url: true,
       },
       orderBy: {
         created_at: 'desc',
