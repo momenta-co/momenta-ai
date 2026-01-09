@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model experiences {
+  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title             String
+  description_short String?
+  city              String
+  price_min         Decimal?  @db.Decimal(10, 2)
+  price_max         Decimal?  @db.Decimal(10, 2)
+  duration_minutes  Int?
+  tags              Json?     @default("[]")
+  status            String?   @default("active")
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+  image_url         String?
+  numeric_id        Int?      @unique
+  slug              String?   @unique
+
+  @@index([city], map: "idx_experiences_city")
+  @@index([status], map: "idx_experiences_status")
+  @@index([slug], map: "idx_experiences_slug")
+}
+
+model recommendation_runs {
+  id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id             String    @db.Uuid
+  input_context       Json?
+  constraints_applied Json?
+  candidate_ids       Json?     @default("[]")
+  model               String?
+  prompt_version      String?
+  output              Json?
+  created_at          DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([created_at], map: "idx_recommendation_runs_created")
+  @@index([user_id], map: "idx_recommendation_runs_user")
+}
