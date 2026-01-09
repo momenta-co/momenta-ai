@@ -24,7 +24,7 @@ export default function RotatingTitleWord() {
     <span
       className={`
         relative inline-block px-5 py-2 mx-1 rounded-xl bg-[#F5EFE0] text-neutral-1000
-        transition-all duration-400
+        transition-all duration-[400ms] min-w-[240px]
         ${isAnimating ? 'opacity-0 translate-y-2 scale-95' : 'opacity-100 translate-y-0 scale-100'}
       `}
     >

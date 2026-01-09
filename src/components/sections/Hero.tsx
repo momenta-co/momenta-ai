@@ -197,15 +197,23 @@ export const Hero = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="text-4xl sm:text-5xl lg:text-[52px] text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center max-w-[70%]"
+                  className="text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center w-full"
+                  style={{ fontSize: 'clamp(2rem, 5vw, 40px)' }}
                 >
-                  La manera más{' '}
-                  <RotatingTitleWord />
+                  La manera más{' '}<RotatingTitleWord />
                   <br />
-                  de vivir
-                  <br />
-                  tu tiempo libre
+                  de vivir tu tiempo libre
                 </motion.h1>
+
+                {/* Subtitle */}
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center w-full text-small"
+                >
+                  Cuéntame de qué tienes ganas hoy - Yo me encargo!
+                </motion.p>
 
                 {/* 3D Sphere */}
                 <motion.div
