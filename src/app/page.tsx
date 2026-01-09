@@ -1,4 +1,4 @@
-import HeroChat from "@/components/sections/HeroChat";
+import { Hero } from "@/components/sections/Hero";
 import { Footer } from "@/components/layout/Footer";
 import { Browse } from "@/components/sections/Browse";
 import { Feed } from "@/components/sections/Feed";
@@ -10,7 +10,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroChat />
+      <Hero />
       <Browse />
       <Feed
         tonightIdeas={feedData.tonightIdeas}
