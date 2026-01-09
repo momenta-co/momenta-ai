@@ -51,60 +51,61 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="hidden lg:flex items-center h-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="flex items-center h-full w-full"
     >
-      <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-2xl">
-        {/* Carousel Images */}
-        {carouselExperiences.map((experience, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: index === currentSlide ? 1 : 0 }}
-            transition={{ duration: 0.7, ease: 'easeInOut' }}
-            className="absolute inset-0"
-            style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
-          >
-            {/* Hero Image */}
-            <Image
-              src={experience.image}
-              alt={experience.title}
-              fill
-              className="object-cover"
-              priority={index === 0}
-              unoptimized
-            />
+          <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-2xl">
+            {/* Carousel Images */}
+            {carouselExperiences.map((experience, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: index === currentSlide ? 1 : 0 }}
+                transition={{ duration: 0.7, ease: 'easeInOut' }}
+                className="absolute inset-0"
+                style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
+              >
+                {/* Hero Image */}
+                <Image
+                  src={experience.image}
+                  alt={experience.title}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                  unoptimized
+                />
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-            {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
-              <h2 className="text-[32px] font-serif font-normal mb-0 leading-tight">
-                {experience.title}
-              </h2>
-              <p className="text-base mb-7 opacity-90 font-light">
-                {experience.description}
-              </p>
+                {/* Content Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+                  <h2 className="text-[32px] font-serif font-normal mb-0 leading-tight">
+                    {experience.title}
+                  </h2>
+                  <p className="text-base mb-7 opacity-90 font-light">
+                    {experience.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+
+            {/* Pagination Dots */}
+            <div className="absolute bottom-10 right-10 flex gap-2">
+              {carouselExperiences.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+                    }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
-          </motion.div>
-        ))}
-
-        {/* Pagination Dots */}
-        <div className="absolute bottom-10 right-10 flex gap-2">
-          {carouselExperiences.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
-                }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
+          </div>
     </motion.div>
   );
 });

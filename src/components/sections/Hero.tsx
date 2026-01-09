@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAIChat, type ChatMessage } from '@/hooks/useAIChat';
 import type { AudioVisualizerData, RecommendationData } from '@/types/chat';
 
@@ -185,10 +185,22 @@ export const Hero = () => {
   return (
     <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
       {/* Two Column Layout - Always Visible */}
-      <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 w-full h-full">
+      <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8 overflow-hidden">
+        <motion.div
+          className="flex flex-col lg:flex-row w-full h-full"
+          animate={{
+            gap: messages.length > 0 ? '0px' : '64px'
+          }}
+          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           {/* Left Column - Chat Interface */}
-          <div className="flex flex-col h-full w-full max-h-[83vh]">
+          <motion.div
+            className="flex flex-col h-full w-full max-h-[83vh]"
+            animate={{
+              flex: messages.length > 0 ? '1 1 100%' : '1 1 50%',
+            }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
             {/* Title and Sphere - Only show when no messages */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center flex-1 gap-8">
@@ -295,11 +307,23 @@ export const Hero = () => {
               onSubmit={onSubmit}
               toggleVoice={toggleVoice}
             />
-          </div>
+          </motion.div>
 
           {/* Right Column - Featured Experience Carousel */}
-          <ExperienceCarousel />
-        </div>
+          <AnimatePresence mode="wait">
+            {messages.length === 0 && (
+              <motion.div
+                key="carousel-wrapper"
+                initial={{ opacity: 1, flex: '1 1 50%' }}
+                exit={{ opacity: 0, flex: '0 0 0%' }}
+                transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="overflow-hidden hidden lg:flex"
+              >
+                <ExperienceCarousel />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );
