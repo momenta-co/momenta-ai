@@ -5,6 +5,7 @@ export interface Price {
 }
 
 export interface Experience {
+  id: string;
   title: string;
   description: string;
   url: string;

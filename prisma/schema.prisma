@@ -20,8 +20,9 @@ model experiences {
   created_at        DateTime? @default(now()) @db.Timestamp(6)
   updated_at        DateTime? @default(now()) @db.Timestamp(6)
   image_url         String?
-  numeric_id        Int?      @unique
+  numeric_id        Int       @unique(map: "idx_experiences_numeric_id") @default(autoincrement())
   slug              String?   @unique
+  source_url        String?
 
   @@index([city], map: "idx_experiences_city")
   @@index([status], map: "idx_experiences_status")
@@ -29,16 +30,33 @@ model experiences {
 }
 
 model recommendation_runs {
-  id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id             String    @db.Uuid
+  id                  String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id             String          @db.Uuid
   input_context       Json?
   constraints_applied Json?
-  candidate_ids       Json?     @default("[]")
+  candidate_ids       Json?           @default("[]")
   model               String?
   prompt_version      String?
   output              Json?
-  created_at          DateTime? @default(now()) @db.Timestamp(6)
+  created_at          DateTime?       @default(now()) @db.Timestamp(6)
+  beta_feedback       beta_feedback[]
 
   @@index([created_at], map: "idx_recommendation_runs_created")
   @@index([user_id], map: "idx_recommendation_runs_user")
+}
+
+model beta_feedback {
+  id                    String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                 String
+  user_id               String?              @db.Uuid
+  recommendation_run_id String?              @db.Uuid
+  liked_recommendations Boolean?
+  comments              String?
+  created_at            DateTime?            @default(now()) @db.Timestamp(6)
+  recommendation_runs   recommendation_runs? @relation(fields: [recommendation_run_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([created_at], map: "idx_beta_feedback_created")
+  @@index([email], map: "idx_beta_feedback_email")
+  @@index([recommendation_run_id], map: "idx_beta_feedback_run")
+  @@index([user_id], map: "idx_beta_feedback_user")
 }

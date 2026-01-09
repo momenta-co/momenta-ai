@@ -1,6 +1,11 @@
 import { prisma } from './prisma';
 import type { Experience } from '@/types/experience';
 
+// Simple in-memory cache to avoid repeated DB calls
+let cachedFeed: { tonightIdeas: Experience[]; stressRelief: Experience[] } | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL = 60 * 1000; // 1 minute cache
+
 /**
  * Transform database experience to Feed Experience type
  */
@@ -17,19 +22,17 @@ function transformToFeedExperience(dbExp: any): Experience {
 
   const price = dbExp.price_min
     ? {
-        amount: dbExp.price_min.toString(),
-        currency: 'COP',
-        unit: 'per_person',
-      }
+      amount: dbExp.price_min.toString(),
+      currency: 'COP',
+      unit: 'per_person',
+    }
     : null;
 
-  // Use slug from database, fallback to id if not available
-  const urlSlug = dbExp.slug || dbExp.id;
-
   return {
+    id: dbExp.id,
     title: dbExp.title,
     description: dbExp.description_short || '',
-    url: `/experiencias/${urlSlug}`,
+    url: dbExp.source_url || `/experiencias/${dbExp.slug || dbExp.id}`,
     image: dbExp.image_url || '',
     categories: tags,
     price,
@@ -56,17 +59,28 @@ function shuffleArray<T>(array: T[]): T[] {
  * Get diverse experiences from multiple cities
  */
 async function getDiverseExperiences(limit: number): Promise<any[]> {
-  // Fetch more than needed to ensure diversity
+  // Fetch only what we need - reduced from limit * 3 to limit * 1.5
   const experiences = await prisma.experiences.findMany({
     where: {
       status: 'active',
       image_url: { not: null },
-      slug: { not: null }, // Only experiences with slugs
+    },
+    select: {
+      id: true,
+      title: true,
+      description_short: true,
+      city: true,
+      price_min: true,
+      duration_minutes: true,
+      tags: true,
+      image_url: true,
+      slug: true,
+      source_url: true,
     },
     orderBy: {
       created_at: 'desc',
     },
-    take: limit * 3, // Fetch 3x to ensure variety
+    take: Math.ceil(limit * 1.5), // Reduced for faster queries
   });
 
   // If no experiences found, return empty array
@@ -146,17 +160,28 @@ export async function getTonightIdeas(limit: number = 10): Promise<Experience[]>
  */
 export async function getStressReliefExperiences(limit: number = 10): Promise<Experience[]> {
   try {
-    // Get diverse experiences
+    // Get experiences - reduced from 100 to 30 for faster queries
     const allExperiences = await prisma.experiences.findMany({
       where: {
         status: 'active',
         image_url: { not: null },
-        slug: { not: null },
+      },
+      select: {
+        id: true,
+        title: true,
+        description_short: true,
+        city: true,
+        price_min: true,
+        duration_minutes: true,
+        tags: true,
+        image_url: true,
+        slug: true,
+        source_url: true,
       },
       orderBy: {
         created_at: 'desc',
       },
-      take: 100, // Get more to filter
+      take: 30, // Reduced from 100 for faster queries
     });
 
     // Filter for wellness/relaxation experiences based on tags or title
@@ -248,16 +273,25 @@ export async function getStressReliefExperiences(limit: number = 10): Promise<Ex
 }
 
 /**
- * Get all feed experiences at once
+ * Get all feed experiences at once (with cache)
  */
 export async function getFeedExperiences() {
+  // Return cached data if still valid
+  const now = Date.now();
+  if (cachedFeed && (now - cacheTimestamp) < CACHE_TTL) {
+    console.log('[Feed] Returning cached data');
+    return cachedFeed;
+  }
+
+  console.log('[Feed] Fetching fresh data from DB');
   const [tonightIdeas, stressRelief] = await Promise.all([
     getTonightIdeas(10),
     getStressReliefExperiences(10),
   ]);
 
-  return {
-    tonightIdeas,
-    stressRelief,
-  };
+  // Update cache
+  cachedFeed = { tonightIdeas, stressRelief };
+  cacheTimestamp = now;
+
+  return cachedFeed;
 }

@@ -31,7 +31,7 @@ function transformDbExperience(dbExp: any): Experience {
     id: dbExp.id,
     title: dbExp.title,
     description: dbExp.description_short || '',
-    url: `https://www.momentaboutique.com/experiencias/${dbExp.id}`, // Generate URL
+    url: dbExp.source_url || `https://www.momentaboutique.com/experiencias/${dbExp.id}`,
     image: dbExp.image_url || '',
     categories: tags,
     price,
@@ -50,6 +50,18 @@ export async function getAllExperiences(): Promise<Experience[]> {
     const experiences = await prisma.experiences.findMany({
       where: {
         status: 'active',
+      },
+      select: {
+        id: true,
+        title: true,
+        description_short: true,
+        city: true,
+        price_min: true,
+        price_max: true,
+        duration_minutes: true,
+        tags: true,
+        image_url: true,
+        source_url: true,
       },
       orderBy: {
         created_at: 'desc',
