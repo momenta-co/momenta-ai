@@ -49,6 +49,11 @@ const suggestions = [
 ];
 
 // ============================================
+// ROTATING TITLE WORDS
+// ============================================
+const titleWords = ["auténtica", "especial", "curada", "memorable", "perfecta"];
+
+// ============================================
 // VOICE-REACTIVE 3D SPHERE SHADERS
 // ============================================
 const monsteraVertexShader = `
@@ -288,9 +293,9 @@ function VoiceSphere({
     directionalLight.position.set(1, 2, 4);
     scene.add(directionalLight);
 
-    // Momenta soft cream/gold tones
-    const colorEdge = new THREE.Color('#E8DFC0');
-    const colorMid = new THREE.Color('#FFFAE8');
+    // Light blue tones
+    const colorEdge = new THREE.Color('#B3E5FC');
+    const colorMid = new THREE.Color('#81D4FA');
     const colorCenter = new THREE.Color('#FFFFFF');
 
     const leafGeometry = new THREE.IcosahedronGeometry(1, 64);
@@ -430,6 +435,38 @@ function VoiceSphere({
 }
 
 // ============================================
+// ROTATING TITLE WORD COMPONENT
+// ============================================
+function RotatingTitleWord() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % titleWords.length);
+        setIsAnimating(false);
+      }, 400);
+    }, 5000); // Synchronized with carousel
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span
+      className={`
+        relative inline-block px-5 py-2 mx-1 rounded-xl bg-[#F5EFE0] text-neutral-1000
+        transition-all duration-400
+        ${isAnimating ? 'opacity-0 translate-y-2 scale-95' : 'opacity-100 translate-y-0 scale-100'}
+      `}
+    >
+      {titleWords[currentIndex]}
+    </span>
+  );
+}
+
+// ============================================
 // ROTATING PLACEHOLDER COMPONENT
 // ============================================
 function RotatingPlaceholder() {
@@ -451,7 +488,7 @@ function RotatingPlaceholder() {
   return (
     <span
       className={`
-        text-neutral-700/50 transition-all duration-300 pointer-events-none
+        text-neutral-700/40 text-base sm:text-lg font-light transition-all duration-300 pointer-events-none
         ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}
       `}
     >
@@ -461,39 +498,54 @@ function RotatingPlaceholder() {
 }
 
 // ============================================
-// MESSAGE COMPONENTS
+// MESSAGE COMPONENTS - Floating Design
 // ============================================
 function UserMessage({ content }: { content: string }) {
   return (
-    <div className="flex justify-end mb-4">
-      <div className="max-w-[80%] bg-primary-700 text-white px-4 py-3 rounded-2xl rounded-br-md">
-        <p className="text-[15px] whitespace-pre-wrap">{content}</p>
+    <motion.div
+      initial={{ opacity: 0, x: 20, y: 10 }}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="flex justify-end mb-6"
+    >
+      <div className="max-w-[80%] bg-primary-700 text-white px-6 py-4 rounded-3xl rounded-br-lg shadow-lg shadow-primary-700/20">
+        <p className="text-base leading-relaxed whitespace-pre-wrap">{content}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function AssistantMessage({ content }: { content: string }) {
   return (
-    <div className="flex justify-start mb-4">
-      <div className="max-w-[80%] bg-neutral-200 text-neutral-1000 px-4 py-3 rounded-2xl rounded-bl-md">
-        <p className="text-[15px] whitespace-pre-wrap">{content}</p>
+    <motion.div
+      initial={{ opacity: 0, x: -20, y: 10 }}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="flex justify-start mb-6"
+    >
+      <div className="max-w-[80%] bg-white/90 backdrop-blur-sm text-neutral-1000 px-6 py-4 rounded-3xl rounded-bl-lg shadow-lg shadow-neutral-900/10 border border-neutral-200/50">
+        <p className="text-base leading-relaxed whitespace-pre-wrap">{content}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function LoadingMessage() {
   return (
-    <div className="flex justify-start mb-4">
-      <div className="bg-neutral-200 px-4 py-3 rounded-2xl rounded-bl-md">
-        <div className="flex gap-1">
-          <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-neutral-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex justify-start mb-6"
+    >
+      <div className="bg-white/90 backdrop-blur-sm px-6 py-4 rounded-3xl rounded-bl-lg shadow-lg shadow-neutral-900/10 border border-neutral-200/50">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2.5 h-2.5 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2.5 h-2.5 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -513,11 +565,11 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
 
   const ExperienceCard = ({ recommendation, index }: { recommendation: RecommendationData; index: number }) => (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{
-        duration: 0.5,
-        delay: index * 0.08,
+        duration: 0.6,
+        delay: index * 0.1,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
       className="flex flex-col"
@@ -525,7 +577,7 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
       <Link
         href={recommendation.url}
         target="_blank"
-        className="group block bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden border border-neutral-200/60 hover:border-primary-700/30 transition-all duration-500 hover:shadow-lg hover:shadow-primary-700/5 mb-2"
+        className="group block bg-white/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-neutral-200/60 hover:border-primary-700/40 transition-all duration-700 hover:shadow-2xl hover:shadow-primary-700/15 hover:scale-[1.02] mb-3 shadow-lg shadow-neutral-900/10"
       >
         {/* Image with overlay */}
         <div className="relative h-[100px] sm:h-[120px] overflow-hidden">
@@ -553,20 +605,20 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
         </div>
 
         {/* Content - Compact */}
-        <div className="p-3">
-          <h3 className="font-serif text-sm sm:text-base text-neutral-900 leading-tight line-clamp-2 group-hover:text-primary-700 transition-colors duration-300">
+        <div className="p-4">
+          <h3 className="font-serif text-base sm:text-lg text-neutral-900 leading-snug line-clamp-2 group-hover:text-primary-700 transition-colors duration-500 mb-3">
             {recommendation.title}
           </h3>
 
-          <div className="flex items-center gap-2 mt-2 text-[10px] sm:text-xs text-neutral-500">
+          <div className="flex items-center gap-3 text-xs text-neutral-500">
             {recommendation.duration && (
-              <span className="flex items-center gap-0.5">
-                <Clock className="w-3 h-3" />
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
                 {recommendation.duration}
               </span>
             )}
-            <span className="flex items-center gap-0.5">
-              <MapPin className="w-3 h-3" />
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
               {recommendation.location}
             </span>
           </div>
@@ -574,8 +626,8 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
       </Link>
 
       {/* AI Reasoning - Why Momenta chose this */}
-      <div className="px-2">
-        <p className="text-xs text-neutral-700 leading-relaxed italic">
+      <div className="px-3">
+        <p className="text-xs text-neutral-600 leading-relaxed italic font-light">
           "{recommendation.reasons}"
         </p>
       </div>
@@ -583,9 +635,24 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
   );
 
   return (
-    <div className="w-full mb-4 px-2">
+    <div className="w-full mb-8 mt-8">
+      {/* Title for recommendations */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-6"
+      >
+        <h2 className="text-2xl sm:text-3xl font-serif text-neutral-900 mb-2">
+          Experiencias perfectas para ti
+        </h2>
+        <p className="text-sm text-neutral-600 font-light">
+          Seleccionadas especialmente por Momenta AI
+        </p>
+      </motion.div>
+
       {/* First row - 3 cards */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2 sm:mb-3">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
         {firstRow.map((recommendation, index) => (
           <ExperienceCard key={recommendation.url} recommendation={recommendation} index={index} />
         ))}
@@ -593,7 +660,7 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
 
       {/* Second row - 2 cards centered */}
       {secondRow.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
           <div className="col-start-1 col-span-1 sm:col-start-1">
             {secondRow[0] && (
               <ExperienceCard recommendation={secondRow[0]} index={3} />
@@ -609,6 +676,42 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
     </div>
   );
 }
+
+// ============================================
+// CAROUSEL DATA
+// ============================================
+const carouselExperiences = [
+  {
+    title: "Taller de pintura",
+    description: "Creatividad artística · 2-4 personas · Fin de semana",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/f065395e-683c-4686-9213-81ebacd1c014",
+  },
+  {
+    title: "Cena clandestina",
+    description: "Experiencia culinaria única · 8-12 personas · Viernes",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/d4f65285-17ed-4e65-a2a2-21dddbc09e84",
+  },
+  {
+    title: "Vuelo en parapente",
+    description: "Aventura extrema · 1 persona · Día soleado",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/9a332c9e-19e3-444a-8249-72c1651f615b",
+  },
+  {
+    title: "Taller de scrapbook",
+    description: "Arte y recuerdos · 3-6 personas · Tarde",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/59e7ec82-5a94-4cc1-8675-d2c2277544c0",
+  },
+  {
+    title: "Sesión de Spa",
+    description: "Relajación total · 2 personas · Sábado",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/5d973ac0-5852-4218-a546-23f2043b28d8",
+  },
+  {
+    title: "Taller de pasta fresca",
+    description: "Cocina italiana · 4-8 personas · Domingo",
+    image: "https://d3p3fw3rutb1if.cloudfront.net/photos/ff6930dc-ad0f-4f54-b281-ca30ea5c2fe4",
+  },
+];
 
 // ============================================
 // MAIN HERO CHAT COMPONENT
@@ -638,6 +741,7 @@ export default function HeroChat() {
   const [isListening, setIsListening] = useState(false);
   const [audioData, setAudioData] = useState<AudioVisualizerData>({ volume: 0, frequencies: [] });
   const [isFocused, setIsFocused] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Refs
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -654,6 +758,15 @@ export default function HeroChat() {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  // Carousel auto-rotation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselExperiences.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const analyzeAudio = useCallback(() => {
     if (!analyserRef.current || !isListeningRef.current) return;
@@ -784,182 +897,268 @@ export default function HeroChat() {
 
   const recommendations = extractRecommendations();
 
-  // Check if in chat mode (has messages)
-  const inChatMode = messages.length > 0;
-
   return (
-    <section className={`
-      relative h-screen flex flex-col bg-neutral-100
-      ${inChatMode ? 'pt-20' : 'pt-20'}
-    `}>
-      {/* Initial Hero State */}
-      {!inChatMode && (
-        <div className="flex-1 flex flex-col items-center justify-center px-4">
-          {/* Title */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl text-neutral-1000 text-center leading-tight mb-8">
-            Disfruta tu ciudad
-            <br />
-            <span className="text-primary-700">sin scrollear sin fin</span>
-          </h1>
+    <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
+      {/* Two Column Layout - Always Visible */}
+      <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 w-full h-full">
+          {/* Left Column - Chat Interface */}
+          <div className="flex flex-col h-full w-full max-h-[83vh]">
+            {/* Title and Sphere - Only show when no messages */}
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center flex-1 gap-8">
+                {/* Title */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="text-4xl sm:text-5xl lg:text-[52px] text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center max-w-[70%]"
+                >
+                  La manera más{' '}
+                  <RotatingTitleWord />
+                  <br />
+                  de vivir
+                  <br />
+                  tu tiempo libre
+                </motion.h1>
 
-          {/* 3D Sphere */}
-          <div className="my-8">
-            <VoiceSphere isListening={isListening} audioData={audioData} />
-          </div>
-        </div>
-      )}
+                {/* 3D Sphere */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="relative w-72 h-72 -ml-4"
+                >
+                  <VoiceSphere isListening={isListening} audioData={audioData} />
+                </motion.div>
+              </div>
+            )}
 
-      {/* Chat Messages Area */}
-      {inChatMode && (
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto py-6">
-          <div className="max-w-2xl mx-auto px-4">
-            {messages.map((message) => {
-              // Extract text content from parts (AI SDK v6 format)
-              const textContent = message.parts
-                ?.filter((part): part is { type: 'text'; text: string } => (part as any).type === 'text')
-                .map((part) => part.text)
-                .join('') || '';
+            {/* Chat Messages Area - Scrollable */}
+            {messages.length > 0 && (
+              <div className="flex-1 overflow-hidden mb-6">
+                <div
+                  ref={messagesContainerRef}
+                  className="h-full overflow-y-auto px-2 custom-scrollbar"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#CBD5E1 transparent'
+                  }}
+                >
+                  {messages.map((message) => {
+                    // Extract text content from parts (AI SDK v6 format)
+                    const textContent = message.parts
+                      ?.filter((part): part is { type: 'text'; text: string } => (part as any).type === 'text')
+                      .map((part) => part.text)
+                      .join('') || '';
 
-              // Only render user and assistant messages
-              if (message.role === 'user') {
-                return <UserMessage key={message.id} content={textContent} />;
-              }
+                    // Only render user and assistant messages
+                    if (message.role === 'user') {
+                      return <UserMessage key={message.id} content={textContent} />;
+                    }
 
-              if (message.role === 'assistant') {
-                // Only show assistant message if it has text content
-                if (textContent) {
-                  return <AssistantMessage key={message.id} content={textContent} />;
-                }
-              }
+                    if (message.role === 'assistant') {
+                      // Only show assistant message if it has text content
+                      if (textContent) {
+                        return <AssistantMessage key={message.id} content={textContent} />;
+                      }
+                    }
 
-              return null;
-            })}
+                    return null;
+                  })}
 
-            {/* Loading indicator */}
-            {isLoading && <LoadingMessage />}
+                  {/* Loading indicator */}
+                  {isLoading && <LoadingMessage />}
 
-            {/* Error message */}
-            {error && (
-              <div className="flex justify-center mb-4">
-                <div className="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
-                  <p className="text-sm">Error: {error.message}</p>
+                  {/* Error message */}
+                  {error && (
+                    <div className="flex justify-center mb-4">
+                      <div className="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
+                        <p className="text-sm">Error: {error.message}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show recommendations if available */}
+                  {recommendations && recommendations.length > 0 && (
+                    <div className="mt-4">
+                      <ExperienceRecommendations recommendations={recommendations} />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Show recommendations if available */}
-            {recommendations && recommendations.length > 0 && (
-              <div className="mt-4">
-                <ExperienceRecommendations recommendations={recommendations} />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Chat Input Bar - Always at bottom */}
-      <div className="bg-neutral-100 px-4 py-4">
-        <div className="max-w-2xl mx-auto">
-          <form onSubmit={onSubmit}>
-            <div
-              className={`
-                bg-white rounded-2xl
-                border-2 transition-all duration-300
-                shadow-lg shadow-neutral-1000/5
-                ${isFocused ? 'border-primary-700 shadow-primary-700/10' : 'border-neutral-300'}
-              `}
+            {/* Chat Input Bar - Always at bottom of left column */}
+            <motion.form
+              onSubmit={onSubmit}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="w-full"
             >
-              {/* Textarea row */}
-              <div className="relative px-4 pt-3 pb-2">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => {
-                    setInput(e.target.value);
-                    // Auto-resize textarea dynamically
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      if (input.trim() && !isLoading) {
-                        onSubmit(e as any);
-                      }
-                    }
-                  }}
-                  onFocus={() => setIsFocused(true)}
-                  onBlur={() => setIsFocused(false)}
-                  rows={1}
-                  disabled={isLoading}
-                  className="
-                    w-full bg-transparent
-                    text-neutral-1000 text-[15px] leading-relaxed
-                    focus:outline-none
-                    placeholder-transparent
-                    resize-none overflow-hidden
-                    disabled:opacity-50
-                  "
-                  style={{ minHeight: '28px' }}
-                  placeholder="Escribe tu mensaje..."
-                />
-                {/* Rotating placeholder overlay */}
-                {!input && !isFocused && !inChatMode && (
-                  <div className="absolute inset-x-4 top-3 pointer-events-none">
-                    <RotatingPlaceholder />
-                  </div>
-                )}
-                {!input && !isFocused && inChatMode && (
-                  <div className="absolute inset-x-4 top-3 pointer-events-none">
-                    <span className="text-neutral-700/50">Escribe tu mensaje...</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Buttons row */}
-              <div className="flex items-center justify-end gap-2 px-2 pb-2">
-                {/* Microphone button */}
-                <button
-                  type="button"
-                  onClick={toggleVoice}
-                  disabled={isLoading}
-                  className={`
-                    flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
-                    transition-all duration-200
-                    disabled:opacity-50
-                    ${isListening
-                      ? 'bg-primary-700 text-white'
-                      : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
-                    }
+              <div
+                className={`
+                    bg-white/95 backdrop-blur-xl rounded-3xl
+                    border transition-all duration-500
+                    ${isFocused
+                    ? 'border-primary-700/40 shadow-2xl shadow-primary-700/20 scale-[1.01]'
+                    : 'border-neutral-300/50 shadow-xl shadow-neutral-900/8'
+                  }
                   `}
-                  aria-label={isListening ? 'Detener' : 'Hablar'}
-                >
-                  {isListening ? (
-                    <Square className="w-4 h-4" strokeWidth={2} fill="currentColor" />
-                  ) : (
-                    <Mic className="w-5 h-5" strokeWidth={2} />
+                style={{
+                  boxShadow: isFocused
+                    ? '0 20px 60px -15px rgba(30, 58, 95, 0.25), 0 10px 30px -10px rgba(30, 58, 95, 0.15)'
+                    : '0 15px 45px -10px rgba(31, 41, 55, 0.12), 0 8px 20px -5px rgba(31, 41, 55, 0.08)',
+                }}
+              >
+                {/* Textarea row */}
+                <div className="relative px-6 pt-5 pb-3">
+                  <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      // Auto-resize textarea dynamically
+                      e.target.style.height = 'auto';
+                      e.target.style.height = e.target.scrollHeight + 'px';
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (input.trim() && !isLoading) {
+                          onSubmit(e as any);
+                        }
+                      }
+                    }}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    rows={1}
+                    disabled={isLoading}
+                    className="
+                        w-full bg-transparent
+                        text-neutral-1000 text-base leading-relaxed
+                        focus:outline-none
+                        resize-none overflow-hidden
+                        disabled:opacity-50
+                        font-light min-h-[28px]
+                      "
+                  />
+                  {/* Rotating placeholder overlay */}
+                  {!input && !isFocused && (
+                    <div className="absolute inset-x-6 top-5 pointer-events-none">
+                      <RotatingPlaceholder />
+                    </div>
                   )}
-                </button>
+                </div>
 
-                {/* Send button */}
-                <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className="
-                    flex-shrink-0 w-10 h-10 rounded-xl
-                    bg-primary-700 text-white
-                    flex items-center justify-center
-                    hover:bg-primary-800
-                    disabled:opacity-30 disabled:cursor-not-allowed
-                    transition-all duration-200
-                  "
-                  aria-label="Enviar"
+                {/* Buttons row */}
+                <div className="flex items-center justify-end gap-3 px-4 pb-3">
+                  {/* Microphone button */}
+                  <button
+                    type="button"
+                    onClick={toggleVoice}
+                    disabled={isLoading}
+                    className={`
+                        flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center
+                        transition-all duration-300
+                        disabled:opacity-50
+                        ${isListening
+                        ? 'bg-primary-700 text-white shadow-lg shadow-primary-700/30 scale-105'
+                        : 'bg-neutral-200/80 text-neutral-600 hover:bg-neutral-300/80 hover:scale-105'
+                      }
+                      `}
+                    aria-label={isListening ? 'Detener' : 'Hablar'}
+                  >
+                    {isListening ? (
+                      <Square className="w-4 h-4" strokeWidth={2} fill="currentColor" />
+                    ) : (
+                      <Mic className="w-4 h-4" strokeWidth={2} />
+                    )}
+                  </button>
+
+                  {/* Send button */}
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || isLoading}
+                    className="
+                        flex-shrink-0 w-11 h-11 rounded-full
+                        bg-neutral-300/80 text-neutral-600
+                        flex items-center justify-center
+                        hover:bg-neutral-400/80 hover:scale-105
+                        disabled:opacity-30 disabled:cursor-not-allowed
+                        transition-all duration-300
+                        active:scale-95
+                      "
+                    aria-label="Enviar"
+                  >
+                    <Send className="w-4 h-4" strokeWidth={2} />
+                  </button>
+                </div>
+              </div>
+            </motion.form>
+          </div>
+
+          {/* Right Column - Featured Experience Carousel */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="hidden lg:flex items-center h-full"
+          >
+            <div className="relative w-full h-full rounded-[32px] overflow-hidden shadow-2xl">
+              {/* Carousel Images */}
+              {carouselExperiences.map((experience, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: index === currentSlide ? 1 : 0 }}
+                  transition={{ duration: 0.7, ease: 'easeInOut' }}
+                  className="absolute inset-0"
+                  style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
                 >
-                  <Send className="w-5 h-5" strokeWidth={2} />
-                </button>
+                  {/* Hero Image */}
+                  <Image
+                    src={experience.image}
+                    alt={experience.title}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                    unoptimized
+                  />
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+                    <h2 className="text-[32px] font-serif font-normal mb-4 leading-tight">
+                      {experience.title}
+                    </h2>
+                    <p className="text-base mb-7 opacity-90 font-light">
+                      {experience.description}
+                    </p>
+                    <button className="px-10 py-3.5 bg-primary-700/90 hover:bg-primary-700 backdrop-blur-sm rounded-full text-white font-medium transition-all duration-300 hover:scale-105 text-base">
+                      Descubrir
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Pagination Dots */}
+              <div className="absolute bottom-10 right-10 flex gap-2">
+                {carouselExperiences.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+                      }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
-          </form>
+          </motion.div>
         </div>
       </div>
     </section>

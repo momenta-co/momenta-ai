@@ -46,7 +46,7 @@ export function Navbar() {
           {/* Left - Catálogo Link */}
           <div className="flex items-center justify-start">
             <a
-              href="#experiencias"
+              href="/experiencias"
               className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
             >
               Experiencias

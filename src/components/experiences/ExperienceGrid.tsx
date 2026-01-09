@@ -35,6 +35,11 @@ export function ExperienceGrid({
   const searchParams = useSearchParams();
   const catParam = searchParams.get("cat");
 
+  // Browse filters from URL
+  const cityParam = searchParams.get("city");
+  const dateParam = searchParams.get("date");
+  const attendeesParam = searchParams.get("attendees");
+
   // Mapear el parámetro de URL al nombre de categoría
   const initialCategory = catParam ? (categoryMap[catParam] || "Ver todo") : "Ver todo";
 
@@ -45,7 +50,17 @@ export function ExperienceGrid({
     const newCategory = catParam ? (categoryMap[catParam] || "Ver todo") : "Ver todo";
     setSelectedCategory(newCategory);
   }, [catParam]);
-  const [selectedLocation, setSelectedLocation] = useState<string>("Todas");
+
+  // Initialize location from URL if city param exists
+  const [selectedLocation, setSelectedLocation] = useState<string>(cityParam || "Todas");
+
+  // Update location when city param changes
+  useEffect(() => {
+    if (cityParam) {
+      setSelectedLocation(cityParam);
+    }
+  }, [cityParam]);
+
   const [visibleCount, setVisibleCount] = useState(limit || ITEMS_PER_PAGE);
 
   const categories = useMemo(() => {
@@ -96,6 +111,34 @@ export function ExperienceGrid({
           onLocationChange={setSelectedLocation}
           totalResults={filteredExperiences.length}
         />
+      )}
+
+      {/* Browse Filters Display */}
+      {(cityParam || dateParam || attendeesParam) && (
+        <div className="mt-4 p-4 bg-cream/50 rounded-lg border border-charcoal/10">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-charcoal/80">Filtros de búsqueda:</span>
+            {cityParam && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gold/20 text-charcoal">
+                📍 {cityParam}
+              </span>
+            )}
+            {dateParam && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gold/20 text-charcoal">
+                📅 {new Date(dateParam).toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+            )}
+            {attendeesParam && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gold/20 text-charcoal">
+                👥 {attendeesParam} {Number(attendeesParam) === 1 ? 'persona' : 'personas'}
+              </span>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Grid */}
