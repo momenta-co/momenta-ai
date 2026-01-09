@@ -15,9 +15,10 @@ import UserMessage from '@/components/molecules/UserMessage';
 import AssistantMessage from '@/components/molecules/AssistantMessage';
 
 // Organisms
-import ExperienceRecommendations from '@/components/organisms/ExperienceRecommendations';
+import HorizontalSlider from '@/components/organisms/HorizontalSlider';
 import ChatInputBar from '@/components/organisms/ChatInputBar';
 import ExperienceCarousel from '@/components/organisms/ExperienceCarousel';
+import ExperienceCard from '@/components/molecules/ExperienceCard';
 
 export const Hero = () => {
   // Custom AI chat hook - handles all conversation state
@@ -260,7 +261,17 @@ export const Hero = () => {
                   {/* Show recommendations if available */}
                   {recommendations && recommendations.length > 0 && (
                     <div className="mt-4">
-                      <ExperienceRecommendations recommendations={recommendations} />
+                      <HorizontalSlider
+                        title="Experiencias perfectas para ti"
+                        items={recommendations}
+                        keyExtractor={(rec) => rec.url}
+                        renderCard={(rec, index) => (
+                          <ExperienceCard
+                            recommendation={rec}
+                            index={index}
+                          />
+                        )}
+                      />
                     </div>
                   )}
                 </div>
