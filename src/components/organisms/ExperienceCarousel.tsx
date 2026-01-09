@@ -82,15 +82,12 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
 
             {/* Content Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
-              <h2 className="text-[32px] font-serif font-normal mb-4 leading-tight">
+              <h2 className="text-[32px] font-serif font-normal mb-0 leading-tight">
                 {experience.title}
               </h2>
               <p className="text-base mb-7 opacity-90 font-light">
                 {experience.description}
               </p>
-              <button className="px-10 py-3.5 bg-primary-700/90 hover:bg-primary-700 backdrop-blur-sm rounded-full text-white font-medium transition-all duration-300 hover:scale-105 text-base">
-                Descubrir
-              </button>
             </div>
           </motion.div>
         ))}
@@ -101,9 +98,8 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
-              }`}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
