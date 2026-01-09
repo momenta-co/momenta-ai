@@ -27,9 +27,20 @@ export const Hero = () => {
 
   // Log for debugging
   useEffect(() => {
-    console.log('Messages:', messages);
-    console.log('isLoading:', isLoading);
-    if (error) console.error('Chat error:', error);
+    console.log('[Hero] Messages:', messages);
+    console.log('[Hero] Messages count:', messages.length);
+    messages.forEach((msg, idx) => {
+      console.log(`[Hero] Message ${idx}:`, {
+        id: msg.id,
+        role: msg.role,
+        content: msg.content,
+        contentLength: msg.content?.length || 0,
+        hasToolInvocations: !!msg.toolInvocations,
+        toolInvocationsCount: msg.toolInvocations?.length || 0
+      });
+    });
+    console.log('[Hero] isLoading:', isLoading);
+    if (error) console.error('[Hero] Chat error:', error);
   }, [messages, isLoading, error]);
 
   // UI state
@@ -208,7 +219,10 @@ export const Hero = () => {
                     }
 
                     if (message.role === 'assistant') {
-                      return <AssistantMessage key={message.id} content={message.content} />;
+                      // Only show assistant message if it has content
+                      if (message.content && message.content.trim()) {
+                        return <AssistantMessage key={message.id} content={message.content} />;
+                      }
                     }
 
                     return null;
