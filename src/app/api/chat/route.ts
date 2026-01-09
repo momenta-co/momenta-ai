@@ -76,6 +76,91 @@ const OFF_TOPIC_RESPONSE = `¡Hola! Aquí te ayudo a encontrar el plan perfecto.
 const TOURIST_RESPONSE = `Mmm, eso no es lo mío, pero sí puedo ayudarte a encontrar un momento especial. ¿Qué quieres celebrar?`;
 
 // ============================================
+// FAST PATH: Instant local responses (no API call)
+// ============================================
+interface FastResponse {
+  pattern: RegExp;
+  responses: string[];
+  requiresFirstMessage?: boolean; // Only respond if it's the first user message
+}
+
+const FAST_RESPONSES: FastResponse[] = [
+  // Saludos simples - solo si es el primer mensaje
+  {
+    pattern: /^(hola|hey|hi|hello|buenas?|qué tal|que tal|buenos días|buenas tardes|buenas noches)[\s!.,?]*$/i,
+    responses: [
+      '¡Hola! Soy tu asistente de Momenta 💚 Cuéntame, ¿qué momento especial quieres vivir? ¿Un plan romántico, algo con amigos, o un momento para ti?',
+      '¡Hey! Qué gusto saludarte 💚 ¿Qué tienes en mente? ¿Algo para celebrar, relajarte o compartir con alguien especial?',
+    ],
+    requiresFirstMessage: true,
+  },
+  // Experiencias románticas/pareja
+  {
+    pattern: /\b(romántic[oa]|pareja|novio|novia|aniversario|san valent[ií]n)\b/i,
+    responses: [
+      '¡Ay qué lindo! Tenemos experiencias románticas increíbles 💕 Desde cenas privadas con chef, hasta escapadas cerca a la ciudad. ¿Para cuándo lo están planeando y en qué ciudad?',
+      '¡Me encanta! Un plan en pareja siempre es especial 💕 ¿En Bogotá o Medellín? Y cuéntame, ¿buscan algo tranquilito o algo más aventurero?',
+    ],
+  },
+  // Cumpleaños/celebraciones
+  {
+    pattern: /\b(cumpleaños|cumple|celebra(r|ción)?|fiesta)\b/i,
+    responses: [
+      '¡Qué emoción! Para celebraciones tenemos opciones increíbles 🎂 ¿Me cuentas para quién es, cuántos van a ser y en qué ciudad?',
+      '¡Me encanta! Las celebraciones son lo mejor 🎉 ¿Para cuándo, en qué ciudad y cuántas personas van a ser?',
+    ],
+  },
+  // Corporativo/equipos
+  {
+    pattern: /\b(corporativ[oa]|empresa|equipo|team.?building|oficina)\b/i,
+    responses: [
+      'Nuestras experiencias corporativas son geniales para fortalecer equipos 💼 Tenemos talleres de cocina colaborativa, actividades de bienestar y más. ¿Cuántas personas son y en qué ciudad?',
+    ],
+  },
+  // Spa/bienestar/relajación
+  {
+    pattern: /\b(spa|relaj(ar|ante)|bienestar|masaje|yoga|descansar|desconectar)\b/i,
+    responses: [
+      '¡Un momento de relax! Me encanta 🧘 ¿En Bogotá o Medellín? ¿Y vas sola o acompañada?',
+      'Autocuidado es clave 💆 Tenemos spas increíbles. ¿Para cuándo lo quieres y en qué ciudad?',
+    ],
+  },
+  // Amigos
+  {
+    pattern: /\b(amigos|amigas|parche|grupo|reuni[oó]n)\b/i,
+    responses: [
+      '¡Un plan con amigos! Eso siempre es bueno 🎉 ¿Cuántos son, para cuándo y en qué ciudad? ¿Algo chill o algo más de fiesta?',
+    ],
+  },
+  // Gracias
+  {
+    pattern: /^(gracias|muchas gracias|te agradezco|genial|perfecto|excelente)[\s!.,]*$/i,
+    responses: [
+      '¡Con mucho gusto! Si necesitas algo más, aquí estoy 💚',
+      '¡Para eso estoy! Cuéntame si puedo ayudarte con algo más 💚',
+    ],
+  },
+];
+
+function getFastResponse(message: string, isFirstMessage: boolean): string | null {
+  const lowerMessage = message.toLowerCase().trim();
+
+  for (const fastResponse of FAST_RESPONSES) {
+    if (fastResponse.pattern.test(lowerMessage)) {
+      // Skip if requires first message and it's not
+      if (fastResponse.requiresFirstMessage && !isFirstMessage) {
+        continue;
+      }
+      // Return random response from options
+      const randomIndex = Math.floor(Math.random() * fastResponse.responses.length);
+      return fastResponse.responses[randomIndex];
+    }
+  }
+
+  return null;
+}
+
+// ============================================
 // HELPER: Convert AI SDK v6 messages
 // ============================================
 type MessageRole = 'user' | 'assistant' | 'system';
@@ -201,10 +286,13 @@ export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
   const messages = convertMessages(rawMessages);
 
-  // Pre-filter check
-  const lastUserMessage = messages.filter((m: { role: string }) => m.role === 'user').pop();
+  // Count user messages to determine if it's the first message
+  const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
+  const isFirstMessage = userMessages.length === 1;
+  const lastUserMessage = userMessages.pop();
 
   if (lastUserMessage?.content) {
+    // 1. Check for off-topic messages first
     const contextCheck = checkMessageContext(lastUserMessage.content);
     if (!contextCheck.isOnTopic) {
       const response = contextCheck.reason === 'tourist' ? TOURIST_RESPONSE : OFF_TOPIC_RESPONSE;
@@ -212,9 +300,19 @@ export async function POST(req: Request) {
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
       });
     }
+
+    // 2. Try fast path for instant responses (no API call)
+    const fastResponse = getFastResponse(lastUserMessage.content, isFirstMessage);
+    if (fastResponse) {
+      console.log('[FAST PATH] Responding instantly without API call');
+      return new Response(fastResponse, {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      });
+    }
   }
 
-  // Stream with AI SDK and tools
+  // 3. Full AI path - only when fast path doesn't match
+  console.log('[AI PATH] Using OpenAI for complex response');
   const result = streamText({
     model: openai('gpt-4o-mini'),
     system: SYSTEM_PROMPT,
