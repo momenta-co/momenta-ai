@@ -235,7 +235,7 @@ function HorizontalSlider({
       <SliderContainer>
         <SliderTrack ref={sliderRef}>
           {items.map((item, index) => (
-            <SliderCard key={item.url || index}>
+            <SliderCard key={item.id || index}>
               {renderCard(item, index)}
             </SliderCard>
           ))}

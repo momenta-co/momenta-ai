@@ -24,6 +24,7 @@ function transformToFeedExperience(dbExp: any): Experience {
     : null;
 
   return {
+    id: dbExp.id,
     title: dbExp.title,
     description: dbExp.description_short || '',
     url: dbExp.source_url || `/experiencias/${dbExp.slug || dbExp.id}`,
