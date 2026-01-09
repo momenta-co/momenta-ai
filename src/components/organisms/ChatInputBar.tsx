@@ -70,13 +70,11 @@ export default function ChatInputBar({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             rows={1}
-            disabled={isLoading}
             className="
               w-full bg-transparent
               text-neutral-1000 text-base leading-relaxed
               focus:outline-none
               resize-none overflow-hidden
-              disabled:opacity-50
               font-light min-h-[28px]
             "
           />
@@ -94,11 +92,9 @@ export default function ChatInputBar({
           <button
             type="button"
             onClick={toggleVoice}
-            disabled={isLoading}
             className={`
               flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center
               transition-all duration-300
-              disabled:opacity-50
               ${isListening
                 ? 'bg-primary-700 text-white shadow-lg shadow-primary-700/30 scale-105'
                 : 'bg-neutral-200/80 text-neutral-600 hover:bg-neutral-300/80 hover:scale-105'
