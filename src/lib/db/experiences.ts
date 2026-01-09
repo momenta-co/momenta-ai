@@ -21,10 +21,10 @@ function transformDbExperience(dbExp: any): Experience {
   // Calculate price from min/max
   const price = dbExp.price_min
     ? {
-        amount: dbExp.price_min.toString(),
-        currency: 'COP',
-        unit: 'por persona',
-      }
+      amount: dbExp.price_min.toString(),
+      currency: 'COP',
+      unit: 'por persona',
+    }
     : null;
 
   return {

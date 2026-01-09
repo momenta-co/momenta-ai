@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Mic, Send, Square, Clock, MapPin } from 'lucide-react';
 import { useChat } from '@ai-sdk/react';
 import type { Experience } from '@/types/experience';
+import { ChatMessage } from '@/hooks/useAIChat';
 
 // ============================================
 // TYPES
