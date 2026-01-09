@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAIChat, type ChatMessage } from '@/hooks/useAIChat';
 import type { AudioVisualizerData, RecommendationData } from '@/types/chat';
@@ -133,8 +133,8 @@ export const Hero = () => {
     handleSubmit(e);
   };
 
-  // Extract recommendations from tool calls in messages
-  const extractRecommendations = (): RecommendationData[] | null => {
+  // Extract recommendations from tool calls in messages - memoized to prevent unnecessary recalculations
+  const recommendations = useMemo((): RecommendationData[] | null => {
     // Look for the last message with tool results
     for (let i = messages.length - 1; i >= 0; i--) {
       const message = messages[i];
@@ -151,9 +151,7 @@ export const Hero = () => {
       }
     }
     return null;
-  };
-
-  const recommendations = extractRecommendations();
+  }, [messages]);
 
   return (
     <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">

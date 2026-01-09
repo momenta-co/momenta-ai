@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import ExperienceCard from '@/components/molecules/ExperienceCard';
 import type { RecommendationData } from '@/types/chat';
@@ -9,7 +9,7 @@ interface ExperienceRecommendationsProps {
   recommendations: RecommendationData[];
 }
 
-export default function ExperienceRecommendations({ recommendations }: ExperienceRecommendationsProps) {
+const ExperienceRecommendations = memo(function ExperienceRecommendations({ recommendations }: ExperienceRecommendationsProps) {
   // Split recommendations into rows: first 3, then remaining 2
   const firstRow = recommendations.slice(0, 3);
   const secondRow = recommendations.slice(3, 5);
@@ -55,4 +55,6 @@ export default function ExperienceRecommendations({ recommendations }: Experienc
       )}
     </div>
   );
-}
+});
+
+export default ExperienceRecommendations;

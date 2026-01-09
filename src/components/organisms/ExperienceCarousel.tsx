@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import type { CarouselExperience } from '@/types/chat';
@@ -38,7 +38,7 @@ const carouselExperiences: CarouselExperience[] = [
   },
 ];
 
-export default function ExperienceCarousel() {
+const ExperienceCarousel = memo(function ExperienceCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -111,4 +111,6 @@ export default function ExperienceCarousel() {
       </div>
     </motion.div>
   );
-}
+});
+
+export default ExperienceCarousel;
