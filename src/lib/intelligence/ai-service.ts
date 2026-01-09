@@ -1,23 +1,23 @@
 import { generateText, Output } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
-import type { UserContext, Experience, Recommendation } from './types';
+import type { UserContext, Experience, Recommendation, ScoringBreakdown } from './types';
 import { buildPrompt } from './prompt-builder';
 import { generateFallbackRecommendations } from './fallback';
 
-// Zod schema for AI response validation
+// Zod schema for AI response validation - Updated for priority-based scoring
 const aiRecommendationSchema = z.object({
   recommendations: z.array(
     z.object({
       experienceId: z.string(),
       scoreBreakdown: z.object({
-        occasion: z.number().min(0).max(100),
-        relation: z.number().min(0).max(100),
-        mood: z.number().min(0).max(100),
-        budget: z.number().min(0).max(100),
-        total: z.number().min(0).max(100),
+        priority1: z.number().min(0).max(100), // Ciudad, personas, fecha
+        priority2: z.number().min(0).max(100), // Tipo grupo, ocasión, categoría, presupuesto
+        priority3: z.number().min(0).max(100), // Energía, intención, evitar
+        priority4: z.number().min(0).max(100), // Modalidad, mood, conexión
+        total: z.number().min(0).max(100),     // Weighted average
       }),
-      reasons: z.string().min(10), // Paragraph format (2-4 sentences)
+      reasons: z.string().min(10),
     })
   ).min(3).max(5),
 });
@@ -25,13 +25,12 @@ const aiRecommendationSchema = z.object({
 type AIRecommendationResponse = z.infer<typeof aiRecommendationSchema>;
 
 /**
- * Generate recommendations using OpenAI
+ * Generate recommendations using OpenAI with priority-based scoring
  */
 export async function generateAIRecommendations(
   userContext: UserContext,
   experiences: Experience[]
 ): Promise<Recommendation[]> {
-  // Validate environment variables
   const apiKey = process.env.OPENAI_API_KEY;
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
@@ -41,11 +40,8 @@ export async function generateAIRecommendations(
   }
 
   try {
-    // Build the prompt
     const prompt = buildPrompt(userContext, experiences);
 
-    // Call OpenAI using AI SDK with structured output
-    // Note: Type casting needed due to AI SDK version compatibility
     const result = await generateText({
       model: openai(model) as any,
       system: prompt.system,
@@ -56,11 +52,9 @@ export async function generateAIRecommendations(
       }),
     } as any);
 
-    // Extract structured output
     const aiResponse = (result as any).output as AIRecommendationResponse;
     console.log('AI Response: ', aiResponse);
 
-    // Map AI response to our Recommendation format
     const recommendations = mapAIResponseToRecommendations(
       aiResponse,
       experiences
@@ -69,15 +63,13 @@ export async function generateAIRecommendations(
     return recommendations;
   } catch (error) {
     console.error('OpenAI API error, falling back to heuristic scoring:', error);
-
-    // Fallback to heuristic scoring on error
     return generateFallbackRecommendations(userContext, experiences);
   }
 }
 
 /**
- * Map AI response to our Recommendation type
- * Handles index-based IDs (exp-0, exp-1, etc.) returned by the AI
+ * Map AI response to Recommendation format
+ * Converts priority-based scores to legacy format for frontend compatibility
  */
 function mapAIResponseToRecommendations(
   aiResponse: AIRecommendationResponse,
@@ -85,7 +77,6 @@ function mapAIResponseToRecommendations(
 ): Recommendation[] {
   return aiResponse.recommendations
     .map(aiRec => {
-      // Parse index from experienceId (format: "exp-0", "exp-1", etc.)
       const match = aiRec.experienceId.match(/^exp-(\d+)$/);
 
       if (!match) {
@@ -97,13 +88,22 @@ function mapAIResponseToRecommendations(
       const experience = experiences[index];
 
       if (!experience) {
-        console.warn(`Experience at index ${index} not found in pool (ID: ${aiRec.experienceId})`);
+        console.warn(`Experience at index ${index} not found (ID: ${aiRec.experienceId})`);
         return null;
       }
 
+      // Convert priority-based scores to legacy format for frontend compatibility
+      const scoreBreakdown: ScoringBreakdown = {
+        occasion: aiRec.scoreBreakdown.priority2,  // Priority 2 includes ocasión
+        relation: aiRec.scoreBreakdown.priority2,  // Priority 2 includes tipoGrupo
+        mood: aiRec.scoreBreakdown.priority3,      // Priority 3 includes nivelEnergia
+        budget: aiRec.scoreBreakdown.priority2,    // Priority 2 includes presupuesto
+        total: aiRec.scoreBreakdown.total,
+      };
+
       return {
         experience,
-        scoreBreakdown: aiRec.scoreBreakdown,
+        scoreBreakdown,
         reasons: aiRec.reasons,
       };
     })
