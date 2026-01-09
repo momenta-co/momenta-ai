@@ -141,7 +141,7 @@ function HorizontalSlider<T>({
       <SliderContainer>
         <SliderTrack ref={sliderRef}>
           {items.map((item, index) => (
-            <SliderCard key={keyExtractor(item, index)}>
+            <SliderCard key={`${keyExtractor(item, index)}-${index}`}>
               {renderCard(item, index)}
             </SliderCard>
           ))}
