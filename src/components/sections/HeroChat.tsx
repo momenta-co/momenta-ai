@@ -869,15 +869,17 @@ export default function HeroChat() {
       <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 w-full h-full">
           {/* Left Column - Chat Interface */}
-          <div className="flex flex-col relative h-full w-full justify-between items-center">
+          <div className="flex flex-col h-full w-full max-h-[83vh]">
             {/* Title and Sphere - Only show when no messages */}
             {messages.length === 0 && (
-              <>
+              <div className="flex flex-col items-center justify-center flex-1 gap-8">
                 {/* Title */}
                 <motion.h1
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }} className="text-4xl sm:text-5xl lg:text-[52px] text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center max-w-[70%]">
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="text-4xl sm:text-5xl lg:text-[52px] text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center max-w-[70%]"
+                >
                   La manera más{' '}
                   <RotatingTitleWord />
                   <br />
@@ -895,43 +897,52 @@ export default function HeroChat() {
                 >
                   <VoiceSphere isListening={isListening} audioData={audioData} />
                 </motion.div>
-              </>
+              </div>
             )}
 
-            {/* Chat Messages Area */}
+            {/* Chat Messages Area - Scrollable */}
             {messages.length > 0 && (
-              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto pb-6">
-                {messages.map((message: ChatMessage) => {
-                  // Only render user and assistant messages
-                  if (message.role === 'user') {
-                    return <UserMessage key={message.id} content={message.content} />;
-                  }
+              <div className="flex-1 overflow-hidden mb-6">
+                <div
+                  ref={messagesContainerRef}
+                  className="h-full overflow-y-auto px-2 custom-scrollbar"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#CBD5E1 transparent'
+                  }}
+                >
+                  {messages.map((message: ChatMessage) => {
+                    // Only render user and assistant messages
+                    if (message.role === 'user') {
+                      return <UserMessage key={message.id} content={message.content} />;
+                    }
 
-                  if (message.role === 'assistant') {
-                    return <AssistantMessage key={message.id} content={message.content} />;
-                  }
+                    if (message.role === 'assistant') {
+                      return <AssistantMessage key={message.id} content={message.content} />;
+                    }
 
-                  return null;
-                })}
+                    return null;
+                  })}
 
-                {/* Loading indicator */}
-                {isLoading && <LoadingMessage />}
+                  {/* Loading indicator */}
+                  {isLoading && <LoadingMessage />}
 
-                {/* Error message */}
-                {error && (
-                  <div className="flex justify-center mb-4">
-                    <div className="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
-                      <p className="text-sm">Error: {error.message}</p>
+                  {/* Error message */}
+                  {error && (
+                    <div className="flex justify-center mb-4">
+                      <div className="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
+                        <p className="text-sm">Error: {error.message}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Show recommendations if available */}
-                {recommendations && recommendations.length > 0 && (
-                  <div className="mt-4">
-                    <ExperienceRecommendations recommendations={recommendations} />
-                  </div>
-                )}
+                  {/* Show recommendations if available */}
+                  {recommendations && recommendations.length > 0 && (
+                    <div className="mt-4">
+                      <ExperienceRecommendations recommendations={recommendations} />
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -985,16 +996,14 @@ export default function HeroChat() {
                         w-full bg-transparent
                         text-neutral-1000 text-base leading-relaxed
                         focus:outline-none
-                        placeholder-transparent
                         resize-none overflow-hidden
                         disabled:opacity-50
                         font-light min-h-[28px]
                       "
-                    placeholder="Quiero regalar una experiencia de bienestar"
                   />
                   {/* Rotating placeholder overlay */}
                   {!input && !isFocused && (
-                    <div className="absolute inset-x-4 top-3 pointer-events-none">
+                    <div className="absolute inset-x-6 top-5 pointer-events-none">
                       <RotatingPlaceholder />
                     </div>
                   )}
