@@ -559,10 +559,6 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
     return `$${amount}`;
   };
 
-  // Split recommendations into rows: first 3, then remaining 2
-  const firstRow = recommendations.slice(0, 3);
-  const secondRow = recommendations.slice(3, 5);
-
   const ExperienceCard = ({ recommendation, index }: { recommendation: RecommendationData; index: number }) => (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -580,7 +576,7 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
         className="group block bg-white/90 backdrop-blur-xl rounded-2xl overflow-hidden border border-neutral-200/60 hover:border-primary-700/40 transition-all duration-700 hover:shadow-2xl hover:shadow-primary-700/15 hover:scale-[1.02] mb-3 shadow-lg shadow-neutral-900/10"
       >
         {/* Image with overlay */}
-        <div className="relative h-[100px] sm:h-[120px] overflow-hidden">
+        <div className="relative h-[120px] sm:h-[100px] md:h-[120px] overflow-hidden">
           <Image
             src={recommendation.image}
             alt={recommendation.title}
@@ -605,29 +601,30 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
         </div>
 
         {/* Content - Compact */}
-        <div className="p-4">
-          <h3 className="font-serif text-base sm:text-lg text-neutral-900 leading-snug line-clamp-2 group-hover:text-primary-700 transition-colors duration-500 mb-3">
+        <div className="p-3 sm:p-4">
+          <h3 className="font-serif text-sm sm:text-base md:text-lg text-neutral-900 leading-snug line-clamp-2 group-hover:text-primary-700 transition-colors duration-500 mb-2 sm:mb-3">
             {recommendation.title}
           </h3>
 
-          <div className="flex items-center gap-3 text-xs text-neutral-500">
+          <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-neutral-500 flex-wrap">
             {recommendation.duration && (
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                {recommendation.duration}
+                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden xs:inline">{recommendation.duration}</span>
+                <span className="xs:hidden">{recommendation.duration.split(' ')[0]}</span>
               </span>
             )}
             <span className="flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5" />
+              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               {recommendation.location}
             </span>
           </div>
         </div>
       </Link>
 
-      {/* AI Reasoning - Why Momenta chose this */}
-      <div className="px-3">
-        <p className="text-xs text-neutral-600 leading-relaxed italic font-light">
+      {/* AI Reasoning - Why Momenta chose this - Hidden on very small screens */}
+      <div className="px-2 sm:px-3 hidden sm:block">
+        <p className="text-xs text-neutral-600 leading-relaxed italic font-light line-clamp-2">
           "{recommendation.reasons}"
         </p>
       </div>
@@ -635,44 +632,28 @@ function ExperienceRecommendations({ recommendations }: { recommendations: Recom
   );
 
   return (
-    <div className="w-full mb-8 mt-8">
+    <div className="w-full mb-6 sm:mb-8 mt-6 sm:mt-8">
       {/* Title for recommendations */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-6"
+        className="mb-4 sm:mb-6"
       >
-        <h2 className="text-2xl sm:text-3xl font-serif text-neutral-900 mb-2">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-serif text-neutral-900 mb-1 sm:mb-2">
           Experiencias perfectas para ti
         </h2>
-        <p className="text-sm text-neutral-600 font-light">
+        <p className="text-xs sm:text-sm text-neutral-600 font-light">
           Seleccionadas especialmente por Momenta AI
         </p>
       </motion.div>
 
-      {/* First row - 3 cards */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
-        {firstRow.map((recommendation, index) => (
+      {/* Responsive grid: 1 col on mobile, 2 on sm, 3 on md+ */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+        {recommendations.map((recommendation, index) => (
           <ExperienceCard key={recommendation.url} recommendation={recommendation} index={index} />
         ))}
       </div>
-
-      {/* Second row - 2 cards centered */}
-      {secondRow.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          <div className="col-start-1 col-span-1 sm:col-start-1">
-            {secondRow[0] && (
-              <ExperienceCard recommendation={secondRow[0]} index={3} />
-            )}
-          </div>
-          <div className="col-start-2 col-span-1">
-            {secondRow[1] && (
-              <ExperienceCard recommendation={secondRow[1]} index={4} />
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -864,27 +845,29 @@ export default function HeroChat() {
   const recommendations = extractRecommendations();
 
   return (
-    <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
+    <section className="relative min-h-screen h-screen-safe flex flex-col bg-neutral-100 pt-16 sm:pt-20">
       {/* Two Column Layout - Always Visible */}
-      <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 w-full h-full">
+      <div className="flex-1 flex items-stretch px-4 sm:px-6 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16 w-full h-full">
           {/* Left Column - Chat Interface */}
-          <div className="flex flex-col h-full w-full max-h-[83vh]">
+          <div className="flex flex-col h-full w-full max-h-[75vh] sm:max-h-[83vh]">
             {/* Title and Sphere - Only show when no messages */}
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center flex-1 gap-8">
+              <div className="flex flex-col items-center justify-center flex-1 gap-4 sm:gap-8">
                 {/* Title */}
                 <motion.h1
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="text-4xl sm:text-5xl lg:text-[52px] text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center max-w-[70%]"
+                  className="text-2xl sm:text-4xl lg:text-[52px] text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center max-w-[90%] sm:max-w-[70%]"
                 >
                   La manera más{' '}
                   <RotatingTitleWord />
-                  <br />
+                  <br className="hidden sm:block" />
+                  <span className="sm:hidden"> </span>
                   de vivir
-                  <br />
+                  <br className="hidden sm:block" />
+                  <span className="sm:hidden"> </span>
                   tu tiempo libre
                 </motion.h1>
 
@@ -893,7 +876,7 @@ export default function HeroChat() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className="relative w-72 h-72 -ml-4"
+                  className="relative w-48 h-48 sm:w-72 sm:h-72 -ml-0 sm:-ml-4"
                 >
                   <VoiceSphere isListening={isListening} audioData={audioData} />
                 </motion.div>
@@ -1057,6 +1040,7 @@ export default function HeroChat() {
           </div>
 
           {/* Right Column - Featured Experience Carousel */}
+          {/* Desktop: Full height carousel */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -1116,6 +1100,53 @@ export default function HeroChat() {
               </div>
             </div>
           </motion.div>
+
+          {/* Mobile: Horizontal scroll carousel - Only visible when no messages on mobile */}
+          {messages.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="lg:hidden -mx-4 sm:-mx-6 px-4 sm:px-6"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-neutral-600 uppercase tracking-wide">
+                  Experiencias destacadas
+                </h3>
+                <div className="flex gap-1">
+                  {carouselExperiences.slice(0, 4).map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                        index === currentSlide % 4 ? 'bg-primary-700 w-4' : 'bg-neutral-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-3 overflow-x-auto scroll-container-x pb-2">
+                {carouselExperiences.map((experience, index) => (
+                  <div
+                    key={index}
+                    className="relative flex-shrink-0 w-[200px] h-[140px] rounded-2xl overflow-hidden shadow-lg"
+                  >
+                    <Image
+                      src={experience.image}
+                      alt={experience.title}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                      <h4 className="text-sm font-medium line-clamp-1">{experience.title}</h4>
+                      <p className="text-xs opacity-80 line-clamp-1 mt-0.5">{experience.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>

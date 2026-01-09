@@ -93,50 +93,52 @@ export function Categories() {
   const category = categories[activeCategory];
 
   return (
-    <section className="py-24 bg-sage-light/20">
+    <section className="py-12 sm:py-16 lg:py-24 bg-sage-light/20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <span className="text-sage text-sm font-medium uppercase tracking-wider">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <span className="text-sage text-xs sm:text-sm font-medium uppercase tracking-wider">
             Categorías
           </span>
-          <h2 className="mt-2 font-serif text-3xl md:text-4xl lg:text-5xl text-charcoal">
+          <h2 className="mt-2 font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-charcoal">
             Encuentra tu experiencia ideal
           </h2>
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {categories.map((cat, index) => (
-            <button
-              key={cat.id}
-              onClick={() => handleCategoryClick(index)}
-              className={cn(
-                "relative flex items-center gap-2 px-6 py-3 rounded-full transition-all",
-                activeCategory === index
-                  ? "bg-charcoal text-cream"
-                  : "bg-white text-charcoal/70 hover:bg-charcoal/10"
-              )}
-            >
-              <cat.icon className="h-5 w-5" />
-              <span className="font-medium">{cat.name}</span>
-              {/* Progress Ring */}
-              {activeCategory === index && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1 bg-charcoal/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-sage transition-all duration-100"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              )}
-            </button>
-          ))}
+        {/* Category Tabs - Horizontal scroll on mobile */}
+        <div className="-mx-4 sm:mx-0 px-4 sm:px-0 mb-8 sm:mb-12">
+          <div className="flex sm:flex-wrap sm:justify-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 sm:pb-0">
+            {categories.map((cat, index) => (
+              <button
+                key={cat.id}
+                onClick={() => handleCategoryClick(index)}
+                className={cn(
+                  "relative flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all whitespace-nowrap flex-shrink-0",
+                  activeCategory === index
+                    ? "bg-charcoal text-cream"
+                    : "bg-white text-charcoal/70 hover:bg-charcoal/10"
+                )}
+              >
+                <cat.icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="font-medium text-sm sm:text-base">{cat.name}</span>
+                {/* Progress Ring */}
+                {activeCategory === index && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 sm:w-12 h-1 bg-charcoal/20 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-sage transition-all duration-100"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
           {/* Image */}
-          <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden">
+          <div className="relative h-[280px] sm:h-[350px] lg:h-[500px] rounded-xl sm:rounded-2xl overflow-hidden order-1">
             <Image
               src={category.image}
               alt={category.name}
@@ -149,11 +151,11 @@ export function Categories() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" />
             {/* Tags */}
-            <div className="absolute bottom-6 left-6 right-6 flex flex-wrap gap-2">
+            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 flex flex-wrap gap-1.5 sm:gap-2">
               {category.experiences.map((exp) => (
                 <span
                   key={exp}
-                  className="bg-cream/90 text-charcoal px-3 py-1 rounded-full text-sm"
+                  className="bg-cream/90 text-charcoal px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm"
                 >
                   {exp}
                 </span>
@@ -162,21 +164,21 @@ export function Categories() {
           </div>
 
           {/* Description */}
-          <div>
-            <div className="inline-flex items-center gap-2 mb-4">
-              <category.icon className="h-8 w-8 text-sage" />
-              <span className="text-sage font-medium">{category.name}</span>
+          <div className="order-2">
+            <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
+              <category.icon className="h-6 w-6 sm:h-8 sm:w-8 text-sage" />
+              <span className="text-sage font-medium text-sm sm:text-base">{category.name}</span>
             </div>
-            <h3 className="font-serif text-3xl md:text-4xl text-charcoal leading-tight">
+            <h3 className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl text-charcoal leading-tight">
               {category.description}
             </h3>
-            <p className="mt-6 text-charcoal/60 text-lg">
-              Explora nuestra colección de experiencias {category.name.toLowerCase()}
+            <p className="mt-4 sm:mt-6 text-charcoal/60 text-sm sm:text-base lg:text-lg">
+              Explora nuestra colección de experiencias {category.name.toLowerCase()}{' '}
               diseñadas para crear momentos únicos e inolvidables.
             </p>
             <Button
               asChild
-              className="mt-8 bg-sage hover:bg-sage/90 text-white rounded-full px-8"
+              className="mt-6 sm:mt-8 bg-sage hover:bg-sage/90 text-white rounded-full px-6 sm:px-8 text-sm sm:text-base"
             >
               <Link href={`/experiencias?cat=${category.id}`}>
                 Ver experiencias
