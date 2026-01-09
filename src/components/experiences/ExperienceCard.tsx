@@ -33,7 +33,7 @@ export function ExperienceCard({
     <Link href={`/experiencias/${slug}`} className="h-full">
       <Card
         className={cn(
-          "group overflow-hidden border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col",
+          "group overflow-hidden border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 h-full flex flex-col p-0",
           variant === "featured" && "md:col-span-2 md:row-span-2"
         )}
       >
