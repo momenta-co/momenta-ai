@@ -24,7 +24,7 @@ const MOMENTA_KEYWORDS = [
   'grupo', 'personas', 'solos', 'solo', 'sola',
   'relajante', 'relajado', 'aventura', 'divertido', 'tranquilo', 'especial',
   'presupuesto', 'precio',
-  'bogotá', 'medellín', 'ciudad', 'cerca', 'escapada', 'afueras', 'fuera de la ciudad',
+  'bogotá', 'ciudad', 'cerca', 'escapada', 'afueras', 'fuera de la ciudad',
   'restaurante', 'comida', 'spa', 'bienestar', 'arte',
   'busco', 'quiero', 'necesito', 'me gustaría', 'ayuda',
   'qué', 'cuál', 'cómo', 'dónde', 'cuándo',
@@ -153,7 +153,7 @@ function convertMessages(messages: any[]): { role: MessageRole; content: string 
 // SYSTEM PROMPT - Flujo de conversación amigable
 // ============================================
 const SYSTEM_PROMPT = `
-Eres el asistente de Momenta Boutique - la mejor amiga para encontrar experiencias especiales en Bogotá y Medellín.
+Eres el asistente de Momenta Boutique - la mejor amiga para encontrar experiencias especiales en Bogotá y cerca de Bogotá.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎭 PERSONALIDAD
@@ -172,7 +172,7 @@ IMPORTANTE: Solo puedes recomendar experiencias que EXISTEN en nuestro catálogo
 
 🏙️ CIUDADES:
   • Bogotá: 31 experiencias
-  • Medellín: 9 experiencias
+  • Cerca de Bogotá: experiencias de escapada y aventura
   • Cerca a Bogotá: algunas escapadas
 
 👥 PÚBLICO OBJETIVO:
@@ -188,7 +188,7 @@ IMPORTANTE: Solo puedes recomendar experiencias que EXISTEN en nuestro catálogo
   • Bienestar: masajes, yoga, reiki, pilates, spa
   • Manualidad: kintsugi, cerámica, joyería, scrapbook
   • Gastronómico: catas de vino, café, cerveza, licores
-  • Aventura: parapente (solo Medellín)
+  • Aventura: experiencias outdoor cerca de Bogotá
   • Belleza y Autocuidado: tratamientos, skincare
   • Fiesta: experiencias con música, brindis
 
@@ -207,7 +207,7 @@ Ejemplo:
 - "algo para niños" → Tenemos talleres de manualidades como Kintsugi, Scrapbook
 - "algo romántico" → Cenas, masajes en pareja, catas de vino
 - "con mis amigas" → Yoga + brunch, talleres de cocina, spa
-- "aventura" → Parapente en Medellín, experiencias outdoor cerca a Bogotá
+- "aventura" → Experiencias outdoor cerca de Bogotá
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🧠 CLASIFICACIÓN DE INTENCIÓN DEL USUARIO
@@ -223,7 +223,7 @@ ANTES de responder, clasifica SIEMPRE el mensaje del usuario en UNA de estas int
 | FEEDBACK | Respuesta a recomendaciones mostradas | "me gusta la segunda", "ninguna me convence", "qué otras opciones hay" |
 | QUESTION | Pregunta sobre Momenta/servicios | "qué es Momenta", "cómo funciona", "tienen gift cards" |
 | CONFIRMATION | Confirma datos para buscar | "sí", "perfecto", "dale", "busca" |
-| MODIFICATION | Quiere cambiar parámetros | "mejor en Medellín", "cambia la fecha", "somos más personas" |
+| MODIFICATION | Quiere cambiar parámetros | "mejor cerca de Bogotá", "cambia la fecha", "somos más personas" |
 | OFF_TOPIC | Fuera del alcance de Momenta | "cuál es la capital de Francia", "ayúdame con código" |
 | UNCLEAR | No se puede determinar claramente | mensajes ambiguos o muy cortos sin contexto |
 
@@ -253,7 +253,7 @@ ANTES de responder, clasifica SIEMPRE el mensaje del usuario en UNA de estas int
 
 📍 QUESTION:
   → Responde sobre Momenta de forma breve y útil
-  → Momenta es una plataforma de experiencias boutique en Bogotá y Medellín
+  → Momenta es una plataforma de experiencias boutique en Bogotá y cerca de Bogotá
   → Categorías: gastronomía, bienestar, arte, aventura
   → Luego redirige: "¿Te ayudo a encontrar una experiencia?"
 
@@ -270,7 +270,7 @@ ANTES de responder, clasifica SIEMPRE el mensaje del usuario en UNA de estas int
 
 📍 OFF_TOPIC:
   → Redirecciona amablemente sin juzgar
-  → "Mmm, eso no es lo mío, pero sí puedo ayudarte a encontrar experiencias increíbles en Bogotá y Medellín. ¿Qué momento especial quieres vivir?"
+  → "Mmm, eso no es lo mío, pero sí puedo ayudarte a encontrar experiencias increíbles en Bogotá. ¿Qué momento especial quieres vivir?"
 
 📍 UNCLEAR:
   → Pide clarificación de forma amigable
@@ -281,7 +281,7 @@ ANTES de responder, clasifica SIEMPRE el mensaje del usuario en UNA de estas int
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🔴 PRIORIDAD 1 (OBLIGATORIOS para recomendar):
-  • ciudad: "Bogotá" | "Cerca a Bogotá" | "Medellín"
+  • ciudad: "Bogotá" | "Cerca de Bogotá"
   • fecha: referencia temporal (hoy, mañana, sábado, fin de semana, etc.)
 
 🟡 PRIORIDAD 2 (Mejoran la búsqueda):
@@ -312,7 +312,7 @@ ENERGÍA (infiere de estas palabras):
   • social: fiesta, rumba, parche, celebración, animado, música, tragos, brindis
 
 CIUDAD:
-  • "escapada/fuera de la ciudad/afueras" → Pregunta: "¿Cerca a Bogotá o Medellín?"
+  • "escapada/fuera de la ciudad/afueras" → Infiere: "Cerca de Bogotá"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🛠️ USO DE HERRAMIENTAS
@@ -429,7 +429,7 @@ Usuario: "ninguna me convence"
 
 Usuario: "qué es Momenta?"
 → Intención: QUESTION
-→ Tú: "Momenta es tu aliada para experiencias boutique en Bogotá y Medellín 💚 ¿Te ayudo a encontrar algo especial?"
+→ Tú: "Momenta es tu aliada para experiencias boutique en Bogotá 💚 ¿Te ayudo a encontrar algo especial?"
 `;
 
 // Función para construir el prompt con contexto acumulado
@@ -702,7 +702,7 @@ export async function POST(req: Request) {
         `,
         inputSchema: z.object({
           // PRIORIDAD 1 (Requeridos)
-          ciudad: z.string().describe('Ciudad: "Bogotá", "Cerca a Bogotá", o "Medellín"'),
+          ciudad: z.string().describe('Ciudad: "Bogotá" o "Cerca de Bogotá"'),
           fecha: z.string().describe('Fecha o referencia temporal: "este sábado", "mañana", "15 de enero"'),
           personas: z.number().describe('Número de personas'),
 
