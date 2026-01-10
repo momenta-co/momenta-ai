@@ -131,7 +131,7 @@ const CIUDAD_PATTERNS: { pattern: RegExp; ciudad: string }[] = [
   { pattern: /\b(afueras|escapada|escapar)\b/i, ciudad: 'Cerca a Bogotá' },
   { pattern: /\bsalir\s+de\s+(la\s+)?ciudad\b/i, ciudad: 'Cerca a Bogotá' },
   // Ciudades directas - DESPUÉS de los patrones de "cerca/fuera" (incluye abreviaturas comunes)
-  { pattern: /\b(en\s+)?(medell[ií]n|mede)\b/i, ciudad: 'Medellín' },
+  // NOTA: Medellín ya no está disponible, solo Bogotá y cerca de Bogotá
   { pattern: /\b(en\s+)?(bogot[áa]?|vogota|bog)\b/i, ciudad: 'Bogotá' },
 ];
 
@@ -404,16 +404,8 @@ export function extractAccumulatedContext(
     }
   }
 
-  // Inferencias adicionales basadas en contexto
-  if (context.tipoGrupo === 'amigos' && !context.personas) {
-    context.personas = 5; // Promedio para grupos de amigos
-    context.extractedFromMessages.push('personas (inferido de amigos): 5');
-  }
-
-  if (context.tipoGrupo === 'familia' && !context.personas) {
-    context.personas = 4; // Promedio para familia
-    context.extractedFromMessages.push('personas (inferido de familia): 4');
-  }
+  // NO inferir número de personas para amigos/familia - siempre preguntar
+  // Solo inferimos personas para pareja (2) y sola (1)
 
   return context;
 }
@@ -434,7 +426,8 @@ export function generateContextReminder(context: ExtractedContext): string {
 
   // CASO ESPECIAL: El usuario ya confirmó el resumen
   if (context.userConfirmed && context.confirmSearchWasShown) {
-    const inferredPersonas = context.personas || (context.tipoGrupo === 'pareja' ? 2 : context.tipoGrupo === 'sola' ? 1 : 5);
+    // Solo inferir personas para pareja (2) y sola (1), nunca para amigos/familia
+    const inferredPersonas = context.personas || (context.tipoGrupo === 'pareja' ? 2 : context.tipoGrupo === 'sola' ? 1 : undefined);
     return `
 🚨🚨🚨 USUARIO YA CONFIRMÓ - LLAMA getRecommendations AHORA 🚨🚨🚨
 
@@ -456,12 +449,15 @@ Llama getRecommendations con estos parámetros:
     return '';
   }
 
-  // Verificar si tiene los 4 datos mínimos para llamar a las herramientas
+  // Verificar si tiene los datos mínimos para llamar a las herramientas
+  // Para pareja/sola: ciudad + fecha + tipoGrupo
+  // Para amigos/familia: ciudad + fecha + tipoGrupo + personas (NO inferir)
+  const needsPersonas = context.tipoGrupo === 'amigos' || context.tipoGrupo === 'familia';
   const hasMinimumData = Boolean(
     context.ciudad &&
     context.fecha &&
     context.tipoGrupo &&
-    context.nivelEnergia
+    (!needsPersonas || context.personas) // Solo requiere personas si es amigos/familia
   );
 
   let reminder = `
@@ -480,7 +476,8 @@ ${known.join('\n')}
   }
 
   if (hasMinimumData) {
-    const inferredPersonas = context.personas || (context.tipoGrupo === 'pareja' ? 2 : context.tipoGrupo === 'sola' ? 1 : 5);
+    // Solo inferir personas para pareja (2) y sola (1)
+    const inferredPersonas = context.personas || (context.tipoGrupo === 'pareja' ? 2 : context.tipoGrupo === 'sola' ? 1 : context.personas);
     reminder += `
 🚨 ACCIÓN INMEDIATA REQUERIDA:
 Ya tienes los 4 datos mínimos. LLAMA confirmSearch AHORA.
@@ -501,7 +498,8 @@ NO ESCRIBAS TEXTO. Solo llama al tool con estos parámetros:
     if (!context.ciudad) missing.push('ciudad');
     if (!context.fecha) missing.push('fecha');
     if (!context.tipoGrupo) missing.push('tipo de grupo');
-    if (!context.nivelEnergia) missing.push('nivel de energía/vibe');
+    // Para amigos/familia, siempre preguntar cuántos son
+    if (needsPersonas && !context.personas) missing.push('número de personas');
 
     if (missing.length > 0) {
       reminder += `
