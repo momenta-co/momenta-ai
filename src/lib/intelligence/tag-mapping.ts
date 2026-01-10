@@ -30,12 +30,15 @@ export const AVAILABLE_TAGS = [
  * MAPEO DE NIVEL DE ENERGÍA A TAGS
  *
  * Define qué tags son ideales (boost) y cuáles evitar (penalty) para cada nivel de energía
+ *
+ * NOTA: Yoga y Bienestar son DUALES - funcionan tanto para slow_cozy (meditativo)
+ * como para uplifting (yoga activo con amigas). El contexto determina cuál aplica.
  */
 export const ENERGY_TAG_MAPPING: Record<string, { boost: string[]; penalty: string[]; description: string }> = {
   slow_cozy: {
-    description: 'Tranquilo, relajado, calma, zen, descansar',
+    description: 'Tranquilo, relajado, calma, zen, descansar, yoga meditativo',
     boost: [
-      'Bienestar',           // Spa, yoga, masajes
+      'Bienestar',           // Spa, yoga, masajes - INCLUYE YOGA
       'Belleza y Autocuidado', // Tratamientos faciales, manicure
       'En tu casa',          // Experiencias a domicilio (más relajado)
     ],
@@ -43,14 +46,14 @@ export const ENERGY_TAG_MAPPING: Record<string, { boost: string[]; penalty: stri
       'Cocina',              // Talleres de cocina son activos
       'Aventura',            // Actividades de adrenalina
       'Fiesta',              // Ambientes ruidosos
-      'Para grupos',         // Puede ser muy social/ruidoso
+      // 'Para grupos' REMOVIDO - yoga en grupo puede ser tranquilo
     ],
   },
   calm_mindful: {
     description: 'Íntimo, especial, romántico, reflexivo',
     boost: [
       'Para parejas',        // Experiencias románticas
-      'Bienestar',           // Spa para dos
+      'Bienestar',           // Spa para dos, yoga en pareja
       'Belleza y Autocuidado',
       'Gastronómico',        // Cenas especiales
       'En tu casa',          // Privacidad
@@ -63,35 +66,42 @@ export const ENERGY_TAG_MAPPING: Record<string, { boost: string[]; penalty: stri
     ],
   },
   uplifting: {
-    description: 'Activo, divertido, movido, aventura',
+    description: 'Activo, divertido, movido, aventura, yoga dinámico',
     boost: [
       'Cocina',              // Talleres de cocina activos
       'Manualidad',          // Talleres creativos
       'Aventura',            // Actividades outdoor
       'Gastronómico',        // Experiencias culinarias
+      'Bienestar',           // Yoga activo, clases dinámicas - YOGA ES DUAL
     ],
     penalty: [
-      'Bienestar',           // Muy pasivo para este mood
       'Online',              // Prefieren presencial activo
     ],
   },
   social: {
-    description: 'Parche, fiesta, social, conversación',
+    description: 'Parche, fiesta, social, conversación, yoga con amigas',
     boost: [
       'Para grupos',         // Experiencias grupales
       'Fiesta',              // Ambiente de fiesta
       'Cocina',              // Cocinar en grupo
       'Gastronómico',        // Compartir comida
+      'Bienestar',           // Yoga/wellness con amigas - AGREGADO
     ],
     penalty: [
       'Individual',          // Muy solitario
-      'En tu casa',          // Menos social
+      // 'En tu casa' REMOVIDO - spa en casa con amigas es muy social
     ],
   },
 };
 
 /**
  * MAPEO DE TIPO DE GRUPO A TAGS
+ *
+ * NOTA: Bienestar (yoga, spa) aplica para TODOS los grupos:
+ * - sola: autocuidado personal
+ * - pareja: spa romántico, yoga en pareja
+ * - familia: actividades de bienestar familiar
+ * - amigos: yoga con amigas, spa day grupal
  */
 export const GROUP_TAG_MAPPING: Record<string, { boost: string[]; penalty: string[] }> = {
   sola: {
@@ -103,11 +113,11 @@ export const GROUP_TAG_MAPPING: Record<string, { boost: string[]; penalty: strin
     penalty: ['Para grupos', 'Corporativo', 'Para niños'],
   },
   familia: {
-    boost: ['Para niños', 'Para Niños', 'Cocina', 'Manualidad'],
+    boost: ['Para niños', 'Para Niños', 'Cocina', 'Manualidad', 'Bienestar'],
     penalty: ['Corporativo', 'Fiesta'],
   },
   amigos: {
-    boost: ['Para grupos', 'Cocina', 'Fiesta', 'Gastronómico', 'Aventura'],
+    boost: ['Para grupos', 'Cocina', 'Fiesta', 'Gastronómico', 'Aventura', 'Bienestar'], // BIENESTAR AGREGADO - yoga/spa con amigas
     penalty: ['Individual', 'Corporativo'],
   },
 };

@@ -257,8 +257,28 @@ export const Hero = () => {
                     }
 
                     if (message.role === 'assistant') {
-                      // Only show assistant message if it has content
-                      if (message.content && message.content.trim()) {
+                      // Check if this message has a confirmSearch tool result
+                      const confirmSearchResult = message.toolInvocations?.find(
+                        (t) => t.toolName === 'confirmSearch' && t.state === 'result' && t.result?.displayMessage
+                      );
+
+                      if (confirmSearchResult) {
+                        // ONLY show the tool's displayMessage, ignore AI's text content to avoid duplication
+                        return (
+                          <AssistantMessage
+                            key={message.id}
+                            content={confirmSearchResult.result.displayMessage}
+                          />
+                        );
+                      }
+
+                      // Check if this message has a getRecommendations tool result (don't show text, cards will show)
+                      const hasRecommendations = message.toolInvocations?.find(
+                        (t) => t.toolName === 'getRecommendations' && t.state === 'result' && t.result?.success
+                      );
+
+                      // Only show assistant message if it has content AND no tool results that replace it
+                      if (message.content && message.content.trim() && !hasRecommendations) {
                         return <AssistantMessage key={message.id} content={message.content} />;
                       }
                     }
