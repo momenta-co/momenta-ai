@@ -19,6 +19,7 @@ import HorizontalSlider from '@/components/organisms/HorizontalSlider';
 import ChatInputBar from '@/components/organisms/ChatInputBar';
 import ExperienceCarousel from '@/components/organisms/ExperienceCarousel';
 import ExperienceCard from '@/components/molecules/ExperienceCard';
+import FeedbackForm from '@/components/organisms/FeedbackForm';
 
 export const Hero = () => {
   // Custom AI chat hook - handles all conversation state
@@ -47,6 +48,7 @@ export const Hero = () => {
   // UI state
   const [isListening, setIsListening] = useState(false);
   const [audioData, setAudioData] = useState<AudioVisualizerData>({ volume: 0, frequencies: [] });
+  const [submittedFeedbackIds, setSubmittedFeedbackIds] = useState<Set<string>>(new Set());
 
   // Refs
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -161,6 +163,32 @@ export const Hero = () => {
     return null;
   }, []);
 
+  // Helper function to extract feedback request from tool invocations
+  const getFeedbackRequestForMessage = useCallback((message: ChatMessage): {
+    showForm: boolean;
+    contextMessage: string;
+    recommendationIds?: string[];
+    userSentiment?: 'positive' | 'negative' | 'neutral';
+  } | null => {
+    if (message.role === 'assistant' && message.toolInvocations) {
+      for (const toolInvocation of message.toolInvocations) {
+        if (
+          toolInvocation.toolName === 'requestFeedback' &&
+          toolInvocation.state === 'result' &&
+          toolInvocation.result?.success
+        ) {
+          return {
+            showForm: true,
+            contextMessage: toolInvocation.result.message || '',
+            recommendationIds: toolInvocation.result.context?.recommendationIds,
+            userSentiment: toolInvocation.result.context?.userSentiment,
+          };
+        }
+      }
+    }
+    return null;
+  }, []);
+
   return (
     <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
       {/* Two Column Layout - Always Visible */}
@@ -237,6 +265,7 @@ export const Hero = () => {
 
                     if (message.role === 'assistant') {
                       const messageRecommendations = getRecommendationsForMessage(message);
+                      const feedbackRequest = getFeedbackRequestForMessage(message);
 
                       // Check if this message has a confirmSearch tool result
                       const confirmSearchResult = message.toolInvocations?.find(
@@ -273,6 +302,20 @@ export const Hero = () => {
                                     index={index}
                                   />
                                 )}
+                              />
+                            </div>
+                          )}
+
+                          {/* Feedback form - triggered by AI tool */}
+                          {feedbackRequest?.showForm && !submittedFeedbackIds.has(message.id) && (
+                            <div className="mt-4 mb-4">
+                              <FeedbackForm
+                                messageId={message.id}
+                                recommendationIds={feedbackRequest.recommendationIds}
+                                userSentiment={feedbackRequest.userSentiment}
+                                onSubmitSuccess={() => {
+                                  setSubmittedFeedbackIds(prev => new Set(prev).add(message.id));
+                                }}
                               />
                             </div>
                           )}
