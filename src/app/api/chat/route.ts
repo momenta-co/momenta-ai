@@ -318,13 +318,8 @@ CIUDAD:
 🛠️ USO DE HERRAMIENTAS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔧 confirmSearch:
-  → CUÁNDO: Tienes Ciudad + Fecha + Grupo + Energía y quieres confirmar
-  → QUÉ HACE: Muestra resumen con emojis (📍👥📅💫) para que usuario confirme
-  → DESPUÉS: Espera confirmación del usuario
-
 🔧 getRecommendations:
-  → CUÁNDO: Usuario confirmó O tienes datos suficientes y mensaje es SPECIFIC_SEARCH completo
+  → CUÁNDO: Tienes ciudad + fecha (mínimo) y quieres buscar experiencias
   → QUÉ HACE: Busca experiencias en la base de datos
   → DESPUÉS: SIEMPRE pregunta "¿Te gustó alguna de estas opciones?"
 
@@ -334,16 +329,37 @@ CIUDAD:
   → MENSAJE: Explica que es para el giveaway
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 MENSAJE DE CONFIRMACIÓN (genera tú el texto)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cuando tengas suficiente información, GENERA un mensaje de confirmación con emojis:
+
+FORMATO:
+📍 Ciudad: [ciudad]
+👥 Grupo: [descripción natural del grupo]
+📅 Fecha: [fecha]
+💫 Vibe: [descripción contextual - NO uses términos técnicos]
+
+EJEMPLOS DE VIBE CONTEXTUAL:
+- Plan con sobrina → "Divertido y apto para niños 🎨"
+- Cita romántica → "Íntimo y romántico 💕"
+- Amigas → "Relajado y para pasarla rico 💅"
+- Cumpleaños → "Festivo y especial 🎂"
+- Familia → "Tranquilo para compartir en familia 👨‍👩‍👧"
+
+Termina con: "¿Está bien así o quieres ajustar algo?"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ REGLAS CRÍTICAS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. NO REPETIR PREGUNTAS: Si el usuario ya dio información, NO la preguntes de nuevo
 2. MÁXIMO 2 MENSAJES antes de recomendar (si tienes ciudad + fecha, ¡recomienda!)
-3. Si ya mostraste confirmSearch y usuario confirma → getRecommendations (NO confirmSearch de nuevo)
+3. Si ya mostraste resumen con emojis (📍👥📅) y usuario confirma → getRecommendations
 4. DESPUÉS de getRecommendations → SIEMPRE pregunta opinión en el MISMO mensaje
 5. NO preguntes presupuesto a menos que lo mencionen
 6. Pregunta máximo 2 cosas por mensaje
-7. Si el mensaje tiene TODA la info → LLAMA getRecommendations DIRECTO (sin confirmSearch)
+7. El VIBE debe ser contextual y natural, NO términos técnicos como "calm_mindful"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📚 EJEMPLOS DE FLUJO
@@ -396,75 +412,37 @@ function buildSystemPromptWithContext(accumulatedContext: string): string {
 }
 
 // ============================================
-// HELPER: Detect and extract confirmSearch tool result from raw messages
+// HELPER: Detect confirmation message with emojis (📍👥📅)
 // ============================================
-interface ConfirmSearchData {
-  found: boolean;
-  params?: {
-    ciudad?: string;
-    fecha?: string;
-    personas?: number;
-    tipoGrupo?: string;
-    ocasion?: string;
-    nivelEnergia?: string;
-  };
-}
-
-function findConfirmSearchResult(rawMessages: any[]): ConfirmSearchData {
-  console.log('[DETECTION] Checking raw messages for confirmSearch. Message count:', rawMessages.length);
-
+function wasConfirmationShown(rawMessages: any[]): boolean {
   for (const msg of rawMessages) {
     if (msg.role === 'assistant') {
-      // Check for tool invocations in various formats
-      const toolInvocations = msg.toolInvocations || msg.tool_invocations || [];
-
-      for (const tool of toolInvocations) {
-        if (tool.toolName === 'confirmSearch' && tool.state === 'result') {
-          console.log('[DETECTION] ✅ Found confirmSearch tool result:', tool);
-          // Extract params from the result summary
-          const summary = tool.result?.summary;
-          return {
-            found: true,
-            params: summary ? {
-              ciudad: summary.ciudad,
-              fecha: summary.fecha,
-              personas: summary.personas,
-              tipoGrupo: summary.tipoGrupo,
-              ocasion: summary.ocasion,
-              nivelEnergia: summary.nivelEnergia,
-            } : undefined,
-          };
-        }
-      }
-
-      // Also check parts array (AI SDK v3 format)
-      if (msg.parts && Array.isArray(msg.parts)) {
-        for (const part of msg.parts) {
-          if (part.type === 'tool-invocation' && part.toolInvocation?.toolName === 'confirmSearch') {
-            console.log('[DETECTION] ✅ Found confirmSearch in parts (tool-invocation)');
-            return { found: true };
-          }
-          if (part.type === 'tool-result' && part.toolName === 'confirmSearch') {
-            console.log('[DETECTION] ✅ Found confirmSearch in parts (tool-result)');
-            return { found: true };
-          }
-        }
-      }
-
-      // Also check content for the emoji pattern (backup)
+      // Check content for the emoji pattern
       const content = msg.content || '';
       if (content.includes('📍') && content.includes('👥') && content.includes('📅')) {
-        console.log('[DETECTION] ✅ Found confirmSearch emojis in content');
-        return { found: true };
+        console.log('[DETECTION] ✅ Found confirmation message with emojis');
+        return true;
+      }
+
+      // Also check parts array for text content
+      if (msg.parts && Array.isArray(msg.parts)) {
+        for (const part of msg.parts) {
+          if (part.type === 'text' && part.text) {
+            if (part.text.includes('📍') && part.text.includes('👥') && part.text.includes('📅')) {
+              console.log('[DETECTION] ✅ Found confirmation emojis in parts');
+              return true;
+            }
+          }
+        }
       }
     }
   }
-  console.log('[DETECTION] ❌ No confirmSearch found');
-  return { found: false };
+  return false;
 }
 
+// Alias for backwards compatibility
 function wasConfirmSearchShown(rawMessages: any[]): boolean {
-  return findConfirmSearchResult(rawMessages).found;
+  return wasConfirmationShown(rawMessages);
 }
 
 // ============================================
@@ -515,49 +493,20 @@ export async function POST(req: Request) {
   const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
   const lastUserMessage = userMessages[userMessages.length - 1];
 
-  // Detect confirmSearch from RAW messages (before conversion strips tool invocations)
-  const confirmSearchData = findConfirmSearchResult(rawMessages);
+  // Detect if confirmation message was shown (message with emojis 📍👥📅)
+  const confirmationWasShown = wasConfirmationShown(rawMessages);
   const userConfirmed = lastUserMessage && isUserConfirmation(lastUserMessage.content);
 
-  console.log('[DETECTION] confirmSearchShown:', confirmSearchData.found);
-  console.log('[DETECTION] confirmSearchParams:', confirmSearchData.params);
+  console.log('[DETECTION] confirmationWasShown:', confirmationWasShown);
   console.log('[DETECTION] userConfirmed:', userConfirmed);
   console.log('[DETECTION] lastUserMessage:', lastUserMessage?.content);
 
   // Extraer contexto acumulado de TODOS los mensajes del usuario
   const accumulatedContext = extractAccumulatedContext(messages);
 
-  // Override with more reliable detection from raw messages
-  accumulatedContext.confirmSearchWasShown = confirmSearchData.found;
+  // Track confirmation state
+  accumulatedContext.confirmSearchWasShown = confirmationWasShown;
   accumulatedContext.userConfirmed = userConfirmed;
-
-  // Use confirmSearch params as backup if context extraction missed something
-  if (confirmSearchData.params) {
-    if (!accumulatedContext.ciudad && confirmSearchData.params.ciudad) {
-      accumulatedContext.ciudad = confirmSearchData.params.ciudad;
-      console.log('[BACKUP] Using ciudad from confirmSearch:', confirmSearchData.params.ciudad);
-    }
-    if (!accumulatedContext.fecha && confirmSearchData.params.fecha) {
-      accumulatedContext.fecha = confirmSearchData.params.fecha;
-      console.log('[BACKUP] Using fecha from confirmSearch:', confirmSearchData.params.fecha);
-    }
-    if (!accumulatedContext.tipoGrupo && confirmSearchData.params.tipoGrupo) {
-      accumulatedContext.tipoGrupo = confirmSearchData.params.tipoGrupo as any;
-      console.log('[BACKUP] Using tipoGrupo from confirmSearch:', confirmSearchData.params.tipoGrupo);
-    }
-    if (!accumulatedContext.nivelEnergia && confirmSearchData.params.nivelEnergia) {
-      accumulatedContext.nivelEnergia = confirmSearchData.params.nivelEnergia as any;
-      console.log('[BACKUP] Using nivelEnergia from confirmSearch:', confirmSearchData.params.nivelEnergia);
-    }
-    if (!accumulatedContext.personas && confirmSearchData.params.personas) {
-      accumulatedContext.personas = confirmSearchData.params.personas;
-      console.log('[BACKUP] Using personas from confirmSearch:', confirmSearchData.params.personas);
-    }
-    if (!accumulatedContext.ocasion && confirmSearchData.params.ocasion) {
-      accumulatedContext.ocasion = confirmSearchData.params.ocasion;
-      console.log('[BACKUP] Using ocasion from confirmSearch:', confirmSearchData.params.ocasion);
-    }
-  }
 
   const contextReminder = generateContextReminder(accumulatedContext);
 
@@ -710,68 +659,16 @@ export async function POST(req: Request) {
     system: systemPromptWithContext,
     messages,
     tools: {
-      // PASO 1: Tool de confirmación - muestra resumen antes de buscar
-      confirmSearch: tool({
-        description: `PASO 1: Muestra un resumen con bullets para que el usuario confirme antes de buscar.
-LLAMA ESTA HERRAMIENTA cuando tengas los 4 datos: ciudad + fecha + tipoGrupo + nivelEnergia.
-Después de que el usuario confirme, usa getRecommendations.`,
-        inputSchema: z.object({
-          ciudad: z.string().describe('Ciudad: "Bogotá", "Cerca a Bogotá", o "Medellín"'),
-          fecha: z.string().describe('Fecha o referencia temporal'),
-          personas: z.number().describe('Número de personas'),
-          tipoGrupo: z.enum(['sola', 'pareja', 'familia', 'amigos']).describe('Tipo de grupo'),
-          ocasion: z.string().optional().describe('Ocasión especial si la hay'),
-          nivelEnergia: z.enum(['slow_cozy', 'calm_mindful', 'uplifting', 'social']).optional()
-            .describe('Nivel de energía/vibe'),
-        }),
-        execute: async (params) => {
-          console.log('[confirmSearch] Showing summary for confirmation:', params);
-
-          const energiaTexto: Record<string, string> = {
-            slow_cozy: 'Tranquilo/Relajado 🧘',
-            calm_mindful: 'Íntimo/Romántico 💕',
-            uplifting: 'Activo/Divertido 🎉',
-            social: 'Social/Fiesta 🥳',
-          };
-
-          const grupoTexto: Record<string, string> = {
-            sola: 'Plan individual',
-            pareja: 'Plan en pareja',
-            familia: 'Plan familiar',
-            amigos: 'Plan con amigos',
-          };
-
-          return {
-            confirmed: false,
-            summary: {
-              ciudad: params.ciudad,
-              fecha: params.fecha,
-              personas: params.personas,
-              tipoGrupo: params.tipoGrupo,
-              ocasion: params.ocasion,
-              nivelEnergia: params.nivelEnergia,
-            },
-            displayMessage: `¡Perfecto! Déjame confirmar lo que busco:
-
-📍 Ciudad: ${params.ciudad}
-👥 Grupo: ${grupoTexto[params.tipoGrupo]} (${params.personas} persona${params.personas > 1 ? 's' : ''})
-📅 Fecha: ${params.fecha}${params.ocasion ? `\n🎉 Ocasión: ${params.ocasion}` : ''}
-💫 Vibe: ${params.nivelEnergia ? energiaTexto[params.nivelEnergia] : 'Flexible'}
-
-¿Está bien así o quieres ajustar algo?`,
-          };
-        },
-      }),
-
-      // PASO 2: Tool de recomendaciones - busca en la base de datos
+      // Tool de recomendaciones - busca en la base de datos
       getRecommendations: tool({
         description: `
-          PASO 2: Busca experiencias en la base de datos.
-          SOLO usa esta herramienta DESPUÉS de que el usuario confirme con confirmSearch.
-          Si el usuario dice "sí", "dale", "perfecto", "ok", "está bien" → usa esta herramienta.
+          Busca experiencias en la base de datos según los criterios del usuario.
 
-          CRÍTICO: Después de llamar este tool, DEBES continuar generando texto preguntando por la opinión del usuario.
-          NO termines tu respuesta después de llamar este tool. Sigue con algo como:
+          CUÁNDO USAR:
+          - Usuario confirmó el resumen que mostraste (dice "sí", "dale", "perfecto", "ok")
+          - O tienes toda la información necesaria (ciudad + fecha como mínimo)
+
+          DESPUÉS DE LLAMAR: Pregunta por la opinión del usuario.
           "¿Te gustó alguna de estas opciones?" o "¿Qué te parecieron?"
         `,
         inputSchema: z.object({
