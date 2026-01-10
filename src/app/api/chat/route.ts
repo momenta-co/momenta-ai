@@ -343,7 +343,10 @@ FORMATO:
 📍 Ciudad: [ciudad]
 👥 Grupo: [descripción natural del grupo]
 📅 Fecha: [fecha]
-💫 Vibe: [INFIERE del contexto emocional - sé específico y variado]
+💫 Vibe: [SIEMPRE INFIERE - NUNCA preguntes, usa el contexto emocional]
+
+⚠️ EL VIBE NUNCA ES UNA PREGUNTA - siempre es una afirmación inferida del contexto.
+Si no hay contexto emocional claro, usa un vibe genérico positivo como "Especial, memorable ✨"
 
 VOCABULARIO PARA VIBES (usa combinaciones según el contexto):
 - Celebraciones: celebración, festivo, especial, memorable
@@ -368,6 +371,7 @@ Termina con: "¿Está bien así o quieres ajustar algo?"
 5. NO preguntes presupuesto a menos que lo mencionen
 6. Pregunta máximo 2 cosas por mensaje
 7. El VIBE debe ser contextual y natural, NO términos técnicos como "calm_mindful"
+8. El VIBE NUNCA es pregunta - SIEMPRE es afirmación inferida del contexto
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📚 EJEMPLOS DE FLUJO (SIEMPRE pregunta lo que falta)
