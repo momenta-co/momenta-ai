@@ -53,10 +53,23 @@ model beta_feedback {
   liked_recommendations Boolean?
   comments              String?
   created_at            DateTime?            @default(now()) @db.Timestamp(6)
+  ip                    String?
   recommendation_runs   recommendation_runs? @relation(fields: [recommendation_run_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([created_at], map: "idx_beta_feedback_created")
   @@index([email], map: "idx_beta_feedback_email")
   @@index([recommendation_run_id], map: "idx_beta_feedback_run")
   @@index([user_id], map: "idx_beta_feedback_user")
+}
+
+model beta_signups {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email            String
+  instagram_handle String?
+  referral_source  String?
+  metadata         Json?
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([created_at], map: "idx_beta_signups_created")
+  @@index([email], map: "idx_beta_signups_email")
 }

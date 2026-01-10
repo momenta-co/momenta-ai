@@ -14,6 +14,12 @@ export const metadata: Metadata = {
 };
 
 export default function ExperienciasPage() {
+  // Add IDs to experiences data
+  const experiencesWithIds = experiencesData.experiencias.map((exp, index) => ({
+    ...exp,
+    id: (exp as any).id || `exp-${index}`,
+  }));
+
   return (
     <>
       {/* Hero Section */}
@@ -39,7 +45,7 @@ export default function ExperienciasPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Suspense fallback={<div className="text-center py-8">Cargando...</div>}>
             <ExperienceGrid
-              experiences={experiencesData.experiencias}
+              experiences={experiencesWithIds}
               showFilters={true}
               showLoadMore={true}
             />
