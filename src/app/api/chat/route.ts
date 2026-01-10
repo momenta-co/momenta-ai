@@ -338,14 +338,43 @@ FORMATO:
 📍 Ciudad: [ciudad]
 👥 Grupo: [descripción natural del grupo]
 📅 Fecha: [fecha]
-💫 Vibe: [descripción contextual - NO uses términos técnicos]
+💫 Vibe: [INFIERE del contexto emocional - sé específico y variado]
 
-EJEMPLOS DE VIBE CONTEXTUAL:
-- Plan con sobrina → "Divertido y apto para niños 🎨"
-- Cita romántica → "Íntimo y romántico 💕"
-- Amigas → "Relajado y para pasarla rico 💅"
-- Cumpleaños → "Festivo y especial 🎂"
-- Familia → "Tranquilo para compartir en familia 👨‍👩‍👧"
+⚠️ EL VIBE DEBE REFLEJAR LA INTENCIÓN EMOCIONAL DEL USUARIO:
+
+CELEBRACIONES:
+- "Cumpleaños de mi esposo" → "Celebración romántica, especial 💕"
+- "Cumpleaños de mi mamá con toda la familia" → "Familiar, unión, creativo 👨‍👩‍👧"
+- "Cumpleaños 21 de mi hija con amigos" → "Festivo, social, mayoría de edad 🎉"
+- "Aniversario de mis papás" → "Celebración familiar, especial ✨"
+
+SORPRESAS Y REGALOS:
+- "Regalo sorpresa para mi esposo" → "Significativo, memorable, especial 🎁"
+- "Quiero sorprender a mi novia" → "Romántico, sorpresa, wow factor 💝"
+- "Regalo de navidad para mi novio" → "Festivo, romántico, especial 🎄"
+
+RECONEXIÓN Y SANACIÓN:
+- "Recuperar el vínculo con mi pareja" → "Reconexión, íntimo, sanación 💫"
+- "Sanar mis relaciones rotas" → "Introspectivo, sanación, crecimiento 🌱"
+- "Tiempo de calidad con mi mamá" → "Conexión, especial, memorable 💛"
+
+BIENESTAR:
+- "Yoga terapéutica con soundhealing" → "Terapéutico, sanación, mindful 🧘"
+- "Despedida de soltera para mi amiga" → "Relajación, amistad, celebración 💅"
+- "Desconectar y relajarme" → "Autocuidado, paz, reset 🌿"
+
+CORPORATIVO:
+- "Integración de equipo de trabajo" → "Profesional, integración, team building 💼"
+- "Cerrar año con el equipo" → "Reflexivo, celebración, unión 🥂"
+
+EXPERIENCIAS ESPECIALES:
+- "Mi novia viene de vacaciones" → "Romántico, experiencial, memorable ✈️"
+- "Pareja a distancia" → "Conexión, romántico, significativo 💕"
+- "Algo diferente y único" → "Experiencial, memorable, especial ✨"
+
+USA PALABRAS COMO: celebración, romántico, significativo, especial, familiar, creativo,
+unión, sofisticado, reconexión, íntimo, sanación, terapéutico, introspectivo, crecimiento,
+festivo, social, profesional, integración, relajación, amistad, reflexivo, memorable, wow factor
 
 Termina con: "¿Está bien así o quieres ajustar algo?"
 
