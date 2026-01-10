@@ -205,6 +205,36 @@ const EXCLUSION_PATTERNS: { pattern: RegExp; exclusion: string }[] = [
 ];
 
 // ============================================
+// PATRONES PARA INCLUSIONES (cancelan exclusiones previas)
+// "incluye yoga", "mejor con yoga", "sí yoga" = QUIERE yoga
+// ============================================
+const INCLUSION_PATTERNS: { pattern: RegExp; inclusion: string }[] = [
+  // Yoga inclusions
+  { pattern: /\b(incluye|incluir|con)\s+yoga\b/i, inclusion: 'yoga' },
+  { pattern: /\bs[ií]\s+yoga\b/i, inclusion: 'yoga' },
+  { pattern: /\bmejor\s+con\s+yoga\b/i, inclusion: 'yoga' },
+  { pattern: /\bquiero\s+yoga\b/i, inclusion: 'yoga' },
+
+  // Spa inclusions
+  { pattern: /\b(incluye|incluir|con)\s+spa\b/i, inclusion: 'spa' },
+  { pattern: /\bs[ií]\s+spa\b/i, inclusion: 'spa' },
+  { pattern: /\bmejor\s+con\s+spa\b/i, inclusion: 'spa' },
+  { pattern: /\bquiero\s+spa\b/i, inclusion: 'spa' },
+
+  // Masaje inclusions
+  { pattern: /\b(incluye|incluir|con)\s+masaje\b/i, inclusion: 'masaje' },
+  { pattern: /\bs[ií]\s+masaje\b/i, inclusion: 'masaje' },
+
+  // Cocina inclusions
+  { pattern: /\b(incluye|incluir|con)\s+cocina\b/i, inclusion: 'cocina' },
+  { pattern: /\bs[ií]\s+cocina\b/i, inclusion: 'cocina' },
+
+  // Aventura inclusions
+  { pattern: /\b(incluye|incluir|con)\s+aventura\b/i, inclusion: 'aventura' },
+  { pattern: /\bs[ií]\s+aventura\b/i, inclusion: 'aventura' },
+];
+
+// ============================================
 // INTERFACES
 // ============================================
 
@@ -374,6 +404,17 @@ export function extractAccumulatedContext(
         if (!context.evitar.includes(exclusion)) {
           context.evitar.push(exclusion);
           context.extractedFromMessages.push(`evitar: ${exclusion}`);
+        }
+      }
+    }
+
+    // Extraer inclusiones (cancelan exclusiones previas)
+    // "incluye yoga", "sí yoga" = el usuario cambió de opinión y QUIERE yoga
+    for (const { pattern, inclusion } of INCLUSION_PATTERNS) {
+      if (pattern.test(content)) {
+        if (context.evitar && context.evitar.includes(inclusion)) {
+          context.evitar = context.evitar.filter(item => item !== inclusion);
+          context.extractedFromMessages.push(`incluir (cancela exclusión): ${inclusion}`);
         }
       }
     }
