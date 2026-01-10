@@ -238,6 +238,21 @@ export const Hero = () => {
                     if (message.role === 'assistant') {
                       const messageRecommendations = getRecommendationsForMessage(message);
 
+                      // Check if this message has a confirmSearch tool result
+                      const confirmSearchResult = message.toolInvocations?.find(
+                        (t) => t.toolName === 'confirmSearch' && t.state === 'result' && t.result?.displayMessage
+                      );
+
+                      if (confirmSearchResult) {
+                        // ONLY show the tool's displayMessage, ignore AI's text content to avoid duplication
+                        return (
+                          <AssistantMessage
+                            key={message.id}
+                            content={confirmSearchResult.result.displayMessage}
+                          />
+                        );
+                      }
+
                       return (
                         <React.Fragment key={message.id}>
                           {/* Only show assistant message if it has content */}
