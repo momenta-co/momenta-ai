@@ -44,7 +44,7 @@ MATRIZ DE PRIORIDADES PARA SCORING (MUY IMPORTANTE)
      * sola → experiencias individuales, autocuidado
      * pareja → románticas, íntimas, para dos
      * familia → aptas para varios, ambiente familiar
-     * amigos → grupales, sociales, divertidas
+     * amigos → grupales, sociales, divertidas, INCLUYE YOGA/BIENESTAR
 
    - Ocasión (10%):
      * cumpleaños → celebración, especial, memorable
@@ -63,15 +63,22 @@ MATRIZ DE PRIORIDADES PARA SCORING (MUY IMPORTANTE)
      * alto > 250,000 COP
 
 🟢 PRIORIDAD 3 (20% del score) - AJUSTE FINO:
-   - Nivel de Energía (8%) - MUY IMPORTANTE:
-     * slow_cozy → spa, masajes, yoga, catas tranquilas, meditación
-       EVITA: talleres activos, escape rooms, actividades físicas
-     * calm_mindful → experiencias íntimas, reflexivas, especiales
-       PRIORIZA: ambiente tranquilo, conexión emocional
-     * uplifting → talleres activos, cocina, actividades dinámicas
-       EVITA: experiencias muy pasivas o contemplativas
-     * social → grupal, fiesta, conversación, ambiente animado
-       PRIORIZA: experiencias para compartir, ambientes sociales
+   - Nivel de Energía (8%) - ⚠️ CRÍTICO PARA RECOMENDACIONES:
+     * slow_cozy (tranquilo/relajado):
+       ✅ INCLUYE: spa, masajes, yoga suave, catas tranquilas, meditación, picnic
+       ❌ EXCLUYE SIEMPRE: parapente, escalada, deportes extremos, escape rooms, actividades físicas intensas
+
+     * calm_mindful (íntimo/romántico):
+       ✅ INCLUYE: cenas privadas, catas de vino, spa en pareja, experiencias a solas
+       ❌ EXCLUYE: actividades de aventura, deportes, planes grupales ruidosos
+
+     * uplifting (activo/divertido):
+       ✅ INCLUYE: talleres de cocina, escape rooms, actividades outdoor, deportes suaves
+       ❌ EXCLUYE: experiencias muy pasivas, meditación silenciosa
+
+     * social (fiesta/parche):
+       ✅ INCLUYE: experiencias grupales, cocteles, ambiente animado
+       ❌ EXCLUYE: experiencias individuales silenciosas
 
    - Intención (6%):
      * sorprender → experiencias únicas, memorables, diferentes
@@ -137,7 +144,29 @@ Devuelve SOLO JSON válido:
   ]
 }
 
-Incluye 5 recomendaciones ordenadas por total score (mayor primero).`;
+⚠️ REGLAS OBLIGATORIAS - LEE CON CUIDADO:
+
+1️⃣ EXACTAMENTE 5 RECOMENDACIONES:
+   - Ni más ni menos de 5
+   - Si no hay 5 experiencias que encajen perfecto, incluye las mejores disponibles
+
+2️⃣ IDs ÚNICOS OBLIGATORIOS:
+   - NUNCA repitas el mismo experienceId
+   - Usa 5 IDs DIFERENTES: ej. exp-0, exp-2, exp-5, exp-8, exp-12
+   - ❌ Si repites un ID (ej. exp-3 dos veces), LA RESPUESTA SERÁ RECHAZADA
+
+3️⃣ RESPETAR NIVEL DE ENERGÍA:
+   - Si nivelEnergia=slow_cozy → ❌ NO incluyas: parapente, escalada, deportes, aventura
+   - Si nivelEnergia=calm_mindful → ❌ NO incluyas: actividades extremas o ruidosas
+   - PENALIZA con score bajo (30-40) cualquier experiencia que contradiga el nivel de energía
+
+4️⃣ ORDEN:
+   - Ordena por total score (mayor primero)
+
+🧘 REGLA ESPECIAL - YOGA/BIENESTAR PARA AMIGAS:
+Si el tipoGrupo es "amigos" (especialmente amigas), SIEMPRE incluye al menos
+UNA experiencia de yoga, spa o bienestar entre las 5 recomendaciones.
+El yoga con amigas es MUY popular - puede ser Hot Yoga, Yoga & Brunch, Spa Day, etc.`;
 }
 
 /**
@@ -235,16 +264,30 @@ CÓMO CALCULAR SCORES
 3. total = (p1*0.40) + (p2*0.35) + (p3*0.20) + (p4*0.05)
 
 ═══════════════════════════════════════════════════
-EJEMPLO CONCRETO
+EJEMPLO CONCRETO - MUY IMPORTANTE LEER
 ═══════════════════════════════════════════════════
 
-Si el usuario busca algo "tranquilo" (slow_cozy):
-- "Masaje Relajante" (tags: Bienestar, Belleza y Autocuidado) → priority3 = 95
-- "Taller de Cocina" (tags: Cocina, Gastronómico) → priority3 = 35 ❌
-- "Hot Yoga & Brunch" (tags: Bienestar) → priority3 = 85
-- "Cake Party" (tags: Cocina, En tu casa) → priority3 = 40 ❌
+🔴 EJEMPLO 1: Usuario busca algo "tranquilo" (slow_cozy)
+INCLUYE:
+- "Masaje Relajante" → priority3 = 95 ✅
+- "Hot Yoga & Brunch" → priority3 = 85 ✅
+- "Cata de Vinos privada" → priority3 = 80 ✅
 
-NO recomiendes "Taller de Cocina" o "Cake Party" si buscan algo tranquilo.
+NO INCLUYAS:
+- "Vuelo en Parapente" → priority3 = 15 ❌ (aventura ≠ tranquilo)
+- "Taller de Cocina" → priority3 = 35 ❌ (activo ≠ tranquilo)
+- "Escape Room" → priority3 = 20 ❌ (intenso ≠ tranquilo)
+
+🔴 EJEMPLO 2: Usuario busca algo "íntimo/romántico" (calm_mindful)
+INCLUYE:
+- "Cena con Chef Privado" → priority3 = 95 ✅
+- "Spa en Pareja" → priority3 = 90 ✅
+
+NO INCLUYAS:
+- "Vuelo en Parapente" → priority3 = 15 ❌
+- "Escape Room" → priority3 = 25 ❌
+
+⚠️ REGLA: Si una experiencia contradice el nivel de energía, NO LA INCLUYAS en las 5 recomendaciones.
 
 ═══════════════════════════════════════════════════
 RESPUESTA
@@ -253,6 +296,10 @@ RESPUESTA
 Devuelve 5 experiencias en JSON válido.
 Escribe "reasons" como amiga entusiasta, NO como robot.
 Asegúrate de que las experiencias recomendadas REALMENTE encajen con el nivel de energía solicitado.
+
+🧘 IMPORTANTE PARA PLANES CON AMIGAS:
+Si el tipoGrupo es "amigos", INCLUYE al menos UNA experiencia de yoga/bienestar/spa.
+Yoga con amigas es muy popular (Hot Yoga, Yoga & Brunch, Spa Day, etc.).
 `;
 
   return contextDescription + experiencesDescription + instructions;

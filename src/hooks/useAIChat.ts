@@ -43,9 +43,11 @@ export function useAIChat({ api, initialMessages = [] }: UseAIChatOptions) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            // Include toolInvocations so backend can detect confirmSearch was shown
             messages: [...messages, userMessage].map(m => ({
               role: m.role,
               content: m.content,
+              toolInvocations: m.toolInvocations, // IMPORTANT: Send tool invocations to backend
             })),
           }),
         });
