@@ -31,7 +31,7 @@ function transformDbExperience(dbExp: any): Experience {
     id: dbExp.id,
     title: dbExp.title,
     description: dbExp.description_short || '',
-    url: `https://www.momentaboutique.com/experiencias/${dbExp.id}`, // Generate URL
+    url: dbExp.source_url || `https://www.momentaboutique.com/experiencias/${dbExp.id}`,
     image: dbExp.image_url || '',
     categories: tags,
     price,
@@ -50,6 +50,18 @@ export async function getAllExperiences(): Promise<Experience[]> {
     const experiences = await prisma.experiences.findMany({
       where: {
         status: 'active',
+      },
+      select: {
+        id: true,
+        title: true,
+        description_short: true,
+        city: true,
+        price_min: true,
+        price_max: true,
+        duration_minutes: true,
+        tags: true,
+        image_url: true,
+        source_url: true,
       },
       orderBy: {
         created_at: 'desc',
@@ -75,7 +87,7 @@ export async function getExperiencesByCity(city: string): Promise<Experience[]> 
 
     if (isCercaBogota) {
       // Filter by tag "Cerca a Bogotá"
-      const experiences = await prisma.experiences.findMany({
+      const allExperiences = await prisma.experiences.findMany({
         where: {
           status: 'active',
         },
@@ -85,14 +97,39 @@ export async function getExperiencesByCity(city: string): Promise<Experience[]> 
       });
 
       // Filter experiences that have "Cerca a Bogotá" tag
-      const filteredExperiences = experiences.filter((exp: any) => {
+      const cercaExperiences = allExperiences.filter((exp: any) => {
         const tags = Array.isArray(exp.tags) ? exp.tags : [];
         return tags.some((tag: string) =>
           tag.toLowerCase().includes('cerca') && tag.toLowerCase().includes('bogot')
         );
       });
 
-      return filteredExperiences.map(transformDbExperience);
+      console.log(`[getExperiencesByCity] Found ${cercaExperiences.length} "Cerca a Bogotá" experiences`);
+
+      // If we have fewer than 8 "Cerca a Bogotá" experiences, also include Bogotá experiences
+      // This ensures we have enough variety for recommendations
+      if (cercaExperiences.length < 8) {
+        const bogotaExperiences = allExperiences.filter((exp: any) => {
+          const city = exp.city?.toLowerCase() || '';
+          const tags = Array.isArray(exp.tags) ? exp.tags : [];
+          const hasBogotaTag = tags.some((tag: string) =>
+            tag.toLowerCase().includes('bogotá') || tag.toLowerCase().includes('bogota')
+          );
+          // Include if city is Bogotá OR has "En Bogotá" tag, but NOT if already in cercaExperiences
+          const isCerca = tags.some((tag: string) =>
+            tag.toLowerCase().includes('cerca') && tag.toLowerCase().includes('bogot')
+          );
+          return (city.includes('bogotá') || city.includes('bogota') || hasBogotaTag) && !isCerca;
+        });
+
+        console.log(`[getExperiencesByCity] Adding ${bogotaExperiences.length} Bogotá experiences as fallback`);
+
+        // Combine: "Cerca a Bogotá" first, then Bogotá experiences
+        const combined = [...cercaExperiences, ...bogotaExperiences];
+        return combined.map(transformDbExperience);
+      }
+
+      return cercaExperiences.map(transformDbExperience);
     }
 
     // Standard city filter
