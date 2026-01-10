@@ -94,147 +94,6 @@ const OFF_TOPIC_RESPONSE = `¡Hola! Aquí te ayudo a encontrar el plan perfecto.
 const TOURIST_RESPONSE = `Mmm, eso no es lo mío, pero sí puedo ayudarte a encontrar un momento especial. ¿Qué quieres celebrar?`;
 
 // ============================================
-// FAST PATH: Instant local responses (no API call)
-// ============================================
-interface FastResponse {
-  pattern: RegExp;
-  responses: string[];
-  requiresFirstMessage?: boolean; // Only respond if it's the first user message
-}
-
-const FAST_RESPONSES: FastResponse[] = [
-  // Contenido inapropiado/sexual - bloquear inmediatamente
-  {
-    pattern: /\b(putas?|prostitutas?|escorts?|prepagos?|scorts?|sexo\s+pago|servicios?\s+sexuales?)\b/i,
-    responses: [
-      'Lo siento, pero no puedo ayudar con ese tipo de búsquedas. Estoy aquí para recomendarte experiencias de bienestar, gastronomía y planes especiales. ¿Te gustaría explorar alguna de esas opciones? 😊',
-    ],
-  },
-  // Saludos simples - solo si es el primer mensaje
-  {
-    pattern: /^(hola|hey|hi|hello|buenas?|qué tal|que tal|buenos días|buenas tardes|buenas noches)[\s!.,?]*$/i,
-    responses: [
-      '¡Hola! Soy tu asistente de Momenta 💚 Cuéntame, ¿qué momento especial quieres vivir? ¿Un plan romántico, algo con amigos, o un momento para ti?',
-      '¡Hey! Qué gusto saludarte 💚 ¿Qué tienes en mente? ¿Algo para celebrar, relajarte o compartir con alguien especial?',
-    ],
-    requiresFirstMessage: true,
-  },
-  // Experiencias románticas/pareja
-  {
-    pattern: /\b(romántic[oa]|pareja|novio|novia|nobio|nobia|aniversario|san valent[ií]n)\b/i,
-    responses: [
-      '¡Ay qué lindo! Tenemos experiencias románticas increíbles 💕 ¿Para cuándo lo están planeando y en qué ciudad?',
-      '¡Me encanta! Un plan en pareja siempre es especial 💕 ¿En Bogotá, Medellín, o cerca a la ciudad? ¿Y para cuándo?',
-    ],
-  },
-  // Cumpleaños/celebraciones
-  {
-    pattern: /\b(cumpleaños|cumple|celebra(r|ción)?|fiesta)\b/i,
-    responses: [
-      '¡Qué emoción! Para celebraciones tenemos opciones increíbles 🎂 ¿Me cuentas para quién es, cuántos van a ser y en qué ciudad?',
-      '¡Me encanta! Las celebraciones son lo mejor 🎉 ¿Para cuándo, en qué ciudad y cuántas personas van a ser?',
-    ],
-  },
-  // Corporativo/equipos
-  {
-    pattern: /\b(corporativ[oa]|empresa|equipo|team.?building|oficina)\b/i,
-    responses: [
-      'Nuestras experiencias corporativas son geniales para fortalecer equipos 💼 Tenemos talleres de cocina colaborativa, actividades de bienestar y más. ¿Cuántas personas son y en qué ciudad?',
-    ],
-  },
-  // Spa/bienestar/relajación
-  {
-    pattern: /\b(spa|relaj(ar|ante)|bienestar|masaje|yoga|descansar|desconectar)\b/i,
-    responses: [
-      '¡Un momento de relax! Me encanta 🧘 ¿En Bogotá o Medellín? ¿Y vas sola o acompañada?',
-      'Autocuidado es clave 💆 Tenemos spas increíbles. ¿Para cuándo lo quieres y en qué ciudad?',
-    ],
-  },
-  // Amigos
-  {
-    pattern: /\b(amigos|amigas|parche|grupo|reuni[oó]n)\b/i,
-    responses: [
-      '¡Un plan con amigos! Eso siempre es bueno 🎉 ¿Cuántos son, para cuándo y en qué ciudad?',
-      '¡Me encanta! Planes con amigos son los mejores 🎉 ¿Cuántas personas, en qué ciudad y para cuándo?',
-    ],
-  },
-  // Gracias
-  {
-    pattern: /^(gracias|muchas gracias|te agradezco|genial|perfecto|excelente)[\s!.,]*$/i,
-    responses: [
-      '¡Con mucho gusto! Si necesitas algo más, aquí estoy 💚',
-      '¡Para eso estoy! Cuéntame si puedo ayudarte con algo más 💚',
-    ],
-  },
-];
-
-// Patrones que indican que el mensaje ya tiene contexto rico
-const RICH_CONTEXT_PATTERNS = [
-  /\b(fuera\s+de|cerca\s+(a|de)|afueras|escapada)\b/i,  // Indica ubicación
-  /\b(en\s+)?(bogot[áa]|vogota|bog|medell[ií]n|mede)\b/i,        // Ciudad explícita (incluye abreviaturas)
-  /\b((este|próximo|proximo|el)\s+)?(fin\s+de\s+semana|finde|sábado|sabado|savado|domingo|lunes|martes|miércoles|miercoles|jueves|viernes)\b/i, // Fecha
-  /\b(hoy|mañana|manana)\b/i,                           // Fecha
-  /\bsomos\s+\d+\b/i,                                   // Número de personas
-  /\b\d+\s+personas?\b/i,                               // Número de personas
-  /\b(tranquilo|tranquila|relajado|relajada|relajante|relax|chill|activo|activa|aventura|aventurero|divertido|divertida|diferente|fiesta|íntimo|intimo|íntima|intima|romántico|romantico|romántica|romantica|especial|chimba|bacano|chevere|chévere|genial)\b/i, // Mood/energía
-];
-
-function messageHasRichContext(message: string): boolean {
-  const lowerMessage = message.toLowerCase();
-  let matchCount = 0;
-
-  for (const pattern of RICH_CONTEXT_PATTERNS) {
-    if (pattern.test(lowerMessage)) {
-      matchCount++;
-      // Si tiene 2+ elementos de contexto, es un mensaje rico
-      if (matchCount >= 2) return true;
-    }
-  }
-  return false;
-}
-
-function getFastResponse(message: string, isFirstMessage: boolean, userMessageCount: number): string | null {
-  // CAMBIO IMPORTANTE: Fast path solo aplica en la primera interacción del usuario
-  // Después de eso, siempre se usa el AI para mantener contexto de conversación
-  if (userMessageCount > 1) {
-    console.log('[FAST PATH] Skipping - not first interaction (message count:', userMessageCount, ')');
-    return null;
-  }
-
-  const lowerMessage = message.toLowerCase().trim();
-
-  // PRIMERO: Verificar contenido inapropiado ANTES de cualquier otra lógica
-  // Estos patrones SIEMPRE deben bloquear, sin importar el contexto
-  const BLOCKED_CONTENT_PATTERN = /\b(putas?|prostitutas?|escorts?|prepagos?|scorts?|sexo\s+pago|servicios?\s+sexuales?)\b/i;
-  if (BLOCKED_CONTENT_PATTERN.test(lowerMessage)) {
-    console.log('[FAST PATH] Blocking inappropriate content');
-    return 'Lo siento, pero no puedo ayudar con ese tipo de búsquedas. Estoy aquí para recomendarte experiencias de bienestar, gastronomía y planes especiales. ¿Te gustaría explorar alguna de esas opciones? 😊';
-  }
-
-  // Si el mensaje ya tiene contexto rico (ciudad, fecha, mood, etc.),
-  // NO usar fast path - el AI debe procesar todo el contexto
-  if (messageHasRichContext(message)) {
-    console.log('[FAST PATH] Skipping - message has rich context, needs AI processing');
-    return null;
-  }
-
-  // Fast path SOLO para saludos simples sin contexto adicional
-  for (const fastResponse of FAST_RESPONSES) {
-    if (fastResponse.pattern.test(lowerMessage)) {
-      // Skip if requires first message and it's not
-      if (fastResponse.requiresFirstMessage && !isFirstMessage) {
-        continue;
-      }
-      // Return random response from options
-      const randomIndex = Math.floor(Math.random() * fastResponse.responses.length);
-      return fastResponse.responses[randomIndex];
-    }
-  }
-
-  return null;
-}
-
-// ============================================
 // HELPER: Stream text with delay (más natural)
 // ============================================
 async function* streamWithDelay(text: string): AsyncGenerator<string> {
@@ -694,10 +553,8 @@ export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
   const messages = convertMessages(rawMessages);
 
-  // Count user messages to determine if it's the first message
+  // Get user messages for context
   const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
-  const userMessageCount = userMessages.length;
-  const isFirstMessage = userMessageCount === 1;
   const lastUserMessage = userMessages[userMessages.length - 1];
 
   // Detect confirmSearch from RAW messages (before conversion strips tool invocations)
@@ -882,16 +739,9 @@ export async function POST(req: Request) {
         confirmSearchWasShown: accumulatedContext.confirmSearchWasShown,
       });
     }
-
-    // 3. Try fast path for simple greetings (SOLO en la primera interacción)
-    const fastResponse = getFastResponse(lastUserMessage.content, isFirstMessage, userMessageCount);
-    if (fastResponse) {
-      console.log('[FAST PATH] Responding with delayed stream');
-      return createDelayedStreamResponse(fastResponse);
-    }
   }
 
-  // 3. Full AI path - only when fast path doesn't match
+  // Full AI path - La IA maneja TODO (incluyendo contenido inapropiado)
   console.log('[AI PATH] Using OpenAI for complex response');
 
   // Construir el system prompt con el contexto acumulado
