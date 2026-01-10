@@ -29,3 +29,18 @@ export interface CarouselExperience {
   description: string;
   image: string;
 }
+
+export interface FeedbackData {
+  email: string;
+  likedRecommendations: boolean;
+  comment?: string;
+  recommendationIds: string[];
+  messageId: string;
+  sessionId?: string;
+}
+
+export interface FeedbackSubmissionResponse {
+  success: boolean;
+  feedbackId?: string;
+  error?: string;
+}
