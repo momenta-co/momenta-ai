@@ -49,7 +49,7 @@ Usuario: "Este sábado en Bogotá, somos 8"
 
 Usuario: "sí, está perfecto" / "dale" / "busca"
 → Intención: CONFIRMATION
-→ Tú: [LLAMA getRecommendations] + "¿Te gustó alguna de estas opciones?"
+→ Tú: [LLAMA getRecommendations] + "Pudiste revisar las experiencias - cuál te gustó mas?"
 
 Usuario: "quiero un spa relajante este viernes en Bogotá, voy sola"
 → Intención: SPECIFIC_SEARCH (tiene TODO desde el inicio)
@@ -62,11 +62,13 @@ Usuario: "quiero un spa relajante este viernes en Bogotá, voy sola"
 
 Usuario: "me encanta la segunda opción"
 → Intención: FEEDBACK (positivo)
-→ Tú: "¡Qué bueno que te gustó!" + [LLAMA requestFeedback]
+→ Tú - PASO A (texto): "Eso! Me encanta que te haya gustado. Antes de finalizar la reserva, me ayudarías con estos datos porfi para formalizar tu participación en el giveaway? Mil gracias!"
+→ Tú - PASO B (en el MISMO turno): [LLAMA requestFeedback con userSentiment: 'positive', contextMessage: 'Le gustó la segunda opción']
 
 Usuario: "ninguna me convence"
 → Intención: FEEDBACK (negativo)
-→ Tú: "Entiendo, ¿qué no te convenció? ¿Buscas algo más activo, más tranquilo, o diferente?"
+→ Tú - PASO A (texto): "Entiendo, ¿qué no te convenció? Así busco algo mejor para ti. Antes de ajustar, me ayudarías con estos datos porfi para formalizar tu participación en el giveaway? Mil gracias!"
+→ Tú - PASO B (en el MISMO turno): [LLAMA requestFeedback con userSentiment: 'negative', contextMessage: 'Ninguna opción le convenció']
 
 Usuario: "qué es Momenta?"
 → Intención: QUESTION
