@@ -2,12 +2,14 @@
 
 import type { BetaSignupData, BetaSignupResponse } from '@/types/beta';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { CheckCircle2, Instagram, Loader2, Mail } from 'lucide-react';
+import Link from 'next/link';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
 export default function BetaSignup() {
   const [email, setEmail] = useState('');
+  const [instagram, setInstagram] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +31,7 @@ export default function BetaSignup() {
 
     const signupData: BetaSignupData = {
       email: email.trim(),
+      instagramHandle: instagram.trim() || undefined,
       referralSource: typeof window !== 'undefined' ? window.location.search : undefined,
     };
 
@@ -57,32 +60,55 @@ export default function BetaSignup() {
   // Success state
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+      <div className="min-h-screen bg-white flex flex-col px-8 py-6">
+        {/* Logo */}
+        <motion.header
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
           className="text-center"
         >
+          <Link href="/">
+            <Image
+              src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
+              alt="Momenta"
+              width={160}
+              height={45}
+              className="h-6 md:h-8 w-auto mx-auto transition-opacity duration-300 hover:opacity-80"
+              priority
+              unoptimized
+            />
+          </Link>
+        </motion.header>
+
+        {/* Success Content */}
+        <main className="flex-1 flex items-center justify-center">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 150 }}
-            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            <CheckCircle2 className="w-16 h-16 text-primary-700 mx-auto" strokeWidth={1} />
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 150 }}
+              className="mb-8"
+            >
+              <CheckCircle2 className="w-16 h-16 text-primary-700 mx-auto" strokeWidth={1} />
+            </motion.div>
+
+            <h1 className="font-serif text-5xl md:text-6xl text-primary-700 mb-6">
+              ¡Gracias!
+            </h1>
+
+            <div className="w-16 h-px bg-secondary-700 mx-auto mb-6" />
+
+            <p className="font-sans text-base text-neutral-500">
+              Te contactaremos pronto con tu acceso anticipado.
+            </p>
           </motion.div>
-
-          <h1 className="font-serif text-5xl md:text-6xl text-primary-700 mb-6">
-            ¡Gracias!
-          </h1>
-
-          <div className="w-16 h-px bg-secondary-700 mx-auto mb-6" />
-
-          <p className="font-sans text-base text-neutral-500">
-            Te contactaremos pronto con tu acceso anticipado.
-          </p>
-        </motion.div>
+        </main>
       </div>
     );
   }
@@ -97,15 +123,17 @@ export default function BetaSignup() {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <Image
-          src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
-          alt="Momenta"
-          width={120}
-          height={35}
-          className="h-5 w-auto mx-auto opacity-60"
-          priority
-          unoptimized
-        />
+        <Link href="/">
+          <Image
+            src="https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/d271814a-2a2f-4867-addd-320040f84a22/6Asset+3%403xh.png?format=1500w"
+            alt="Momenta"
+            width={160}
+            height={45}
+            className="h-6 md:h-8 w-auto mx-auto transition-opacity duration-300 hover:opacity-80"
+            priority
+            unoptimized
+          />
+        </Link>
       </motion.header>
 
       {/* Main Content - positioned higher */}
@@ -115,10 +143,10 @@ export default function BetaSignup() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="font-serif text-primary-700 text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] tracking-tight"
+          className="font-serif text-neutral-900 text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] tracking-tight"
         >
           Tu próximo momento<br />
-          <span className="italic">inolvidable</span>
+          <span className="italic text-primary-700">inolvidable</span>
         </motion.h1>
 
         {/* Line */}
@@ -134,76 +162,116 @@ export default function BetaSignup() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="font-sans text-neutral-500 text-base md:text-lg max-w-md"
+          className="font-sans text-neutral-900 text-base md:text-lg max-w-md font-bold"
         >
           Bienvenido al club de personas que viven experiencias inolvidables.
         </motion.p>
 
-        {/* CTA + Form - closer to subtitle */}
+        {/* Form - closer to subtitle */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-16"
+          className="mt-16 w-full max-w-md"
         >
-          <p className="font-sans text-sm text-neutral-600 mb-1">
-            ¿Quieres ser de los primeros en acceder?
-          </p>
-          <p className="font-sans text-sm text-neutral-400 mb-4">
-            Déjanos tu email, te avisaremos cuando estemos listos.
-          </p>
 
-          <form onSubmit={handleSubmit} className="inline-flex">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (error) setError(null);
-              }}
-              placeholder="Tu email"
-              className="
-                w-44 md:w-52 bg-neutral-100 border border-neutral-200 border-r-0
-                px-4 py-2.5
-                font-sans text-sm text-neutral-800
-                placeholder:text-neutral-400
-                focus:outline-none focus:bg-white
-              "
-              disabled={isSubmitting}
-            />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="block font-sans text-xs tracking-widest uppercase text-neutral-500 mb-2">
+                Tu email <span className="text-secondary-700">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                  <Mail className="w-4 h-4 text-neutral-300" />
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) setError(null);
+                  }}
+                  placeholder="tu@email.com"
+                  className="
+                    w-full bg-neutral-100 border-0 rounded-md
+                    pl-11 pr-4 py-3
+                    font-sans text-sm text-neutral-800
+                    placeholder:text-neutral-400 placeholder:italic
+                    focus:outline-none focus:ring-2 focus:ring-primary-700/20
+                  "
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+
+            {/* Instagram */}
+            <div>
+              <label className="block font-sans text-xs tracking-widest uppercase text-neutral-500 mb-2">
+                Instagram <span className="font-normal normal-case tracking-normal text-neutral-400">(opcional)</span>
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                  <Instagram className="w-4 h-4 text-neutral-300" />
+                </div>
+                <input
+                  type="text"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                  placeholder="@usuario"
+                  className="
+                    w-full bg-neutral-100 border-0 rounded-md
+                    pl-11 pr-4 py-3
+                    font-sans text-sm text-neutral-800
+                    placeholder:text-neutral-400 placeholder:italic
+                    focus:outline-none focus:ring-2 focus:ring-primary-700/20
+                  "
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+
+            {/* Error */}
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-xs text-red-500"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={!email || isSubmitting}
-              className={`
-                bg-neutral-800 text-white px-5 py-2.5
-                font-sans text-xs font-medium tracking-widest uppercase
+              className="
+                w-full text-white rounded-full
+                px-6 py-4 mt-2
+                font-sans text-sm font-medium tracking-widest uppercase
                 transition-colors
-                ${(!email || isSubmitting)
-                  ? 'opacity-40 cursor-not-allowed'
-                  : 'hover:bg-neutral-900'
-                }
-              `}
+                flex items-center justify-center gap-2
+                hover:opacity-90
+                disabled:cursor-not-allowed
+              "
+              style={{ backgroundColor: '#1E3A5F' }}
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                'Notificarme'
+                'Únete a la Waiting List'
               )}
             </button>
-          </form>
 
-          <AnimatePresence>
-            {error && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-xs text-red-500 mt-2"
-              >
-                {error}
-              </motion.p>
-            )}
-          </AnimatePresence>
+            {/* Terms */}
+            <p className="text-xs text-neutral-400 text-center pt-2">
+              Al registrarte, aceptas recibir actualizaciones sobre el lanzamiento de Momenta.
+            </p>
+          </form>
         </motion.div>
       </main>
     </div>
