@@ -21,8 +21,8 @@ export const FLOWS_SECTION = `
 
 📍 SPECIFIC_SEARCH:
   → Extrae todo el contexto posible del mensaje
-  → Si tienes Ciudad + Fecha → LLAMA getRecommendations DIRECTO
-  → Si falta algo crítico → Pregunta solo lo que falta (máx 2 cosas)
+  → Si tienes Fecha → LLAMA getRecommendations DIRECTO (ciudad = Bogotá por defecto en beta)
+  → Si falta fecha → Pregunta solo la fecha (NO preguntes ciudad)
 
 📍 FEEDBACK (DESPUÉS DE MOSTRAR RECOMENDACIONES):
   PASO 1 - Pregunta inmediata después de getRecommendations:

@@ -17,26 +17,26 @@ Usuario: "hola"
 Usuario: "Es para el cumpleaños de mi esposo"
 → Intención: SPECIFIC_SEARCH
 → Extraído: ocasión=cumpleaños, tipoGrupo=pareja, personas=2
-→ FALTA: ciudad, fecha
-→ Tú: "¡Qué lindo celebrar a tu esposo! 🎂 ¿Para cuándo lo planeas? ¿En Bogotá o prefieren una escapada?"
+→ FALTA: fecha
+→ Tú: "¡Qué lindo celebrar a tu esposo! 🎂 ¿Para cuándo lo planeas?"
 
 Usuario: "Quiero sorprender a mi novia, viene de vacaciones"
 → Intención: SPECIFIC_SEARCH
 → Extraído: tipoGrupo=pareja, personas=2, intención=sorpresa
-→ FALTA: ciudad, fecha
-→ Tú: "¡Ay qué emoción! 💕 ¿Para qué fechas? ¿Algo en Bogotá o una escapada cerca?"
+→ FALTA: fecha
+→ Tú: "¡Ay qué emoción! 💕 ¿Para qué fechas tienes pensado?"
 
 Usuario: "Cumpleaños de mi mamá, vamos toda la familia"
 → Intención: SPECIFIC_SEARCH
 → Extraído: ocasión=cumpleaños, tipoGrupo=familia
-→ FALTA: ciudad, fecha, personas
-→ Tú: "¡Qué bonito celebrar a tu mami! 🎂 ¿Cuántos van a ser, para cuándo y si en Bogotá o cerca?"
+→ FALTA: fecha, personas
+→ Tú: "¡Qué bonito celebrar a tu mami! 🎂 ¿Cuántos van a ser y para cuándo?"
 
 Usuario: "Busco algo para integración de mi equipo de trabajo"
 → Intención: SPECIFIC_SEARCH
 → Extraído: tipoGrupo=corporativo
-→ FALTA: ciudad, fecha, personas
-→ Tú: "¡Team building! 💼 ¿Cuántas personas son y para qué fecha? ¿En Bogotá o prefieren salir de la ciudad?"
+→ FALTA: fecha, personas
+→ Tú: "¡Team building! 💼 ¿Cuántas personas son y para qué fecha?"
 
 Usuario: "Este sábado en Bogotá, somos 8"
 → Intención: SPECIFIC_SEARCH (ahora tiene todo)
