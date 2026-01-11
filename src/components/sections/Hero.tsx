@@ -1,25 +1,24 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAIChat, type ChatMessage } from '@/hooks/useAIChat';
 import type { AudioVisualizerData, RecommendationData } from '@/types/chat';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Atoms
-import VoiceSphere from '@/components/atoms/VoiceSphere';
-import RotatingTitleWord from '@/components/atoms/RotatingTitleWord';
 import LoadingMessage from '@/components/atoms/LoadingMessage';
+import RotatingTitleWord from '@/components/atoms/RotatingTitleWord';
+import VoiceSphere from '@/components/atoms/VoiceSphere';
 
 // Molecules
-import UserMessage from '@/components/molecules/UserMessage';
 import AssistantMessage from '@/components/molecules/AssistantMessage';
+import UserMessage from '@/components/molecules/UserMessage';
 
 // Organisms
-import HorizontalSlider from '@/components/organisms/HorizontalSlider';
 import ChatInputBar from '@/components/organisms/ChatInputBar';
 import ExperienceCarousel from '@/components/organisms/ExperienceCarousel';
-import ExperienceCard from '@/components/molecules/ExperienceCard';
 import FeedbackForm from '@/components/organisms/FeedbackForm';
+import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
 
 export const Hero = () => {
   // Custom AI chat hook - handles all conversation state
@@ -177,11 +176,12 @@ export const Hero = () => {
           toolInvocation.state === 'result' &&
           toolInvocation.result?.success
         ) {
+          console.log('[Hero] Found requestFeedback tool invocation:', toolInvocation);
           return {
             showForm: true,
             contextMessage: toolInvocation.result.message || '',
-            recommendationIds: toolInvocation.result.context?.recommendationIds,
-            userSentiment: toolInvocation.result.context?.userSentiment,
+            recommendationIds: toolInvocation.result.context?.recommendationIds || [],
+            userSentiment: toolInvocation.result.context?.userSentiment || 'neutral',
           };
         }
       }
@@ -291,22 +291,10 @@ export const Hero = () => {
 
                           {/* Show recommendations inline with this message */}
                           {messageRecommendations && messageRecommendations.length > 0 && (
-                            <div className="mt-4 mb-4">
-                              <HorizontalSlider
-                                title="Experiencias perfectas para ti"
-                                items={messageRecommendations}
-                                keyExtractor={(rec) => rec.url}
-                                renderCard={(rec, index) => (
-                                  <ExperienceCard
-                                    recommendation={rec}
-                                    index={index}
-                                  />
-                                )}
-                              />
-                            </div>
+                            <ExperienceRecommendations recommendations={messageRecommendations} />
                           )}
 
-                          {/* Feedback form - triggered by AI tool */}
+                          {/* Feedback form */}
                           {feedbackRequest?.showForm && !submittedFeedbackIds.has(message.id) && (
                             <div className="mt-4 mb-4">
                               <FeedbackForm
@@ -360,7 +348,7 @@ export const Hero = () => {
                 initial={{ opacity: 1, flex: '1 1 50%' }}
                 exit={{ opacity: 0, flex: '0 0 0%' }}
                 transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="overflow-hidden hidden lg:flex"
+                className="overflow-hidden hidden lg:flex rounded-[32px]"
               >
                 <ExperienceCarousel />
               </motion.div>
