@@ -79,7 +79,7 @@ export function Navbar() {
               href="/login"
               className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
             >
-              Login
+              Waiting List
               <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
             </Link>
           </div>
@@ -114,7 +114,7 @@ export function Navbar() {
               href="/login"
               className="text-[11px] font-medium tracking-[0.1em] uppercase text-charcoal/70"
             >
-              Login
+              Waiting List
             </Link>
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -178,7 +178,7 @@ export function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className="text-sm tracking-wide text-charcoal/60 hover:text-charcoal transition-colors"
                     >
-                      Login
+                      Waiting List
                     </Link>
                   </div>
                 </div>
