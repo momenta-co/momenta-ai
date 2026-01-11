@@ -1,19 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  MessageCircle,
-  Instagram,
-  Send,
-} from "lucide-react";
+import { ExperienceRecommendations } from "@/components/organisms/ExperienceRecommendations";
 import FeedbackForm from "@/components/organisms/FeedbackForm";
 
+const mockRecommendations = [{ "title": "Masaje Relajante en Casa", "description": "Para parejas,Individual,Bienestar,En tu casa,Ver todoMomenta Admin22/03/24Para parejas,Individual,Bienestar,En tu casa,Ver todoMomenta Admin22/03/24", "url": "https://www.momentaboutique.com/experiencias/masajerelajante", "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1698288608933-DNOEMF1YXPI53HDJ28UC/image-asset.jpeg", "price": { "amount": "154000", "currency": "COP", "unit": "por persona" }, "location": "Bogotá", "duration": null, "categories": ["Para parejas", "Individual", "Bienestar", "En tu casa", "Ver todo"], "scoreBreakdown": { "occasion": 85, "relation": 85, "mood": 95, "budget": 85, "total": 89.5 }, "reasons": "¡Esto es perfecto para un cumpleaños familiar! Un masaje relajante en casa les va a permitir disfrutar de un momento de conexión y tranquilidad juntos. Además, es una manera genial de consentir a la cumpleañera." }, { "title": "Wellness Day Pass", "description": "Para grupos,Para parejas,En Bogotá,Bienestar,IndividualMomenta Admin22/10/24Para grupos,Para parejas,En Bogotá,Bienestar,IndividualMomenta Admin22/10/24", "url": "https://www.momentaboutique.com/experiencias/wellness-day-pass", "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1729548301279-SAM732OPLE2Z3UVHH5QX/WELLNESS.jpg", "price": { "amount": "290000", "currency": "COP", "unit": "por persona" }, "location": "Bogotá", "duration": "3 horas", "categories": ["Para grupos", "Para parejas", "En Bogotá", "Bienestar", "Individual"], "scoreBreakdown": { "occasion": 80, "relation": 80, "mood": 90, "budget": 80, "total": 87.5 }, "reasons": "¡Un Wellness Day Pass es una idea increíble! Pueden relajarse y disfrutar de un día de spa juntos, es una manera fabulosa de sorprender a la cumpleañera y hacer que se sienta especial en su día." }, { "title": "Taller de Cocina Saludable", "description": "Bienestar,Cocina,En Bogotá,En tu casa,Para gruposMomenta Admin18/10/24Bienestar,Cocina,En Bogotá,En tu casa,Para gruposMomenta Admin18/10/24", "url": "https://www.momentaboutique.com/experiencias/nutricionywellness", "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1727818272027-F5VEFTSX6VAMHE5LOPKR/DSC03586.jpg", "price": { "amount": "143000", "currency": "COP", "unit": "por persona" }, "location": "Bogotá", "duration": "3 horas", "categories": ["Bienestar", "Cocina", "En Bogotá", "En tu casa", "Para grupos"], "scoreBreakdown": { "occasion": 70, "relation": 70, "mood": 85, "budget": 70, "total": 81.5 }, "reasons": "Este Taller de Cocina Saludable es una opción divertida y diferente. Cocinar juntos siempre crea buenos recuerdos, y el ambiente será perfecto para una celebración familiar. ¡A la cumpleañera le encantará!" }, { "title": "Taller de Yoga Facial", "description": "En tu casa,Corporativo,Para grupos,En Bogotá,Bienestar,Individual,Belleza y AutocuidadoMomenta Admin7/11/24En tu casa,Corporativo,Para grupos,En Bogotá,Bienestar,Individual,Belleza y AutocuidadoMomenta Admin7/11/24", "url": "https://www.momentaboutique.com/experiencias/beautyparty", "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/1730781828671-GWC7K6N08EO6J2J5BSSU/Tarde+de+amigas.jpeg", "price": { "amount": "149000", "currency": "COP", "unit": "por persona" }, "location": "Bogotá", "duration": "1 horas 30 minutos", "categories": ["En tu casa", "Corporativo", "Para grupos", "En Bogotá", "Bienestar", "Individual", "Belleza y Autocuidado"], "scoreBreakdown": { "occasion": 70, "relation": 70, "mood": 80, "budget": 70, "total": 79.5 }, "reasons": "¡El Taller de Yoga Facial es una joya! Es una experiencia relajante y perfecta para consentir a todos. Además, van a aprender algo nuevo y podrán compartir un momento de bienestar juntas." }, { "title": "Cena Clandestina en La Cocina de la Recocha", "description": "Momenta Admin10/07/25Momenta Admin10/07/25Taller de Scrapbook¿Cuándo fue la última vez que te detuviste a celebrar tu propia historia?En este taller de scrapbook, tú decides: crear un álbum con esos momentos que te hacen sonreír, o un mapa de sueños que te inspire cada mañana.Min. 2 persona(s) | En tu casa en Bogotá o en el taller | 3 horasDesde 150,000 COP**Leer más", "url": "https://www.momentaboutique.com/experiencias/cena-clandestina-la-cocina-de-la-recocha", "image": "https://images.squarespace-cdn.com/content/v1/6437ebd38df658408b0c18cf/c18732cf-8414-4419-b3b0-279b9fcfea4b/image-asset.jpg", "price": { "amount": "143000", "currency": "COP", "unit": "por persona" }, "location": "Bogotá", "duration": "2 horas", "categories": ["En tu casa", "Corporativo", "Para grupos", "Para Niños", "En Bogotá", "Manualidad", "Para parejas", "Individual", "Cocina", "Bienestar", "Ver todo", "Gastronómico", "Fiesta", "Belleza y Autocuidado", "Cerca a Bogotá", "Aventura", "Para niños"], "scoreBreakdown": { "occasion": 60, "relation": 60, "mood": 75, "budget": 60, "total": 73 }, "reasons": "¡La Cena Clandestina es una opción deliciosa! Es un plan diferente que les permitirá disfrutar de buena comida y compañía. Aunque no es tan enfocada en el bienestar, será un momento memorable para celebrar." }]
 
 export default function ContactoPage() {
   return (
@@ -30,7 +20,7 @@ export default function ContactoPage() {
         </div>
       </section>
 
-      {/* Contact Section */}
+      <ExperienceRecommendations recommendations={mockRecommendations} />
       <FeedbackForm messageId="contacto" />
     </div>
   );
