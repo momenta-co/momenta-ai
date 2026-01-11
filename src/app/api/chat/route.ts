@@ -1,8 +1,8 @@
 import {
   extractAccumulatedContext
 } from '@/lib/intelligence/context-extractor';
+import { devToolsEnabledModel } from '@/lib/intelligence/model';
 import { buildSystemPromptWithContext } from '@/lib/prompts';
-import { openai } from '@ai-sdk/openai';
 import { stepCountIs, streamText, convertToModelMessages } from 'ai';
 import { getRecommendations, requestFeedback } from './tools';
 
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
   let lastRecommendationIds: string[] = [];
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model: devToolsEnabledModel,
     system: systemPromptWithContext,
     messages,
     stopWhen: stepCountIs(5),
