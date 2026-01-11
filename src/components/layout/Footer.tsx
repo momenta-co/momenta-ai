@@ -4,13 +4,13 @@ import { Instagram, Mail, Phone, MapPin } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="relative bg-charcoal text-cream overflow-hidden">
+    <footer className="relative bg-[#B3D4BC] text-cream overflow-hidden">
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-sage-dark/5 via-transparent to-columbia/5 pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Footer - Two Column Layout */}
-        <div className="py-20 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-12">
+        <div className="py-16 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-12">
 
           {/* Left Column: Brand & Tagline */}
           <div className="space-y-8">
@@ -88,7 +88,7 @@ export function Footer() {
                   href="mailto:hello@momentaboutique.com"
                   className="flex items-center gap-3 text-cream/85 hover:text-cream transition-all duration-300 group-hover:translate-x-1"
                 >
-                  <Mail className="h-5 w-5 flex-shrink-0 text-sage-dark transition-all duration-300 group-hover:scale-110 group-hover:text-columbia" strokeWidth={1.5} />
+                  <Mail className="h-5 w-5 shrink-0 text-sage-dark transition-all duration-300 group-hover:scale-110 group-hover:text-columbia" strokeWidth={1.5} />
                   <span className="text-sm">hello@momentaboutique.com</span>
                 </a>
               </li>
@@ -97,7 +97,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-sage-dark/30 py-8">
+        <div className="border-t border-charcoal/20 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-sage-light/70 text-xs tracking-wider">
               © {new Date().getFullYear()} Momenta. Todos los derechos reservados.
