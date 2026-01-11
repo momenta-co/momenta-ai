@@ -1,9 +1,9 @@
 import {
   extractAccumulatedContext
 } from '@/lib/intelligence/context-extractor';
+import { devToolsEnabledModel } from '@/lib/intelligence/model';
 import { buildSystemPromptWithContext } from '@/lib/prompts';
-import { openai } from '@ai-sdk/openai';
-import { stepCountIs, streamText, convertToModelMessages } from 'ai';
+import { convertToModelMessages, stepCountIs, streamText } from 'ai';
 import { getRecommendations, requestFeedback } from './tools';
 
 // ============================================
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
   let lastRecommendationIds: string[] = [];
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model: devToolsEnabledModel,
     system: systemPromptWithContext,
     messages,
     stopWhen: stepCountIs(5),
@@ -186,121 +186,4 @@ export async function POST(req: Request) {
   });
 
   return result.toUIMessageStreamResponse();
-
-  // // ============================================
-  // // STREAM INTERCEPTOR: Auto-inject follow-up question after getRecommendations
-  // // ============================================
-  // // Intercept the stream and inject text BEFORE the finish event
-
-  // const originalResponse = result.toUIMessageStreamResponse();
-
-  // const encoder = new TextEncoder();
-  // const decoder = new TextDecoder();
-
-  // const transformedStream = originalResponse.body?.pipeThrough(
-  //   new TransformStream({
-  //     transform: async (chunk, controller) => {
-  //       const chunkText = decoder.decode(chunk, { stream: true });
-
-  //       // Accumulate text to detect feedback transition message
-  //       if (chunkText.includes('"type":"text-delta"')) {
-  //         try {
-  //           const lines = chunkText.split('\n');
-  //           for (const line of lines) {
-  //             if (line.startsWith('data: ')) {
-  //               const json = JSON.parse(line.substring(6));
-  //               if (json.type === 'text-delta' && json.delta) {
-  //                 accumulatedText += json.delta;
-  //               }
-  //             }
-  //           }
-  //         } catch (e) {
-  //           // Ignore JSON parse errors
-  //         }
-  //       }
-
-  //       // Capture recommendation IDs from getRecommendations tool results
-  //       if (chunkText.includes('"type":"tool-result"') || chunkText.includes('"type":"tool-output-available"')) {
-  //         console.log('[TRANSFORM] Detected tool result chunk');
-  //         try {
-  //           const lines = chunkText.split('\n');
-  //           for (const line of lines) {
-  //             if (line.startsWith('data: ')) {
-  //               const json = JSON.parse(line.substring(6));
-  //               console.log('[TRANSFORM] Tool result event:', { type: json.type, hasOutput: !!json.output, hasResult: !!json.result });
-
-  //               // Check both json.output and json.result (AI SDK may use either)
-  //               const toolData = json.output || json.result;
-
-  //               if ((json.type === 'tool-result' || json.type === 'tool-output-available') &&
-  //                 toolData?.success &&
-  //                 toolData?.recommendations) {
-  //                 // Extract URLs from recommendations
-  //                 lastRecommendationIds = toolData.recommendations.map((rec: any) => rec.url);
-  //                 console.log('[TRANSFORM] ✅ Captured recommendation IDs:', lastRecommendationIds);
-  //               }
-  //             }
-  //           }
-  //         } catch (e) {
-  //           console.error('[TRANSFORM] Error parsing tool result:', e);
-  //         }
-  //       }
-
-  //       // Check if this chunk contains the finish event
-  //       if (chunkText.includes('"type":"finish"')) {
-  //         console.log('[TRANSFORM] Detected finish event');
-
-  //         // INTERCEPTOR 1: If getRecommendations was called but no text followed, inject question
-  //         if (getRecommendationsWasCalled && !textAfterToolCall) {
-  //           console.log('[TRANSFORM] 💉 Injecting follow-up question BEFORE finish event');
-
-  //           const followUpQuestion = 'Pudiste revisar las experiencias - cuál te gustó mas?';
-  //           const textDeltaEvent = 'data: ' + JSON.stringify({
-  //             type: 'text-delta',
-  //             delta: followUpQuestion
-  //           }) + '\n\n';
-
-  //           controller.enqueue(encoder.encode(textDeltaEvent));
-  //         }
-
-  //         // INTERCEPTOR 2: If feedback transition message was detected, inject feedback form trigger
-  //         const feedbackTriggerPhrases = [
-  //           'Antes de finalizar la reserva',
-  //           'me ayudarías con estos datos',
-  //           'formalizar tu participación en el giveaway'
-  //         ];
-
-  //         const hasFeedbackTrigger = feedbackTriggerPhrases.some(phrase =>
-  //           accumulatedText.toLowerCase().includes(phrase.toLowerCase())
-  //         );
-
-  //         if (hasFeedbackTrigger && !feedbackTransitionDetected) {
-  //           feedbackTransitionDetected = true;
-  //           console.log('[TRANSFORM] 💉 Detected feedback transition message, injecting feedback form trigger');
-  //           console.log('[TRANSFORM] Using recommendation IDs:', lastRecommendationIds);
-
-  //           // Inject custom event to trigger feedback form
-  //           const feedbackFormEvent = 'data: ' + JSON.stringify({
-  //             type: 'show-feedback-form',
-  //             userSentiment: accumulatedText.toLowerCase().includes('me encanta') ||
-  //               accumulatedText.toLowerCase().includes('perfecto') ? 'positive' :
-  //               accumulatedText.toLowerCase().includes('no me convence') ||
-  //                 accumulatedText.toLowerCase().includes('ninguna') ? 'negative' : 'neutral',
-  //             contextMessage: accumulatedText.substring(Math.max(0, accumulatedText.length - 200)),
-  //             recommendationIds: lastRecommendationIds
-  //           }) + '\n\n';
-
-  //           controller.enqueue(encoder.encode(feedbackFormEvent));
-  //         }
-  //       }
-
-  //       // Pass through the original chunk
-  //       controller.enqueue(chunk);
-  //     }
-  //   })
-  // );
-
-  // return new Response(transformedStream, {
-  //   headers: originalResponse.headers,
-  // });
 }
