@@ -99,13 +99,13 @@ export default function BetaSignup() {
             </motion.div>
 
             <h1 className="font-serif text-5xl md:text-6xl text-primary-700 mb-6">
-              ¡Gracias!
+              STAY TUNED
             </h1>
 
             <div className="w-16 h-px bg-secondary-700 mx-auto mb-6" />
 
             <p className="font-sans text-base text-neutral-500">
-              Te contactaremos pronto con tu acceso anticipado.
+              nos vemos pronto!
             </p>
           </motion.div>
         </main>
