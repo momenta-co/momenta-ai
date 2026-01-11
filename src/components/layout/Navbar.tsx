@@ -31,11 +31,6 @@ export function Navbar() {
     }
   };
 
-  // Hide navbar on login page
-  if (pathname === "/login") {
-    return null;
-  }
-
   return (
     <header
       className={cn(

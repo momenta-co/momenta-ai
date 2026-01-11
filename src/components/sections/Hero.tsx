@@ -231,7 +231,7 @@ export const Hero = () => {
                   transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
                   className="text-neutral-1000 leading-[1.25] tracking-tight font-serif font-normal text-center w-full text-small"
                 >
-                  Cuéntame qué experiencia buscas
+                  Cuéntame qué experiencia buscas - Yo te recomiendo!
                 </motion.p>
 
                 {/* 3D Sphere */}
