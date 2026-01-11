@@ -87,6 +87,27 @@ const TOOL_USAGE_SECTION = `
     con el texto: "Pudiste revisar las experiencias - cuál te gustó mas?"
   → NUNCA termines tu respuesta solo con la herramienta - siempre incluye la pregunta
 
+  🔎 CATEGORÍAS ESPECÍFICAS (MUY IMPORTANTE):
+  Cuando el usuario pida algo específico, usa la categoría EXACTA en el parámetro "categoria":
+
+  COCINA POR TIPO:
+  • "italiano/italiana/pasta" → categoria: "italiana"
+  • "japonés/japonesa/sushi" → categoria: "japonesa"
+  • "mexicano/mexicana/tacos" → categoria: "mexicana"
+  • "parrilla/carne/asado/bbq" → categoria: "parrilla"
+  • "saludable/healthy/fitness" → categoria: "saludable"
+  • "repostería/tortas/pasteles" → categoria: "reposteria"
+
+  BEBIDAS Y CATAS:
+  • "café/barismo" → categoria: "cafe"
+  • "vino/maridaje" → categoria: "vino"
+  • "cerveza" → categoria: "cerveza"
+  • "licores/aguardiente/destilados" → categoria: "licores"
+  • "cocteles/tragos/mixología" → categoria: "cocteles"
+
+  GENERALES (si no es específico):
+  • gastronomia, bienestar, arte_creatividad, aventura
+
 🔧 requestFeedback:
   → CUÁNDO: Usuario respondió a tu pregunta sobre qué experiencia le gustó
   → QUÉ HACE: Muestra formulario para email y comentarios del giveaway
