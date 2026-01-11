@@ -98,7 +98,7 @@ export default function BetaSignup() {
               <CheckCircle2 className="w-16 h-16 text-primary-700 mx-auto" strokeWidth={1} />
             </motion.div>
 
-            <h1 className="font-serif text-5xl md:text-6xl text-primary-700 mb-6">
+            <h1 className="font-serif text-4xl md:text-5xl text-primary-700 mb-6">
               STAY TUNED
             </h1>
 
