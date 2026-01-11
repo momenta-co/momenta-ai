@@ -1,14 +1,10 @@
-import { getExperiencesByCity } from '@/lib/db/experiences';
-import { generateAIRecommendations, preFilterByEnergy, preFilterByUserExclusions } from '@/lib/intelligence/ai-service';
 import {
-  extractAccumulatedContext,
-  generateContextReminder
+  extractAccumulatedContext
 } from '@/lib/intelligence/context-extractor';
-import type { NivelEnergia, Presupuesto, TipoGrupo, UserContext } from '@/lib/intelligence/types';
 import { buildSystemPromptWithContext } from '@/lib/prompts';
 import { openai } from '@ai-sdk/openai';
-import { streamText, tool } from 'ai';
-import { z } from 'zod';
+import { stepCountIs, streamText, convertToModelMessages } from 'ai';
+import { getRecommendations, requestFeedback } from './tools';
 
 // ============================================
 // PRE-FILTER: Detect off-topic messages locally
@@ -127,430 +123,184 @@ function createDelayedStreamResponse(text: string): Response {
 }
 
 // ============================================
-// HELPER: Convert AI SDK v6 messages
-// ============================================
-type MessageRole = 'user' | 'assistant' | 'system';
-
-function convertMessages(messages: any[]): { role: MessageRole; content: string }[] {
-  return messages.map((msg) => {
-    const role = msg.role as MessageRole;
-    if (msg.parts && Array.isArray(msg.parts)) {
-      const textContent = msg.parts
-        .filter((part: any) => part.type === 'text')
-        .map((part: any) => part.text)
-        .join('');
-      return { role, content: textContent };
-    }
-    if (msg.content) {
-      return { role, content: msg.content };
-    }
-    return { role, content: '' };
-  });
-}
-
-// ============================================
 // SYSTEM PROMPT - Now managed in modular files
 // See: src/lib/prompts/
 // ============================================
 // The SYSTEM_PROMPT and buildSystemPromptWithContext are now imported from @/lib/prompts
 
 // ============================================
-// HELPER: Detect confirmation message with emojis (📍👥📅)
-// ============================================
-function wasConfirmationShown(rawMessages: any[]): boolean {
-  for (const msg of rawMessages) {
-    if (msg.role === 'assistant') {
-      // Check content for the emoji pattern
-      const content = msg.content || '';
-      if (content.includes('📍') && content.includes('👥') && content.includes('📅')) {
-        console.log('[DETECTION] ✅ Found confirmation message with emojis');
-        return true;
-      }
-
-      // Also check parts array for text content
-      if (msg.parts && Array.isArray(msg.parts)) {
-        for (const part of msg.parts) {
-          if (part.type === 'text' && part.text) {
-            if (part.text.includes('📍') && part.text.includes('👥') && part.text.includes('📅')) {
-              console.log('[DETECTION] ✅ Found confirmation emojis in parts');
-              return true;
-            }
-          }
-        }
-      }
-    }
-  }
-  return false;
-}
-
-// Alias for backwards compatibility
-function wasConfirmSearchShown(rawMessages: any[]): boolean {
-  return wasConfirmationShown(rawMessages);
-}
-
-// ============================================
-// HELPER: Check if last user message is confirmation
-// ============================================
-const CONFIRMATION_PATTERNS_ROUTE = [
-  /^s[ií]$/i,
-  /^ok(ay)?$/i,
-  /^dale/i,
-  /^perfecto/i,
-  /^listo/i,
-  /^va$/i,
-  /^correcto/i,
-  /^confirm[oa]/i,
-  /^busca/i,
-  /est[áa]\s*bien/i,
-  /as[ií]\s*est[áa]/i,
-  /^s[ií]\s*(est[áa]|,)/i,
-  /^s[ií]\s+perfecto/i,      // "si perfecto", "sí perfecto"
-  /^s[ií],?\s*(dale|listo|va|claro|eso|busca|genial)/i, // "si, dale", "si listo", etc.
-  /^bien$/i,
-  /^sip$/i,
-  /^claro/i,
-  /^seguro/i,
-  /^por\s*supuesto/i,
-  /^eso\s*(es|esta)/i,
-  /^exacto/i,
-  /^así\s*mismo/i,
-  /^adelante/i,
-  /^genial/i,                // "genial" como confirmación
-  /^súper/i,                 // "súper", "super"
-  /^excelente/i,             // "excelente"
-];
-
-function isUserConfirmation(message: string): boolean {
-  const clean = message.toLowerCase().trim();
-  return CONFIRMATION_PATTERNS_ROUTE.some(p => p.test(clean));
-}
-
-// ============================================
 // MAIN CHAT ENDPOINT
 // ============================================
 export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
-  const messages = convertMessages(rawMessages);
+  const messages = await convertToModelMessages(rawMessages);
 
   // Get user messages for context
   const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
-  const lastUserMessage = userMessages[userMessages.length - 1];
-
-  // Detect if confirmation message was shown (message with emojis 📍👥📅)
-  const confirmationWasShown = wasConfirmationShown(rawMessages);
-  const userConfirmed = lastUserMessage && isUserConfirmation(lastUserMessage.content);
-
-  console.log('[DETECTION] confirmationWasShown:', confirmationWasShown);
-  console.log('[DETECTION] userConfirmed:', userConfirmed);
-  console.log('[DETECTION] lastUserMessage:', lastUserMessage?.content);
 
   // Extraer contexto acumulado de TODOS los mensajes del usuario
   const accumulatedContext = extractAccumulatedContext(messages);
 
-  // Track confirmation state
-  accumulatedContext.confirmSearchWasShown = confirmationWasShown;
-  accumulatedContext.userConfirmed = userConfirmed;
-
-  const contextReminder = generateContextReminder(accumulatedContext);
-
-  console.log('[CONTEXT] Accumulated context:', accumulatedContext);
-
-  if (lastUserMessage?.content) {
-    // 1. Check for off-topic messages first
-    const contextCheck = checkMessageContext(lastUserMessage.content);
-    if (!contextCheck.isOnTopic) {
-      const response = contextCheck.reason === 'tourist' ? TOURIST_RESPONSE : OFF_TOPIC_RESPONSE;
-      return createDelayedStreamResponse(response);
-    }
-
-    // 2. FAST PATH: Si el usuario confirmó y tenemos todos los datos, ir directo a getRecommendations
-    if (accumulatedContext.userConfirmed && accumulatedContext.confirmSearchWasShown) {
-      console.log('[CONFIRMATION FAST PATH] ✅ User confirmed AND confirmSearch was shown');
-      console.log('[CONFIRMATION FAST PATH] Context:', {
-        ciudad: accumulatedContext.ciudad,
-        fecha: accumulatedContext.fecha,
-        tipoGrupo: accumulatedContext.tipoGrupo,
-        nivelEnergia: accumulatedContext.nivelEnergia,
-        personas: accumulatedContext.personas,
-      });
-
-      const hasAllData = accumulatedContext.ciudad && accumulatedContext.fecha &&
-        accumulatedContext.tipoGrupo;
-
-      // nivelEnergia can be optional - default to calm_mindful for pareja, uplifting for others
-      const nivelEnergia = accumulatedContext.nivelEnergia ||
-        (accumulatedContext.tipoGrupo === 'pareja' ? 'calm_mindful' : 'uplifting');
-
-      if (hasAllData) {
-        console.log('[CONFIRMATION FAST PATH] ✅ Has all required data, executing getRecommendations');
-        try {
-          const rawExperiences = await getExperiencesByCity(accumulatedContext.ciudad!);
-          // PRE-FILTER 1: Remove experiences that contradict energy level
-          let experiences = preFilterByEnergy(rawExperiences, nivelEnergia);
-          console.log(`[CONFIRMATION FAST PATH] Energy pre-filter: ${rawExperiences.length} → ${experiences.length} experiences`);
-
-          // PRE-FILTER 2: Remove experiences the user explicitly wants to avoid
-          if (accumulatedContext.evitar && accumulatedContext.evitar.length > 0) {
-            const beforeUserFilter = experiences.length;
-            experiences = preFilterByUserExclusions(experiences, accumulatedContext.evitar);
-            console.log(`[CONFIRMATION FAST PATH] User exclusion pre-filter: ${beforeUserFilter} → ${experiences.length} experiences (evitar: ${accumulatedContext.evitar.join(', ')})`);
-          }
-
-          if (experiences && experiences.length > 0) {
-            const personas = accumulatedContext.personas ||
-              (accumulatedContext.tipoGrupo === 'pareja' ? 2 :
-                accumulatedContext.tipoGrupo === 'sola' ? 1 : 5);
-
-            const userContext: UserContext = {
-              fecha: accumulatedContext.fecha!,
-              ciudad: accumulatedContext.ciudad!,
-              personas,
-              tipoGrupo: accumulatedContext.tipoGrupo!,
-              nivelEnergia: nivelEnergia as any,
-              ocasion: accumulatedContext.ocasion,
-              evitar: accumulatedContext.evitar,
-            };
-            console.log('[CONFIRMATION FAST PATH] UserContext:', userContext);
-
-            const aiResult = await generateAIRecommendations(userContext, experiences);
-
-            const recommendations = aiResult.map((rec) => ({
-              title: rec.experience.title,
-              description: rec.experience.description,
-              url: rec.experience.url,
-              image: rec.experience.image || '',
-              price: rec.experience.price,
-              location: rec.experience.location,
-              duration: rec.experience.duration,
-              categories: rec.experience.categories,
-              scoreBreakdown: rec.scoreBreakdown,
-              reasons: rec.reasons,
-            }));
-
-            // Crear respuesta con tool result para que el frontend muestre las cards
-            const toolResult = {
-              success: true,
-              recommendations,
-              context: userContext,
-            };
-
-            // Stream response con el tool call + result en formato AI SDK
-            const toolCallId = 'direct-recommendation-' + Date.now();
-            const encoder = new TextEncoder();
-
-            const stream = new ReadableStream({
-              async start(controller) {
-                // 1. Send tool call start (9: prefix - AI SDK format)
-                const toolCall = {
-                  toolCallId: toolCallId,
-                  toolName: 'getRecommendations',
-                  args: userContext,
-                };
-                controller.enqueue(encoder.encode('9:' + JSON.stringify(toolCall) + '\n'));
-                await new Promise(r => setTimeout(r, 50));
-
-                // 2. Send tool result (a: prefix - AI SDK format)
-                const toolResultPayload = {
-                  toolCallId: toolCallId,
-                  result: toolResult,
-                };
-                controller.enqueue(encoder.encode('a:' + JSON.stringify(toolResultPayload) + '\n'));
-                await new Promise(r => setTimeout(r, 50));
-
-                // 3. Send text response
-                const responseText = `¡Encontré estas opciones perfectas para ti! 💕`;
-                controller.enqueue(encoder.encode('0:' + JSON.stringify(responseText) + '\n'));
-
-                controller.close();
-              },
-            });
-
-            return new Response(stream, {
-              headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Transfer-Encoding': 'chunked',
-              },
-            });
-          }
-        } catch (error) {
-          console.error('[CONFIRMATION FAST PATH] Error:', error);
-          // Fall through to AI path
-        }
-      } else {
-        console.log('[CONFIRMATION FAST PATH] ❌ Missing required data:', {
-          ciudad: !!accumulatedContext.ciudad,
-          fecha: !!accumulatedContext.fecha,
-          tipoGrupo: !!accumulatedContext.tipoGrupo,
-        });
-      }
-    } else {
-      console.log('[CONFIRMATION FAST PATH] ❌ Conditions not met:', {
-        userConfirmed: accumulatedContext.userConfirmed,
-        confirmSearchWasShown: accumulatedContext.confirmSearchWasShown,
-      });
-    }
-  }
-
-  // Full AI path - La IA maneja TODO (incluyendo contenido inapropiado)
-  console.log('[AI PATH] Using OpenAI for complex response');
+  // const contextReminder = generateContextReminder(accumulatedContext);
 
   // Construir el system prompt con el contexto acumulado
-  const systemPromptWithContext = buildSystemPromptWithContext(contextReminder);
+  const systemPromptWithContext = buildSystemPromptWithContext(accumulatedContext);
+
+  let getRecommendationsWasCalled = false;
+  let textAfterToolCall = false;
+
+  // Track accumulated text to detect feedback transition message
+  let accumulatedText = '';
+  let feedbackTransitionDetected = false;
+  let lastRecommendationIds: string[] = [];
 
   const result = streamText({
     model: openai('gpt-4o-mini'),
     system: systemPromptWithContext,
     messages,
+    stopWhen: stepCountIs(5),
+    // onStepFinish: ({ text, toolCalls }) => {
+    //   console.log('[onStepFinish] text length:', text?.length || 0);
+    //   if (toolCalls) {
+    //     console.log('[onStepFinish] toolCalls:', toolCalls.map(tc => tc.toolName));
+    //     // Track if getRecommendations was called
+    //     if (toolCalls.some(tc => tc.toolName === 'getRecommendations')) {
+    //       getRecommendationsWasCalled = true;
+    //       console.log('[onStepFinish] ✅ getRecommendations detected');
+    //     }
+    //   }
+    //   // Track if any text was output
+    //   if (text && text.trim().length > 0) {
+    //     textAfterToolCall = true;
+    //     console.log('[onStepFinish] ✅ Text output detected');
+    //   }
+    // },
+
     tools: {
-      // Tool de recomendaciones - busca en la base de datos
-      getRecommendations: tool({
-        description: `
-          Busca experiencias en la base de datos según los criterios del usuario.
+      // Get the experiencies from the database
+      getRecommendations,
 
-          CUÁNDO USAR:
-          - Usuario confirmó el resumen que mostraste (dice "sí", "dale", "perfecto", "ok")
-          - O tienes toda la información necesaria (ciudad + fecha como mínimo)
-
-          DESPUÉS DE LLAMAR: Pregunta por la opinión del usuario.
-          "¿Te gustó alguna de estas opciones?" o "¿Qué te parecieron?"
-        `,
-        inputSchema: z.object({
-          // PRIORIDAD 1 (Requeridos)
-          ciudad: z.string().describe('Ciudad: "Bogotá" o "Cerca de Bogotá"'),
-          fecha: z.string().describe('Fecha o referencia temporal: "este sábado", "mañana", "15 de enero"'),
-          personas: z.number().describe('Número de personas'),
-
-          // PRIORIDAD 2 (Importantes)
-          tipoGrupo: z.enum(['sola', 'pareja', 'familia', 'amigos']).describe('Tipo de grupo'),
-          ocasion: z.string().optional().describe('Ocasión: cumpleaños, aniversario, reencuentro, cita, etc.'),
-          categoria: z.string().optional().describe('Categoría si la piden: gastronomia, bienestar, arte_creatividad, aventura'),
-          presupuesto: z.enum(['bajo', 'medio', 'alto', 'no_prioritario']).optional().describe('Presupuesto si lo mencionan'),
-
-          // PRIORIDAD 3 (Ajuste fino)
-          nivelEnergia: z.enum(['slow_cozy', 'calm_mindful', 'uplifting', 'social']).optional()
-            .describe('slow_cozy=tranquilo/relajado, calm_mindful=íntimo/especial, uplifting=activo/divertido, social=fiesta/parche'),
-          intencion: z.enum(['invitar', 'sorprender', 'compartir', 'agradecer', 'celebrar']).optional()
-            .describe('Intención del plan'),
-          evitar: z.array(z.string()).optional().describe('Cosas a evitar: multitudes, ruido, alcohol, largas_distancias'),
-
-          // PRIORIDAD 4 (Opcional)
-          modalidad: z.enum(['indoor', 'outdoor', 'stay_in']).optional().describe('indoor, outdoor, o stay_in (en casa)'),
-        }),
-        execute: async (params) => {
-          console.log('[getRecommendations] Called with:', params);
-
-          try {
-            const rawExperiences = await getExperiencesByCity(params.ciudad);
-            // PRE-FILTER 1: Remove experiences that contradict energy level
-            let experiences = preFilterByEnergy(rawExperiences, params.nivelEnergia);
-            console.log(`[getRecommendations] Energy pre-filter: ${rawExperiences.length} → ${experiences.length} experiences`);
-
-            // PRE-FILTER 2: Remove experiences the user explicitly wants to avoid
-            if (params.evitar && params.evitar.length > 0) {
-              const beforeUserFilter = experiences.length;
-              experiences = preFilterByUserExclusions(experiences, params.evitar);
-              console.log(`[getRecommendations] User exclusion pre-filter: ${beforeUserFilter} → ${experiences.length} experiences (evitar: ${params.evitar.join(', ')})`);
-            }
-
-            if (!experiences || experiences.length === 0) {
-              return {
-                success: false,
-                error: 'No hay experiencias disponibles en esta ciudad',
-                recommendations: [],
-              };
-            }
-
-            // Build complete UserContext based on priority matrix
-            const userContext: UserContext = {
-              // Prioridad 1
-              fecha: params.fecha,
-              ciudad: params.ciudad,
-              personas: params.personas,
-
-              // Prioridad 2
-              tipoGrupo: params.tipoGrupo as TipoGrupo,
-              categoria: params.categoria as any,
-              ocasion: params.ocasion,
-              presupuesto: params.presupuesto as Presupuesto,
-
-              // Prioridad 3
-              nivelEnergia: params.nivelEnergia as NivelEnergia,
-              intencion: params.intencion as any,
-              evitar: params.evitar,
-
-              // Prioridad 4
-              modalidad: params.modalidad as any,
-            };
-
-            const aiResult = await generateAIRecommendations(userContext, experiences);
-
-            // Map to frontend format
-            const recommendations = aiResult.map((rec) => ({
-              title: rec.experience.title,
-              description: rec.experience.description,
-              url: rec.experience.url,
-              image: rec.experience.image || '',
-              price: rec.experience.price,
-              location: rec.experience.location,
-              duration: rec.experience.duration,
-              categories: rec.experience.categories,
-              scoreBreakdown: rec.scoreBreakdown,
-              reasons: rec.reasons,
-            }));
-
-            return {
-              success: true,
-              recommendations,
-              context: params,
-            };
-          } catch (error) {
-            console.error('[getRecommendations] Error:', error);
-            return {
-              success: false,
-              error: 'Error generando recomendaciones',
-              recommendations: [],
-            };
-          }
-        },
-      }),
-
-      // PASO 3: Pide feedback
-      requestFeedback: tool({
-        description: `
-          Solicita feedback del usuario sobre las recomendaciones mostradas.
-          Usa esta herramienta DESPUÉS de que el usuario haya expresado interés (positivo o negativo) en las recomendaciones. El objetivo es recopilar su email para el sorteo y su opinión general.
-
-          Contexto de uso:
-          - Usuario dice "me gustó X" o "no me convence" → llama esta herramienta
-          - Incluye un mensaje cálido explicando que es para el sorteo"
-        `,
-        inputSchema: z.object({
-          contextMessage: z.string().describe(
-            'Mensaje contextual que se mostrará antes del formulario. ' +
-            'Debe ser cálido y explicar que es para formalizar participación en sorteo.'
-          ),
-          recommendationContext: z.object({
-            recommendationIds: z.array(z.string()).describe('URLs de las recomendaciones mostradas'),
-            userSentiment: z.enum(['positive', 'negative']).describe(
-              'Sentimiento del usuario hacia las recomendaciones basado en su respuesta'
-            )
-          }).optional()
-        }),
-        execute: async ({ contextMessage, recommendationContext }) => {
-          console.log('[requestFeedback] Called with:', { contextMessage, recommendationContext });
-
-          // This tool doesn't need to do anything server-side
-          // It just signals to the frontend to show the feedback form
-          return {
-            success: true,
-            message: contextMessage,
-            showFeedbackForm: true,
-            context: recommendationContext || null
-          };
-        }
-      }),
+      // Request the user feedback about the recommended experiences
+      requestFeedback,
     },
   });
 
   return result.toUIMessageStreamResponse();
+
+  // // ============================================
+  // // STREAM INTERCEPTOR: Auto-inject follow-up question after getRecommendations
+  // // ============================================
+  // // Intercept the stream and inject text BEFORE the finish event
+
+  // const originalResponse = result.toUIMessageStreamResponse();
+
+  // const encoder = new TextEncoder();
+  // const decoder = new TextDecoder();
+
+  // const transformedStream = originalResponse.body?.pipeThrough(
+  //   new TransformStream({
+  //     transform: async (chunk, controller) => {
+  //       const chunkText = decoder.decode(chunk, { stream: true });
+
+  //       // Accumulate text to detect feedback transition message
+  //       if (chunkText.includes('"type":"text-delta"')) {
+  //         try {
+  //           const lines = chunkText.split('\n');
+  //           for (const line of lines) {
+  //             if (line.startsWith('data: ')) {
+  //               const json = JSON.parse(line.substring(6));
+  //               if (json.type === 'text-delta' && json.delta) {
+  //                 accumulatedText += json.delta;
+  //               }
+  //             }
+  //           }
+  //         } catch (e) {
+  //           // Ignore JSON parse errors
+  //         }
+  //       }
+
+  //       // Capture recommendation IDs from getRecommendations tool results
+  //       if (chunkText.includes('"type":"tool-result"') || chunkText.includes('"type":"tool-output-available"')) {
+  //         console.log('[TRANSFORM] Detected tool result chunk');
+  //         try {
+  //           const lines = chunkText.split('\n');
+  //           for (const line of lines) {
+  //             if (line.startsWith('data: ')) {
+  //               const json = JSON.parse(line.substring(6));
+  //               console.log('[TRANSFORM] Tool result event:', { type: json.type, hasOutput: !!json.output, hasResult: !!json.result });
+
+  //               // Check both json.output and json.result (AI SDK may use either)
+  //               const toolData = json.output || json.result;
+
+  //               if ((json.type === 'tool-result' || json.type === 'tool-output-available') &&
+  //                 toolData?.success &&
+  //                 toolData?.recommendations) {
+  //                 // Extract URLs from recommendations
+  //                 lastRecommendationIds = toolData.recommendations.map((rec: any) => rec.url);
+  //                 console.log('[TRANSFORM] ✅ Captured recommendation IDs:', lastRecommendationIds);
+  //               }
+  //             }
+  //           }
+  //         } catch (e) {
+  //           console.error('[TRANSFORM] Error parsing tool result:', e);
+  //         }
+  //       }
+
+  //       // Check if this chunk contains the finish event
+  //       if (chunkText.includes('"type":"finish"')) {
+  //         console.log('[TRANSFORM] Detected finish event');
+
+  //         // INTERCEPTOR 1: If getRecommendations was called but no text followed, inject question
+  //         if (getRecommendationsWasCalled && !textAfterToolCall) {
+  //           console.log('[TRANSFORM] 💉 Injecting follow-up question BEFORE finish event');
+
+  //           const followUpQuestion = 'Pudiste revisar las experiencias - cuál te gustó mas?';
+  //           const textDeltaEvent = 'data: ' + JSON.stringify({
+  //             type: 'text-delta',
+  //             delta: followUpQuestion
+  //           }) + '\n\n';
+
+  //           controller.enqueue(encoder.encode(textDeltaEvent));
+  //         }
+
+  //         // INTERCEPTOR 2: If feedback transition message was detected, inject feedback form trigger
+  //         const feedbackTriggerPhrases = [
+  //           'Antes de finalizar la reserva',
+  //           'me ayudarías con estos datos',
+  //           'formalizar tu participación en el giveaway'
+  //         ];
+
+  //         const hasFeedbackTrigger = feedbackTriggerPhrases.some(phrase =>
+  //           accumulatedText.toLowerCase().includes(phrase.toLowerCase())
+  //         );
+
+  //         if (hasFeedbackTrigger && !feedbackTransitionDetected) {
+  //           feedbackTransitionDetected = true;
+  //           console.log('[TRANSFORM] 💉 Detected feedback transition message, injecting feedback form trigger');
+  //           console.log('[TRANSFORM] Using recommendation IDs:', lastRecommendationIds);
+
+  //           // Inject custom event to trigger feedback form
+  //           const feedbackFormEvent = 'data: ' + JSON.stringify({
+  //             type: 'show-feedback-form',
+  //             userSentiment: accumulatedText.toLowerCase().includes('me encanta') ||
+  //               accumulatedText.toLowerCase().includes('perfecto') ? 'positive' :
+  //               accumulatedText.toLowerCase().includes('no me convence') ||
+  //                 accumulatedText.toLowerCase().includes('ninguna') ? 'negative' : 'neutral',
+  //             contextMessage: accumulatedText.substring(Math.max(0, accumulatedText.length - 200)),
+  //             recommendationIds: lastRecommendationIds
+  //           }) + '\n\n';
+
+  //           controller.enqueue(encoder.encode(feedbackFormEvent));
+  //         }
+  //       }
+
+  //       // Pass through the original chunk
+  //       controller.enqueue(chunk);
+  //     }
+  //   })
+  // );
+
+  // return new Response(transformedStream, {
+  //   headers: originalResponse.headers,
+  // });
 }
