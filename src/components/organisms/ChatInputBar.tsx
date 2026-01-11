@@ -2,25 +2,21 @@
 
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mic, Send, Square } from 'lucide-react';
+import { Send } from 'lucide-react';
 import RotatingPlaceholder from '@/components/atoms/RotatingPlaceholder';
 
 interface ChatInputBarProps {
   input: string;
   setInput: (value: string) => void;
   isLoading: boolean;
-  isListening: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  toggleVoice: () => void;
 }
 
 export default function ChatInputBar({
   input,
   setInput,
   isLoading,
-  isListening,
   onSubmit,
-  toggleVoice,
 }: ChatInputBarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -88,27 +84,6 @@ export default function ChatInputBar({
 
         {/* Buttons row */}
         <div className="flex items-center justify-end gap-3 px-4 pb-3">
-          {/* Microphone button */}
-          <button
-            type="button"
-            onClick={toggleVoice}
-            className={`
-              flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center
-              transition-all duration-300
-              ${isListening
-                ? 'bg-primary-700 text-white shadow-lg shadow-primary-700/30 scale-105'
-                : 'bg-neutral-200/80 text-neutral-600 hover:bg-neutral-300/80 hover:scale-105'
-              }
-            `}
-            aria-label={isListening ? 'Detener' : 'Hablar'}
-          >
-            {isListening ? (
-              <Square className="w-4 h-4" strokeWidth={2} fill="currentColor" />
-            ) : (
-              <Mic className="w-4 h-4" strokeWidth={2} />
-            )}
-          </button>
-
           {/* Send button */}
           <button
             type="submit"

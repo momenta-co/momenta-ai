@@ -346,9 +346,7 @@ export const Hero = () => {
               input={input}
               setInput={setInput}
               isLoading={isLoading}
-              isListening={isListening}
               onSubmit={onSubmit}
-              toggleVoice={toggleVoice}
             />
           </motion.div>
 
