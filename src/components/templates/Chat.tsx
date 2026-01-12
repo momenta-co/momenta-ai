@@ -1,45 +1,87 @@
 'use client';
 
-import React from 'react';
-import { useChat } from "@ai-sdk/react";
 import {
   Conversation,
-  ConversationContent,
-  ConversationEmptyState,
+  ConversationContent
 } from "@/components/ai-elements/conversation";
-import { Message, MessageContent } from "@/components/ai-elements/message";
-import { MessageResponse } from "@/components/ai-elements/message";
+import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import {
+  PromptInput,
+  PromptInputSubmit,
+  PromptInputTextarea,
+} from "@/components/ai-elements/prompt-input";
 import {
   Tool,
   ToolContent,
   ToolHeader,
   ToolInput,
 } from "@/components/ai-elements/tool";
-import {
-  PromptInput,
-  PromptInputTextarea,
-  PromptInputSubmit,
-} from "@/components/ai-elements/prompt-input";
-import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
 import { RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
+import { useChat } from "@ai-sdk/react";
+import { motion } from 'framer-motion';
+import React from 'react';
+import RotatingTitleWord from '../atoms/RotatingTitleWord';
+import VoiceSphere from '../atoms/VoiceSphere';
+import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
 
-export function TestChat() {
+interface ChatProps {
+  onMessagesChange?: (messageCount: number) => void;
+}
+
+export function Chat({ onMessagesChange }: ChatProps) {
   const [input, setInput] = React.useState("");
   const { messages, sendMessage, status } = useChat();
 
-  console.log('TestChat messages: ', messages);
+  console.log('Chat messages: ', messages);
 
   const isLoading = status === 'streaming' || status === 'submitted';
+
+  // Notify parent when messages change
+  React.useEffect(() => {
+    if (onMessagesChange) {
+      onMessagesChange(messages.length);
+    }
+  }, [messages.length, onMessagesChange]);
 
   return (
     <div className="flex flex-col h-screen">
       <Conversation>
         <ConversationContent>
           {messages.length === 0 ? (
-            <ConversationEmptyState
-              title="Start a conversation"
-              description="Type a message below to begin"
-            />
+            <div className="flex flex-col items-center justify-center flex-1 gap-8">
+              {/* Title */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="text-neutral-1000 leading-tight tracking-tight font-serif font-normal text-center w-full"
+                style={{ fontSize: 'clamp(2rem, 5vw, 40px)' }}
+              >
+                La manera más{' '}<RotatingTitleWord />
+                <br />
+                de vivir tu tiempo libre
+              </motion.h1>
+
+              {/* Subtitle */}
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="text-neutral-1000 leading-tight tracking-tight font-serif font-normal text-center w-full text-small"
+              >
+                Cuéntame qué experiencia buscas - Yo te recomiendo!
+              </motion.p>
+
+              {/* 3D Sphere */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="relative w-72 h-72 -ml-4"
+              >
+                <VoiceSphere />
+              </motion.div>
+            </div>
           ) : (
             messages.map((message) => (
               <Message key={message.id} from={message.role}>
@@ -50,8 +92,8 @@ export function TestChat() {
                       // If so, we'll skip text parts that come after it (they duplicate the carousel)
                       const hasSuccessfulRecommendations = message.parts?.some(
                         (p) => p.type === "tool-getRecommendations" &&
-                               p.state === "output-available" &&
-                               p.output
+                          p.state === "output-available" &&
+                          p.output
                       );
                       const recommendationsIndex = message.parts?.findIndex(
                         (p) => p.type === "tool-getRecommendations"
@@ -151,7 +193,7 @@ export function TestChat() {
         </ConversationContent>
       </Conversation>
 
-      <div className="border-t p-4">
+      <div className="p-4">
         <PromptInput
           onSubmit={(message, event) => {
             event.preventDefault();
