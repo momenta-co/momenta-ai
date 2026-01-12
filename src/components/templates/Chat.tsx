@@ -100,23 +100,23 @@ export function Chat({ onMessagesChange }: ChatProps) {
                     ? (() => {
                       // Check if there's a successful getRecommendations tool call
                       // If so, we'll skip text parts that come after it (they duplicate the carousel)
-                      const hasSuccessfulRecommendations = message.parts?.some(
-                        (p) => p.type === "tool-getRecommendations" &&
-                          p.state === "output-available" &&
-                          p.output
-                      );
-                      const recommendationsIndex = message.parts?.findIndex(
-                        (p) => p.type === "tool-getRecommendations"
-                      ) ?? -1;
+                      // const hasSuccessfulRecommendations = message.parts?.some(
+                      //   (p) => p.type === "tool-getRecommendations" &&
+                      //     p.state === "output-available" &&
+                      //     p.output
+                      // );
+                      // const recommendationsIndex = message.parts?.findIndex(
+                      //   (p) => p.type === "tool-getRecommendations"
+                      // ) ?? -1;
 
                       return message.parts?.map((part, i) => {
                         switch (part.type) {
                           case "text":
                             // Skip text parts that come after a successful recommendations tool
                             // (they duplicate the intro/followUp that's already in the tool output)
-                            if (hasSuccessfulRecommendations && i > recommendationsIndex) {
-                              return null;
-                            }
+                            // if (hasSuccessfulRecommendations && i > recommendationsIndex) {
+                            //   return null;
+                            // }
                             return (
                               <MessageResponse key={`${message.id}-${i}`}>
                                 {part.text}

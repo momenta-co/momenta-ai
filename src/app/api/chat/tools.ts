@@ -11,21 +11,9 @@ import {
 import { tool } from "ai";
 import z from "zod";
 
-const GET_RECOMMENDATIONS = {
-  prompt: {
-    v1: `
-      Busca experiencias en la base de datos según los criterios del usuario.
-
-      CUÁNDO USAR:
-      - Usuario confirmó el resumen que mostraste (dice "sí", "dale", "perfecto", "ok")
-      - O tienes toda la información necesaria (ciudad + fecha como mínimo)
-
-      CRÍTICO - CÓMO USAR:
-      1. Proporciona introMessage: Un mensaje cálido introduciendo las recomendaciones (ej: "Aquí van algunas experiencias relajantes perfectas para el cumpleaños 🎉")
-      2. Proporciona followUpQuestion: La pregunta de seguimiento (ej: "¿Cuál te llamó más la atención?")
-      3. NO escribas texto DESPUÉS de llamar esta herramienta - todo va en los campos introMessage y followUpQuestion
-
-      Busca experiencias en la base de datos según los criterios del usuario.
+export const getRecommendations = tool({
+  description: `
+    Busca experiencias en la base de datos según los criterios del usuario.
 
     CUÁNDO USAR:
     - Usuario confirmó el resumen que mostraste (dice "sí", "dale", "perfecto", "ok")
@@ -48,28 +36,8 @@ const GET_RECOMMENDATIONS = {
     "Pudiste revisar las experiencias, ¿cuál te gustó más? 😊"
 
     NO digas "¿Listos para reservar?" ni "¿Hacemos la reserva?" - eso rompe el flujo.
-    `,
-    v2: `
-      Busca experiencias en la base de datos según los criterios del usuario.
-    `,
-  },
-  introMessage: {
-    v1: 'Mensaje cálido introduciendo las recomendaciones y ajustando el tono según el contexto de la ocasion. Ej: "Aquí van algunas experiencias relajantes perfectas para el cumpleaños 🎉"',
-    v2: 'Mensaje cálido introduciendo las recomendaciones y ajustando el tono según el contexto de la ocasion.',
-  },
-  followUpQuestion: {
-    v1: 'Pregunta de seguimiento después del carrusel que ajuste el tono según el contexto de la ocasion. Ej: "¿Cuál te llamó más la atención?"',
-    v2: 'Pregunta de seguimiento después del carrusel que ajuste el tono según el contexto de la ocasion.',
-  }
-}
-
-export const getRecommendations = tool({
-  description: GET_RECOMMENDATIONS.prompt.v2,
+  `,
   inputSchema: z.object({
-    // MENSAJES DE UI (Requeridos)
-    introMessage: z.string().describe(GET_RECOMMENDATIONS.introMessage.v2),
-    followUpQuestion: z.string().describe(GET_RECOMMENDATIONS.followUpQuestion.v2),
-
     // PRIORIDAD 1 (Requeridos)
     ciudad: z.string().describe('Ciudad: "Bogotá" o "Cerca de Bogotá"'),
     fecha: z.string().describe('Fecha o referencia temporal: "este sábado", "mañana", "15 de enero"'),
@@ -93,13 +61,11 @@ export const getRecommendations = tool({
     // PRIORIDAD 4 (Opcional)
     modalidad: z.enum(['indoor', 'outdoor', 'stay_in']).optional().describe('indoor, outdoor, o stay_in (en casa)'),
   }),
-  execute: async function* (params, options) {
+  execute: async (params) => {
     console.log('[getRecommendations] Called with:', params);
-    yield { status: 'loading', message: 'Buscando experiencias...' } as const;
 
     try {
       const rawExperiences = await getExperiencesByCity(params.ciudad);
-      yield { status: 'loading', message: 'Filtrando experiencias...' };
       // PRE-FILTER 1: Remove experiences that contradict energy level
       let experiences = preFilterByEnergy(rawExperiences, params.nivelEnergia);
 
@@ -120,16 +86,13 @@ export const getRecommendations = tool({
       }
 
       if (!experiences || experiences.length === 0) {
-        yield {
-          status: 'error',
+        return {
           success: false,
           error: 'No hay experiencias disponibles en esta ciudad',
           recommendations: [],
         };
-        return;
       }
 
-      yield { status: 'loading', message: 'Generando recomendaciones...' };
       // Build complete UserContext based on priority matrix
       const userContext: UserContext = {
         // Prioridad 1
@@ -189,11 +152,8 @@ export const getRecommendations = tool({
         }
       }
 
-      yield {
-        status: 'success',
+      return {
         success: true,
-        introMessage: params.introMessage,
-        followUpQuestion: params.followUpQuestion,
         recommendations,
         context: params,
         morePeopleSuggestion,
@@ -201,14 +161,13 @@ export const getRecommendations = tool({
       };
     } catch (error) {
       console.error('[getRecommendations] Error:', error);
-      yield {
-        status: 'error',
+      return {
         success: false,
         error: 'Error generando recomendaciones',
         recommendations: [],
       };
     }
-  }
+  },
 })
 
 export const requestFeedback = tool({
@@ -238,7 +197,7 @@ export const requestFeedback = tool({
       )
     }).optional()
   }),
-  execute: async ({ contextMessage, recommendationContext }, options) => {
+  execute: async ({ contextMessage, recommendationContext }) => {
     console.log('[requestFeedback] Called with:', { contextMessage, recommendationContext });
 
     return {
