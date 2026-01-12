@@ -31,8 +31,8 @@ src/
 │       └── fallback.ts        # Simple scoring fallback
 ├── app/
 │   ├── api/
-│   │   └── recommendations/
-│   │       └── route.ts       # POST /api/recommendations
+│   │   └── chat/
+│   │       └── route.ts       # POST /api/chat (AI-powered chat with tools)
 │   └── (dashboard)/
 │       └── intelligence-demo/
 │           └── page.tsx       # Demo UI
@@ -130,59 +130,15 @@ The API returns top 3-5 experiences with:
 
 ## API Endpoints
 
-### POST /api/recommendations
+### POST /api/chat
 
-Get personalized experience recommendations.
+AI-powered chat endpoint with tool integration for personalized recommendations.
 
-**Request:**
-```json
-{
-  "userContext": {
-    "occasion": "Cita romántica",
-    "withWho": "Pareja",
-    "mood": "Relajado",
-    "budget": 150000,
-    "city": "Bogotá"
-  },
-  "experiencePool": [
-    {
-      "id": "1",
-      "title": "Cena Clandestina",
-      "categories": ["Cocina", "Para parejas"],
-      "price": { "amount": "143000", "currency": "COP" },
-      // ... more fields
-    }
-  ]
-}
-```
+The chat endpoint uses AI SDK tools to handle user conversations and generate recommendations inline:
+- `getRecommendations` - Generates personalized experience recommendations based on user context
+- `requestFeedback` - Collects user feedback on recommendations
 
-**Response:**
-```json
-{
-  "recommendations": [
-    {
-      "experience": { /* experience object */ },
-      "scoreBreakdown": {
-        "occasion": 90,
-        "relation": 95,
-        "mood": 85,
-        "budget": 100,
-        "total": 92
-      },
-      "reasons": [
-        "Perfecto para cita romántica",
-        "Ideal para disfrutar en pareja",
-        "Ambiente relajado y acogedor"
-      ]
-    }
-  ],
-  "meta": {
-    "model": "fallback-v1",
-    "promptVersion": "v0.1",
-    "timestamp": "2026-01-04T..."
-  }
-}
-```
+Recommendations are returned as part of the chat conversation flow, with the AI explaining its choices and reasoning.
 
 ## Current Implementation Status
 

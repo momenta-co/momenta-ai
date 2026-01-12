@@ -43,4 +43,5 @@ next-env.d.ts
 /vibe_engineering
 /src/generated/prisma
 /.playwright-mcp
+.devtools
 node_modules

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -50,7 +50,7 @@ export function Navbar() {
               className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
             >
               Experiencias
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
+              <span className="absolute -bottom-1 left-0 w-0 bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
             </a>
           </div>
 
@@ -79,22 +79,14 @@ export function Navbar() {
               href="/login"
               className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
             >
-              Login
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
+              Waiting List
+              <span className="absolute -bottom-1 left-0 w-0 bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
             </Link>
           </div>
         </div>
 
         {/* Mobile Header */}
         <div className="flex md:hidden items-center justify-between h-16">
-          {/* Left - Experiencias */}
-          <a
-            href="#experiencias"
-            className="text-[11px] font-medium tracking-[0.1em] uppercase text-charcoal/70"
-          >
-            Experiencias
-          </a>
-
           {/* Center - Logo */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2" onClick={handleLogoClick}>
             <Image
@@ -110,21 +102,17 @@ export function Navbar() {
 
           {/* Right - Menu & Login */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-[11px] font-medium tracking-[0.1em] uppercase text-charcoal/70"
-            >
-              Login
-            </Link>
-
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-charcoal w-9 h-9">
                   <Menu className="h-5 w-5" strokeWidth={1.5} />
-                  <span className="sr-only">Abrir menú</span>
+                  <span className="sr-only">Menú</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-cream w-full sm:max-w-sm border-l border-sage/10">
+              <SheetTitle className="hidden">
+                Momenta Menú
+              </SheetTitle>
+              <SheetContent side="left" className="bg-cream w-full sm:max-w-sm border-l border-sage/10">
                 <div className="flex flex-col h-full pt-8">
                   {/* Mobile Menu Logo */}
                   <Link
@@ -144,23 +132,15 @@ export function Navbar() {
 
                   {/* Mobile Navigation Links */}
                   <nav className="flex flex-col items-center gap-6">
-                    <a
-                      href="#experiencias"
-                      onClick={() => setIsOpen(false)}
-                      className="text-lg tracking-wide text-charcoal/80 hover:text-charcoal transition-colors duration-300"
-                    >
-                      Experiencias
-                    </a>
                     {[
-                      { name: "Corporativo", href: "/corporativo" },
-                      { name: "Nosotros", href: "/nosotros" },
-                      { name: "Contacto", href: "/contacto" },
+                      { name: "Experiencias", href: "/experiencias" },
+                      { name: "Waiting List", href: "/login" },
                     ].map((item, index) => (
                       <Link
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className="text-lg tracking-wide text-charcoal/80 hover:text-charcoal transition-colors duration-300"
+                        className="text-md font-medium tracking-wide uppercase text-charcoal/70"
                         style={{
                           animationDelay: `${(index + 1) * 50}ms`,
                         }}
@@ -169,18 +149,6 @@ export function Navbar() {
                       </Link>
                     ))}
                   </nav>
-
-                  {/* Mobile Menu Footer */}
-                  <div className="mt-auto pb-8 flex flex-col items-center gap-6">
-                    <div className="w-12 h-[1px] bg-sage/30" />
-                    <Link
-                      href="/login"
-                      onClick={() => setIsOpen(false)}
-                      className="text-sm tracking-wide text-charcoal/60 hover:text-charcoal transition-colors"
-                    >
-                      Login
-                    </Link>
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>

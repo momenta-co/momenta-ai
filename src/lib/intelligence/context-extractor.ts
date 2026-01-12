@@ -7,6 +7,7 @@
  * 3. Evitar que el AI pregunte información que ya se dio
  */
 
+import { ModelMessage, TextPart } from 'ai';
 import type { NivelEnergia, TipoGrupo, Modalidad } from './types';
 
 // ============================================
@@ -281,11 +282,6 @@ const CONFIRMATION_PATTERNS = [
   /^bien$/i,
 ];
 
-function isConfirmationMessage(message: string): boolean {
-  const clean = message.toLowerCase().trim();
-  return CONFIRMATION_PATTERNS.some(p => p.test(clean));
-}
-
 // ============================================
 // FUNCIÓN PRINCIPAL DE EXTRACCIÓN
 // ============================================
@@ -294,151 +290,140 @@ function isConfirmationMessage(message: string): boolean {
  * Extrae contexto acumulado de todos los mensajes del usuario
  */
 export function extractAccumulatedContext(
-  messages: { role: string; content: string }[]
+  messages: ModelMessage[]
 ): ExtractedContext {
   const context: ExtractedContext = {
     extractedFromMessages: [],
   };
 
-  // Detectar si ya se mostró confirmSearch (mensaje con emojis 📍👥📅💫)
-  const assistantMessages = messages.filter(m => m.role === 'assistant');
-  for (const msg of assistantMessages) {
-    if (msg.content && msg.content.includes('📍') && msg.content.includes('👥') && msg.content.includes('📅')) {
-      context.confirmSearchWasShown = true;
-    }
-  }
-
   const userMessages = messages.filter(m => m.role === 'user');
 
-  // Detectar si el último mensaje del usuario es una confirmación
-  if (userMessages.length > 0 && context.confirmSearchWasShown) {
-    const lastUserMessage = userMessages[userMessages.length - 1];
-    if (isConfirmationMessage(lastUserMessage.content)) {
-      context.userConfirmed = true;
-      context.extractedFromMessages.push('userConfirmed: true');
-    }
-  }
+  for (const item of userMessages) {
+    console.log('userMessages item: ', item)
 
-  for (const msg of userMessages) {
-    const content = msg.content.toLowerCase();
+    for (const msg of item.content) {
+      const message = msg as TextPart;
 
-    // Extraer personas
-    if (!context.personas) {
-      for (const { pattern, extract } of PERSONA_PATTERNS) {
-        const match = content.match(pattern);
-        if (match) {
-          context.personas = extract(match);
-          context.extractedFromMessages.push(`personas: ${context.personas}`);
-          break;
-        }
-      }
-    }
-
-    // Extraer tipo de grupo (y posiblemente personas)
-    if (!context.tipoGrupo) {
-      for (const { pattern, grupo, personas } of GRUPO_PATTERNS) {
-        if (pattern.test(content)) {
-          context.tipoGrupo = grupo;
-          context.extractedFromMessages.push(`tipoGrupo: ${grupo}`);
-          if (personas && !context.personas) {
-            context.personas = personas;
-            context.extractedFromMessages.push(`personas (inferido): ${personas}`);
+      if (message.type === 'text') {
+        // Extraer personas
+        if (!context.personas) {
+          for (const { pattern, extract } of PERSONA_PATTERNS) {
+            const match = message.text.match(pattern);
+            if (match) {
+              context.personas = extract(match);
+              context.extractedFromMessages.push(`personas: ${context.personas}`);
+              break;
+            }
           }
-          break;
         }
-      }
-    }
 
-    // Extraer ciudad
-    if (!context.ciudad) {
-      for (const { pattern, ciudad } of CIUDAD_PATTERNS) {
-        if (pattern.test(content)) {
-          context.ciudad = ciudad;
-          context.extractedFromMessages.push(`ciudad: ${ciudad}`);
-          break;
+        // Extraer tipo de grupo (y posiblemente personas)
+        if (!context.tipoGrupo) {
+          for (const { pattern, grupo, personas } of GRUPO_PATTERNS) {
+            if (pattern.test(message.text)) {
+              context.tipoGrupo = grupo;
+              context.extractedFromMessages.push(`tipoGrupo: ${grupo}`);
+              if (personas && !context.personas) {
+                context.personas = personas;
+                context.extractedFromMessages.push(`personas (inferido): ${personas}`);
+              }
+              break;
+            }
+          }
         }
-      }
-    }
 
-    // Extraer fecha
-    if (!context.fecha) {
-      for (const pattern of FECHA_PATTERNS) {
-        const match = content.match(pattern);
-        if (match) {
-          context.fecha = match[0];
-          context.extractedFromMessages.push(`fecha: ${context.fecha}`);
-          break;
+        // Extraer ciudad
+        if (!context.ciudad) {
+          for (const { pattern, ciudad } of CIUDAD_PATTERNS) {
+            if (pattern.test(message.text)) {
+              context.ciudad = ciudad;
+              context.extractedFromMessages.push(`ciudad: ${ciudad}`);
+              break;
+            }
+          }
         }
-      }
-    }
 
-    // Extraer ocasión
-    if (!context.ocasion) {
-      for (const { pattern, ocasion, needsDateClarification } of OCASION_PATTERNS) {
-        if (pattern.test(content)) {
-          context.ocasion = ocasion;
-          context.needsDateClarification = needsDateClarification;
-          context.extractedFromMessages.push(`ocasion: ${ocasion}`);
-          break;
+        // Extraer fecha
+        if (!context.fecha) {
+          for (const pattern of FECHA_PATTERNS) {
+            const match = message.text.match(pattern);
+            if (match) {
+              context.fecha = match[0];
+              context.extractedFromMessages.push(`fecha: ${context.fecha}`);
+              break;
+            }
+          }
         }
-      }
-    }
 
-    // Extraer modalidad
-    if (!context.modalidad) {
-      for (const { pattern, modalidad } of MODALIDAD_PATTERNS) {
-        if (pattern.test(content)) {
-          context.modalidad = modalidad;
-          context.extractedFromMessages.push(`modalidad: ${modalidad}`);
-          break;
+        // Extraer ocasión
+        if (!context.ocasion) {
+          for (const { pattern, ocasion, needsDateClarification } of OCASION_PATTERNS) {
+            if (pattern.test(message.text)) {
+              context.ocasion = ocasion;
+              context.needsDateClarification = needsDateClarification;
+              context.extractedFromMessages.push(`ocasion: ${ocasion}`);
+              break;
+            }
+          }
         }
-      }
-    }
 
-    // Extraer exclusiones ("NO yoga", "sin spa", etc.)
-    for (const { pattern, exclusion } of EXCLUSION_PATTERNS) {
-      if (pattern.test(content)) {
-        if (!context.evitar) {
-          context.evitar = [];
+        // Extraer modalidad
+        if (!context.modalidad) {
+          for (const { pattern, modalidad } of MODALIDAD_PATTERNS) {
+            if (pattern.test(message.text)) {
+              context.modalidad = modalidad;
+              context.extractedFromMessages.push(`modalidad: ${modalidad}`);
+              break;
+            }
+          }
         }
-        if (!context.evitar.includes(exclusion)) {
-          context.evitar.push(exclusion);
-          context.extractedFromMessages.push(`evitar: ${exclusion}`);
-        }
-      }
-    }
 
-    // Extraer inclusiones (cancelan exclusiones previas)
-    // "incluye yoga", "sí yoga" = el usuario cambió de opinión y QUIERE yoga
-    for (const { pattern, inclusion } of INCLUSION_PATTERNS) {
-      if (pattern.test(content)) {
-        if (context.evitar && context.evitar.includes(inclusion)) {
-          context.evitar = context.evitar.filter(item => item !== inclusion);
-          context.extractedFromMessages.push(`incluir (cancela exclusión): ${inclusion}`);
+        // Extraer exclusiones ("NO yoga", "sin spa", etc.)
+        for (const { pattern, exclusion } of EXCLUSION_PATTERNS) {
+          if (pattern.test(message.text)) {
+            if (!context.evitar) {
+              context.evitar = [];
+            }
+            if (!context.evitar.includes(exclusion)) {
+              context.evitar.push(exclusion);
+              context.extractedFromMessages.push(`evitar: ${exclusion}`);
+            }
+          }
         }
-      }
-    }
 
-    // Extraer mood/energía de sinónimos
-    if (!context.nivelEnergia) {
-      // Buscar palabras del contenido en el diccionario de sinónimos
-      const words = content.split(/\s+/);
-      for (const word of words) {
-        const cleanWord = word.replace(/[.,!?¿¡]/g, '').toLowerCase();
-        if (SYNONYM_TO_MOOD[cleanWord]) {
-          context.nivelEnergia = SYNONYM_TO_MOOD[cleanWord];
-          context.extractedFromMessages.push(`nivelEnergia (de "${cleanWord}"): ${context.nivelEnergia}`);
-          break;
+        // Extraer inclusiones (cancelan exclusiones previas)
+        // "incluye yoga", "sí yoga" = el usuario cambió de opinión y QUIERE yoga
+        for (const { pattern, inclusion } of INCLUSION_PATTERNS) {
+          if (pattern.test(message.text)) {
+            if (context.evitar && context.evitar.includes(inclusion)) {
+              context.evitar = context.evitar.filter(item => item !== inclusion);
+              context.extractedFromMessages.push(`incluir (cancela exclusión): ${inclusion}`);
+            }
+          }
         }
-      }
 
-      // Buscar frases compuestas
-      if (!context.nivelEnergia) {
-        for (const [synonym, mood] of Object.entries(SYNONYM_TO_MOOD)) {
-          if (synonym.includes(' ') && content.includes(synonym)) {
-            context.nivelEnergia = mood;
-            context.extractedFromMessages.push(`nivelEnergia (de "${synonym}"): ${context.nivelEnergia}`);
-            break;
+        // Extraer mood/energía de sinónimos
+        if (!context.nivelEnergia) {
+          // Buscar palabras del contenido en el diccionario de sinónimos
+          const words = message.text.split(/\s+/);
+          for (const word of words) {
+            const cleanWord = word.replace(/[.,!?¿¡]/g, '').toLowerCase();
+            if (SYNONYM_TO_MOOD[cleanWord]) {
+              context.nivelEnergia = SYNONYM_TO_MOOD[cleanWord];
+              context.extractedFromMessages.push(`nivelEnergia (de "${cleanWord}"): ${context.nivelEnergia}`);
+              break;
+            }
+          }
+
+          // Buscar frases compuestas
+          if (!context.nivelEnergia) {
+            for (const [synonym, mood] of Object.entries(SYNONYM_TO_MOOD)) {
+              if (synonym.includes(' ') && message.text.includes(synonym)) {
+                context.nivelEnergia = mood;
+                context.extractedFromMessages.push(`nivelEnergia (de "${synonym}"): ${context.nivelEnergia}`);
+                break;
+              }
+            }
           }
         }
       }

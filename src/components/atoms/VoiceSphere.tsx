@@ -237,10 +237,10 @@ export default function VoiceSphere({ isListening = false, audioData }: VoiceSph
     directionalLight.position.set(1, 2, 4);
     scene.add(directionalLight);
 
-    // Sand tones
-    const colorEdge = new THREE.Color('#CEA984');
-    const colorMid = new THREE.Color('#EDC9AF');
-    const colorCenter = new THREE.Color('#FFFFFF');
+    // Pale yellow tones
+    const colorEdge = new THREE.Color('#E8D4A8');
+    const colorMid = new THREE.Color('#F5ECD7');
+    const colorCenter = new THREE.Color('#FFFEF5');
 
     const leafGeometry = new THREE.IcosahedronGeometry(1, 64);
     const leafMaterial = new THREE.ShaderMaterial({
@@ -248,8 +248,8 @@ export default function VoiceSphere({ isListening = false, audioData }: VoiceSph
       fragmentShader: monsteraFragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uAmplitude: { value: 0.4 },
-        uBreathing: { value: 1.0 },
+        uAmplitude: { value: 0.6 },
+        uBreathing: { value: 1.4 },
         uColorEdge: { value: colorEdge },
         uColorMid: { value: colorMid },
         uColorCenter: { value: colorCenter },
@@ -268,25 +268,25 @@ export default function VoiceSphere({ isListening = false, audioData }: VoiceSph
     leafRef.current = leaf;
 
     let time = 0;
-    const smoothingFactor = 0.15;
-    const decayFactor = 0.92;
+    const smoothingFactor = 0.18;
+    const decayFactor = 0.90;
 
     const animate = () => {
       frameRef.current = requestAnimationFrame(animate);
-      time += 0.012;
+      time += 0.018;
 
       if (leafRef.current) {
         const mat = leafRef.current.material as THREE.ShaderMaterial;
         mat.uniforms.uTime.value = time;
 
         const listening = isListeningRef.current;
-        const targetAmplitude = listening ? 0.6 : 0.4;
+        const targetAmplitude = listening ? 0.8 : 0.6;
         const currentAmplitude = mat.uniforms.uAmplitude.value;
-        mat.uniforms.uAmplitude.value += (targetAmplitude - currentAmplitude) * 0.03;
+        mat.uniforms.uAmplitude.value += (targetAmplitude - currentAmplitude) * 0.04;
 
-        const targetBreathing = listening ? 1.5 : 1.0;
+        const targetBreathing = listening ? 1.8 : 1.4;
         const currentBreathing = mat.uniforms.uBreathing.value;
-        mat.uniforms.uBreathing.value += (targetBreathing - currentBreathing) * 0.02;
+        mat.uniforms.uBreathing.value += (targetBreathing - currentBreathing) * 0.03;
 
         const audio = audioDataRef.current;
         const smoothed = smoothedAudioRef.current;

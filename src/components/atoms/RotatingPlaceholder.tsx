@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const suggestions = [
   "Somos un grupo de 6 amigos buscando algo divertido",
@@ -30,7 +30,7 @@ export default function RotatingPlaceholder() {
   return (
     <span
       className={`
-        text-neutral-700/40 text-base sm:text-lg font-light transition-all duration-300 pointer-events-none
+        text-neutral-700/40 text-xs sm:text-md font-light leading-tight transition-all duration-300 pointer-events-none
         ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}
       `}
     >
