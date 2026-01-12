@@ -23,8 +23,8 @@ export interface RecommendationsLoadingOutput {
 export interface RecommendationsSuccessOutput {
   status: 'success';
   success: true;
-  introMessage: string;
-  followUpQuestion: string;
+  introMessage?: string;
+  followUpQuestion?: string;
   recommendations: RecommendationCard[];
   context: RecommendationsToolInput;
   morePeopleSuggestion: string | null;
@@ -69,9 +69,9 @@ export interface RecommendationCard {
 // ===========================================
 
 export interface RecommendationsToolInput {
-  // UI Messages (Required)
-  introMessage: string;
-  followUpQuestion: string;
+  // UI Messages (Optional - for frontend rendering control)
+  introMessage?: string;
+  followUpQuestion?: string;
 
   // Priority 1 (Required)
   ciudad: string;

@@ -1,13 +1,9 @@
 import { getExperiencesByCity } from "@/lib/db/experiences";
 import { generateAIRecommendations, preFilterByEnergy, preFilterByMinPeople, preFilterByUserExclusions } from "@/lib/intelligence/ai-service";
-import { NivelEnergia, Presupuesto, TipoGrupo, UserContext } from "@/lib/intelligence/types";
 import {
-  RecommendationsToolOutput,
-  RecommendationsToolInput,
-  RecommendationCard,
-  FeedbackToolInput,
-  FeedbackToolOutput,
+  RecommendationCard
 } from "@/lib/intelligence/tool-types";
+import { NivelEnergia, Presupuesto, TipoGrupo, UserContext } from "@/lib/intelligence/types";
 import { tool } from "ai";
 import z from "zod";
 
@@ -38,6 +34,14 @@ export const getRecommendations = tool({
     NO digas "¿Listos para reservar?" ni "¿Hacemos la reserva?" - eso rompe el flujo.
   `,
   inputSchema: z.object({
+    // MENSAJES UI (Opcionales - para control de rendering en frontend)
+    introMessage: z.string().optional().describe(
+      'Mensaje cálido introduciendo las recomendaciones. Opcional pero recomendado para mejor UX.'
+    ),
+    followUpQuestion: z.string().optional().describe(
+      'Pregunta de seguimiento después del carrusel. Opcional pero recomendado.'
+    ),
+
     // PRIORIDAD 1 (Requeridos)
     ciudad: z.string().describe('Ciudad: "Bogotá" o "Cerca de Bogotá"'),
     fecha: z.string().describe('Fecha o referencia temporal: "este sábado", "mañana", "15 de enero"'),
@@ -153,7 +157,10 @@ export const getRecommendations = tool({
       }
 
       return {
+        status: 'success',
         success: true,
+        introMessage: params.introMessage,
+        followUpQuestion: params.followUpQuestion,
         recommendations,
         context: params,
         morePeopleSuggestion,
@@ -162,6 +169,7 @@ export const getRecommendations = tool({
     } catch (error) {
       console.error('[getRecommendations] Error:', error);
       return {
+        status: 'error',
         success: false,
         error: 'Error generando recomendaciones',
         recommendations: [],
