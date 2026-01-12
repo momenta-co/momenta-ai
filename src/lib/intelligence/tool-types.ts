@@ -27,6 +27,8 @@ export interface RecommendationsSuccessOutput {
   followUpQuestion: string;
   recommendations: RecommendationCard[];
   context: RecommendationsToolInput;
+  morePeopleSuggestion: string | null;
+  excludedCount: number;
 }
 
 export interface RecommendationsErrorOutput {
@@ -78,6 +80,7 @@ export interface RecommendationsToolInput {
 
   // Priority 2 (Important)
   tipoGrupo: 'sola' | 'pareja' | 'familia' | 'amigos';
+  generoGrupo: 'masculino' | 'femenino' | 'mixto' | 'no_especificado';
   ocasion?: string;
   categoria?: string;
   presupuesto?: 'bajo' | 'medio' | 'alto' | 'no_prioritario';

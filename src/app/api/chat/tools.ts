@@ -93,9 +93,9 @@ export const getRecommendations = tool({
     // PRIORIDAD 4 (Opcional)
     modalidad: z.enum(['indoor', 'outdoor', 'stay_in']).optional().describe('indoor, outdoor, o stay_in (en casa)'),
   }),
-  async *execute(params: RecommendationsToolInput): AsyncGenerator<RecommendationsToolOutput> {
+  execute: async function* (params, options) {
     console.log('[getRecommendations] Called with:', params);
-    yield { status: 'loading', message: 'Buscando experiencias...' };
+    yield { status: 'loading', message: 'Buscando experiencias...' } as const;
 
     try {
       const rawExperiences = await getExperiencesByCity(params.ciudad);
@@ -208,7 +208,7 @@ export const getRecommendations = tool({
         recommendations: [],
       };
     }
-  },
+  }
 })
 
 export const requestFeedback = tool({
@@ -238,7 +238,7 @@ export const requestFeedback = tool({
       )
     }).optional()
   }),
-  execute: async ({ contextMessage, recommendationContext }: FeedbackToolInput): Promise<FeedbackToolOutput> => {
+  execute: async ({ contextMessage, recommendationContext }, options) => {
     console.log('[requestFeedback] Called with:', { contextMessage, recommendationContext });
 
     return {
