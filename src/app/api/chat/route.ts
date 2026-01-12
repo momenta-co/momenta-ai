@@ -135,54 +135,21 @@ export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
   const messages = await convertToModelMessages(rawMessages);
 
-  // Get user messages for context
-  const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
-
   // Extraer contexto acumulado de TODOS los mensajes del usuario
   const accumulatedContext = extractAccumulatedContext(messages);
 
-  // const contextReminder = generateContextReminder(accumulatedContext);
-
   // Construir el system prompt con el contexto acumulado
   const systemPromptWithContext = buildSystemPromptWithContext(accumulatedContext);
-
-  let getRecommendationsWasCalled = false;
-  let textAfterToolCall = false;
-
-  // Track accumulated text to detect feedback transition message
-  let accumulatedText = '';
-  let feedbackTransitionDetected = false;
-  let lastRecommendationIds: string[] = [];
 
   const result = streamText({
     model: devToolsEnabledModel,
     system: systemPromptWithContext,
     messages,
-    stopWhen: stepCountIs(5),
-    // onStepFinish: ({ text, toolCalls }) => {
-    //   console.log('[onStepFinish] text length:', text?.length || 0);
-    //   if (toolCalls) {
-    //     console.log('[onStepFinish] toolCalls:', toolCalls.map(tc => tc.toolName));
-    //     // Track if getRecommendations was called
-    //     if (toolCalls.some(tc => tc.toolName === 'getRecommendations')) {
-    //       getRecommendationsWasCalled = true;
-    //       console.log('[onStepFinish] ✅ getRecommendations detected');
-    //     }
-    //   }
-    //   // Track if any text was output
-    //   if (text && text.trim().length > 0) {
-    //     textAfterToolCall = true;
-    //     console.log('[onStepFinish] ✅ Text output detected');
-    //   }
-    // },
-
     tools: {
-      // Get the experiencies from the database
       getRecommendations,
-
-      // Request the user feedback about the recommended experiences
       requestFeedback,
     },
+    stopWhen: stepCountIs(5),
   });
 
   return result.toUIMessageStreamResponse();
