@@ -38,6 +38,8 @@ export const getRecommendations = tool({
 
     // PRIORIDAD 2 (Importantes)
     tipoGrupo: z.enum(['sola', 'pareja', 'familia', 'amigos']).describe('Tipo de grupo'),
+    generoGrupo: z.enum(['masculino', 'femenino', 'mixto', 'no_especificado']).optional()
+      .describe('Género del grupo: masculino (amigos, parceros, los muchachos), femenino (amigas, las chicas), mixto, no_especificado'),
     ocasion: z.string().optional().describe('Ocasión: cumpleaños, aniversario, reencuentro, cita, etc.'),
     categoria: z.string().optional().describe('Categoría si la piden: gastronomia, bienestar, arte_creatividad, aventura'),
     presupuesto: z.enum(['bajo', 'medio', 'alto', 'no_prioritario']).optional().describe('Presupuesto si lo mencionan'),
@@ -93,6 +95,7 @@ export const getRecommendations = tool({
 
         // Prioridad 2
         tipoGrupo: params.tipoGrupo as TipoGrupo,
+        generoGrupo: params.generoGrupo as any,
         categoria: params.categoria as any,
         ocasion: params.ocasion,
         presupuesto: params.presupuesto as Presupuesto,

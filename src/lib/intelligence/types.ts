@@ -15,6 +15,7 @@ export interface UserContext {
 
   // PRIORIDAD 2 (ALTA) - Ajusta significativamente las recomendaciones
   tipoGrupo: TipoGrupo;       // sola, pareja, familia, amigos
+  generoGrupo?: GeneroGrupo;  // masculino, femenino, mixto, no_especificado
   categoria?: Categoria;      // gastronomía, arte, bienestar, etc.
   ocasion?: string;           // cumpleaños, aniversario, reencuentro, etc.
   presupuesto?: Presupuesto;  // bajo, medio, alto (solo como restricción suave)
@@ -33,6 +34,7 @@ export interface UserContext {
 
 // Enums para validación
 export type TipoGrupo = 'sola' | 'pareja' | 'familia' | 'amigos';
+export type GeneroGrupo = 'masculino' | 'femenino' | 'mixto' | 'no_especificado';
 export type Categoria = 'gastronomia' | 'bienestar' | 'arte_creatividad' | 'aventura' | 'cultural';
 export type Presupuesto = 'bajo' | 'medio' | 'alto' | 'no_prioritario';
 export type FranjaHoraria = 'manana' | 'tarde' | 'noche' | 'flexible';

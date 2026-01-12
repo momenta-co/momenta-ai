@@ -199,9 +199,21 @@ Devuelve SOLO JSON válido:
    - Ordena por total score (mayor primero)
 
 🧘 REGLA ESPECIAL - YOGA/BIENESTAR PARA AMIGAS:
-Si el tipoGrupo es "amigos" (especialmente amigas), SIEMPRE incluye al menos
+Si generoGrupo es "femenino", SIEMPRE incluye al menos
 UNA experiencia de yoga, spa o bienestar entre las 5 recomendaciones.
-El yoga con amigas es MUY popular - puede ser Hot Yoga, Yoga & Brunch, Spa Day, etc.`;
+El yoga con amigas es MUY popular - puede ser Hot Yoga, Yoga & Brunch, Spa Day, etc.
+
+🍺 REGLA ESPECIAL - PRIORIZACIÓN PARA GRUPOS MASCULINOS:
+Si generoGrupo es "masculino" (amigos, parceros, los muchachos):
+→ PRIORIZAR (poner en TOP 3): catas de cerveza, cocteles, licores, parrilla, aventura
+→ NEUTRAL (mostrar pero no primero): cocina, arte, talleres creativos
+→ DESPRIORIZR (score bajo, posiciones 4-5 o no incluir): yoga, spa, aromaterapia, skincare
+→ Las experiencias outdoor/aventura son buenas pero NO son prioridad sobre bebidas
+
+Ejemplo para grupo masculino:
+✅ TOP recomendaciones: "Cata Cervecera", "Taller de Coctelería", "Cata de Licores"
+⚠️ Incluir si no hay más: "Taller de Pintura y Vino" (tiene vino)
+❌ Evitar o poner al final: "Hot Yoga", "Spa Day", "Aromaterapia"`;
 }
 
 /**
@@ -223,6 +235,7 @@ CONTEXTO DEL USUARIO
 
 🟡 PRIORIDAD 2 (ALTO):
 - Tipo de Grupo: ${userContext.tipoGrupo}
+- Género del Grupo: ${userContext.generoGrupo || 'no_especificado'}
 - Ocasión: ${userContext.ocasion || 'No especificada'}
 - Categoría: ${userContext.categoria || 'Abierta a sugerencias'}
 - Presupuesto: ${userContext.presupuesto || 'No prioritario'}
@@ -346,9 +359,10 @@ Devuelve 5 experiencias en JSON válido.
 Escribe "reasons" como amiga entusiasta, NO como robot.
 Asegúrate de que las experiencias recomendadas REALMENTE encajen con el nivel de energía solicitado.
 
-🧘 IMPORTANTE PARA PLANES CON AMIGAS:
-Si el tipoGrupo es "amigos", INCLUYE al menos UNA experiencia de yoga/bienestar/spa.
-Yoga con amigas es muy popular (Hot Yoga, Yoga & Brunch, Spa Day, etc.).
+🧘 IMPORTANTE - PRIORIZACIÓN POR GÉNERO:
+- Si generoGrupo es "femenino": INCLUYE al menos UNA experiencia de yoga/bienestar/spa
+- Si generoGrupo es "masculino": PRIORIZA bebidas (cerveza, cocteles, licores) y EVITA yoga/spa
+- Si generoGrupo es "mixto" o "no_especificado": mantén balance
 `;
 
   return contextDescription + experiencesDescription + instructions;

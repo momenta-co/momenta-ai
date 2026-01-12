@@ -67,6 +67,12 @@ GRUPO:
   • "sola/solo/conmigo" → 1 persona, tipoGrupo: individual
   • "equipo/trabajo/empresa" → PREGUNTA cuántos son, tipoGrupo: corporativo
 
+GÉNERO DEL GRUPO (infiere de estas palabras):
+  • masculino: "mis amigos", "los muchachos", "parceros", "los chicos", "con mi hermano", "con los del trabajo" (si habla en masculino)
+  • femenino: "mis amigas", "las chicas", "con mi hermana", "girls", "con las del trabajo" (si habla en femenino)
+  • mixto: cuando menciona ambos géneros o "pareja"
+  • no_especificado: cuando no hay indicador claro de género
+
 ENERGÍA (infiere de estas palabras):
   • slow_cozy: relax, relajante, chill, tranqui, zen, spa, masaje, descansar, desconectar, naturaleza
   • calm_mindful: íntimo, romántico, especial, privado, exclusivo, para dos, cena íntima, conexión
