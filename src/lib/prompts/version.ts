@@ -5,7 +5,7 @@
  * This helps track changes and debug issues related to prompt modifications.
  */
 
-export const PROMPT_VERSION = '1.4.1';
+export const PROMPT_VERSION = '1.5.0';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
@@ -16,6 +16,7 @@ export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.3.0': 'Added gastronomic coherence rule: when category is food/beverage specific, ALL 5 recommendations must be food/beverage related',
   '1.4.0': 'Beta mode: Removed city question from conversation flow - always assume Bogotá. City only shown in confirmation message, not asked during chat.',
   '1.4.1': 'Personalized response for other cities: "De momento solo operamos en Bogotá, pero pronto estaremos en [ciudad]!"',
+  '1.5.0': 'Escapada culinaria íntima: cuando usuario pide cocinar + tranquilo + cerca de Bogotá, priorizar Neusa con calm_mindful (no slow_cozy). Cocinar juntos en escapada = actividad íntima.',
 };
 
 export const LAST_UPDATED = '2026-01-11';

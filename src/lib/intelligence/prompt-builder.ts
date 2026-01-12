@@ -82,6 +82,14 @@ MATRIZ DE PRIORIDADES PARA SCORING (MUY IMPORTANTE)
      → Solo incluye experiencias con tags: Cocina, Gastronómico, o relacionados con comida/bebida
      → Busca en el título/categorías: Pasta, Sushi, Tamalitos, Parrillero, Café, Vino, Cerveza, Coctelería, Cata, Chef, Brunch
 
+     🏔️ REGLA ESCAPADA CULINARIA (MUY IMPORTANTE):
+     Si la ciudad es "Cerca a Bogotá" Y la categoría es "cocina" o "gastronomia":
+     → PRIORIZA experiencias con "Neusa" en el título (score +40)
+     → "Taller de Cocina En Neusa" DEBE estar en el TOP 2 de recomendaciones
+     → "Taller de Manualidades En Neusa" también es buena opción para escapadas
+     → Estas son experiencias de ESCAPADA culinaria, perfectas para momentos íntimos fuera de la ciudad
+     → Razón: El Neusa ofrece un ambiente tranquilo y especial para cocinar juntos
+
    - Presupuesto (5%): Solo como restricción suave
      * bajo < 100,000 COP
      * medio 100,000-250,000 COP
@@ -313,6 +321,20 @@ INCLUYE:
 NO INCLUYAS:
 - "Vuelo en Parapente" → priority3 = 15 ❌
 - "Escape Room" → priority3 = 25 ❌
+
+🔴 EJEMPLO 3: Usuario busca "cocina + cerca de Bogotá + íntimo" (ESCAPADA CULINARIA)
+→ Ciudad: "Cerca a Bogotá"
+→ Categoría: cocina
+→ nivelEnergia: calm_mindful
+
+OBLIGATORIO INCLUIR EN TOP 2:
+- "Taller de Cocina En Neusa" → priority2 = 100, priority3 = 95 ✅ (ESCAPADA + COCINA + ÍNTIMO)
+- "Taller de Manualidades En Neusa" → priority2 = 85 ✅ (buena alternativa)
+
+TAMBIÉN INCLUYE:
+- Otras experiencias de cocina disponibles
+
+⚠️ CRÍTICO: Si el usuario pide escapada + cocina, "Taller de Cocina En Neusa" DEBE estar en posición 1 o 2.
 
 ⚠️ REGLA: Si una experiencia contradice el nivel de energía, NO LA INCLUYAS en las 5 recomendaciones.
 

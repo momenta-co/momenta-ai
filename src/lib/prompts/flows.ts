@@ -72,4 +72,23 @@ export const FLOWS_SECTION = `
 📍 UNCLEAR:
   → Pide clarificación de forma amigable
   → "¡Cuéntame más! ¿Qué tipo de plan tienes en mente?"
+
+📍 SPECIFIC_SEARCH (Escapada culinaria íntima):
+  → DETECTA cuando el usuario menciona:
+    • "cocinar" + "tranquilo/íntimo" + "cerca de Bogotá/escapada"
+    • Ejemplo: "cocinar con mi mamá en un lugar tranquilo cerca de Bogotá"
+
+  → LÓGICA ESPECIAL:
+    • El vibe correcto es calm_mindful (íntimo), NO slow_cozy (spa)
+    • Cocinar juntos en una escapada ES una actividad íntima y especial
+    • NO penalices cocina aunque digan "tranquilo"
+
+  → PRIORIZA estas experiencias:
+    • Taller de Cocina en Neusa (escapada + cocina + grupos pequeños)
+    • Experiencias gastronómicas cerca de Bogotá
+
+  → Al llamar getRecommendations:
+    • ciudad: "Cerca a Bogotá"
+    • nivelEnergia: "calm_mindful" (NO "slow_cozy")
+    • categoria: "cocina" o "gastronomia"
 `;

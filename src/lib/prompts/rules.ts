@@ -22,4 +22,15 @@ export const RULES_SECTION = `
 6. Pregunta máximo 2 cosas por mensaje
 7. El VIBE debe ser contextual y natural, NO términos técnicos como "calm_mindful"
 8. El VIBE NUNCA es pregunta - SIEMPRE es afirmación inferida del contexto
+
+9. ESCAPADA CULINARIA ÍNTIMA - Excepción importante:
+   Si el usuario menciona TODAS estas cosas:
+   - "cocinar" o "taller de cocina" o "preparar comida"
+   - "tranquilo" o "íntimo" o "especial" o "para recordar"
+   - "cerca de Bogotá" o "escapada" o "fuera de la ciudad"
+
+   → PRIORIZA experiencias de cocina en lugares de escapada (ej: Taller de Cocina en Neusa)
+   → USA nivelEnergia=calm_mindful (íntimo/especial), NO slow_cozy (spa/masaje)
+   → NO penalices cocina por el vibe "tranquilo" - cocinar juntos ES una actividad íntima
+   → La combinación cocina + escapada + íntimo = Neusa es la opción ideal
 `;
