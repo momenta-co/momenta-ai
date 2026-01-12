@@ -5,7 +5,7 @@
  * This helps track changes and debug issues related to prompt modifications.
  */
 
-export const PROMPT_VERSION = '1.6.0';
+export const PROMPT_VERSION = '1.7.0';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
@@ -18,6 +18,7 @@ export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.4.1': 'Personalized response for other cities: "De momento solo operamos en Bogotá, pero pronto estaremos en [ciudad]!"',
   '1.5.0': 'Escapada culinaria íntima: cuando usuario pide cocinar + tranquilo + cerca de Bogotá, priorizar Neusa con calm_mindful (no slow_cozy). Cocinar juntos en escapada = actividad íntima.',
   '1.6.0': 'Filtro min_people: cada experiencia tiene un mínimo de personas requerido. No recomendar experiencias donde min_people > personas del usuario.',
+  '1.7.0': 'Sugerencia de más personas: cuando hay experiencias excluidas por min_people, sugiere al usuario que agregando más personas podrían acceder a más opciones.',
 };
 
 export const LAST_UPDATED = '2026-01-11';

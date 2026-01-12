@@ -12,9 +12,23 @@ export const getRecommendations = tool({
     - Usuario confirmó el resumen que mostraste (dice "sí", "dale", "perfecto", "ok")
     - O tienes toda la información necesaria (ciudad + fecha como mínimo)
 
-    CRÍTICO - DESPUÉS DE LLAMAR:
-    Debes continuar la conversación preguntando: "Pudiste revisar las experiencias - cuál te gustó mas?"
-    Esta pregunta debe aparecer en el MISMO turno, inmediatamente después de mostrar las recomendaciones.
+    ⚠️ CRÍTICO - LEE EL RESULTADO COMPLETO:
+    El resultado incluye:
+    - recommendations: lista de experiencias disponibles
+    - morePeopleSuggestion: mensaje sobre experiencias que requieren más personas (puede ser null)
+
+    DESPUÉS DE RECIBIR EL RESULTADO:
+    1. PRIMERO revisa si "morePeopleSuggestion" tiene valor (no es null)
+    2. Si morePeopleSuggestion existe, MENCIONA ESO PRIMERO antes de las recomendaciones:
+       "Tenemos la Cata Cervecera que buscas, pero requiere mínimo 5 personas. Si suman un amigo más, la incluimos 🍻
+        Mientras tanto, estas son otras opciones geniales para 4 personas:"
+    3. Si morePeopleSuggestion es null, muestra las recomendaciones normalmente
+
+    ⚠️ OBLIGATORIO AL FINAL:
+    SIEMPRE termina con EXACTAMENTE esta pregunta (activa el siguiente flujo):
+    "Pudiste revisar las experiencias, ¿cuál te gustó más? 😊"
+
+    NO digas "¿Listos para reservar?" ni "¿Hacemos la reserva?" - eso rompe el flujo.
   `,
   inputSchema: z.object({
     // PRIORIDAD 1 (Requeridos)
@@ -54,9 +68,11 @@ export const getRecommendations = tool({
       }
 
       // PRE-FILTER 3: Remove experiences where min_people > user's group size
+      let minPeopleFilterResult = { filtered: experiences, excludedByMinPeople: [] as { title: string; minPeople: number }[], nextThreshold: null as number | null };
       if (params.personas && params.personas > 0) {
         const beforeMinPeopleFilter = experiences.length;
-        experiences = preFilterByMinPeople(experiences, params.personas);
+        minPeopleFilterResult = preFilterByMinPeople(experiences, params.personas);
+        experiences = minPeopleFilterResult.filtered;
         console.log(`[getRecommendations] Min people pre-filter: ${beforeMinPeopleFilter} → ${experiences.length} experiences (personas: ${params.personas})`);
       }
 
@@ -107,10 +123,31 @@ export const getRecommendations = tool({
         reasons: rec.reasons,
       }));
 
+      // Build suggestion for more people if there are excluded experiences
+      // Only suggest if: the excluded experiences are relevant to what user asked for
+      let morePeopleSuggestion: string | null = null;
+      if (minPeopleFilterResult.excludedByMinPeople.length > 0 && params.categoria) {
+        // Filter excluded experiences that match the user's requested category
+        const categoryLower = params.categoria.toLowerCase();
+        const relevantExcluded = minPeopleFilterResult.excludedByMinPeople.filter(exp =>
+          exp.title.toLowerCase().includes(categoryLower) ||
+          (categoryLower === 'cerveza' && exp.title.toLowerCase().includes('cervecer'))
+        );
+
+        if (relevantExcluded.length > 0) {
+          const excludedTitles = relevantExcluded.map(e => e.title).join(', ');
+          const minRequired = Math.min(...relevantExcluded.map(e => e.minPeople));
+          morePeopleSuggestion = `La experiencia "${excludedTitles}" requiere mínimo ${minRequired} personas. Si agregan más amigos, podrían acceder a ella.`;
+          console.log(`[getRecommendations] morePeopleSuggestion (relevant): ${morePeopleSuggestion}`);
+        }
+      }
+
       return {
         success: true,
         recommendations,
         context: params,
+        morePeopleSuggestion,
+        excludedCount: minPeopleFilterResult.excludedByMinPeople.length,
       };
     } catch (error) {
       console.error('[getRecommendations] Error:', error);

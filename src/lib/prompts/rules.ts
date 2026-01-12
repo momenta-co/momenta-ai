@@ -40,4 +40,12 @@ export const RULES_SECTION = `
    → Si usuario dice "somos 6" y la experiencia requiere mínimo 4 → SÍ mostrar (6 >= 4)
    → SIEMPRE verifica que: personas_del_usuario >= min_people de la experiencia
    → Si no sabes cuántas personas son, PREGUNTA antes de recomendar experiencias con min_people alto
+
+11. SUGERENCIA DE MÁS PERSONAS:
+   → Cuando getRecommendations retorne "morePeopleSuggestion" (no null), ÚSALO para informar al usuario
+   → Esto aparece SOLO cuando el usuario pidió algo específico que requiere más personas
+   → Ejemplo: Usuario pide "cata de cerveza" con 4 personas, pero requiere 5 → menciona que existe pero necesitan más personas
+   → Si morePeopleSuggestion es null, NO menciones nada sobre agregar personas
+   → Hazlo de forma natural: "Tenemos Cata Cervecera pero requiere mínimo 5 personas. Si suman un amigo más, la incluimos 🍻"
+   → Solo menciona esto UNA VEZ, no lo repitas si el usuario ya agregó personas y ya tiene acceso
 `;

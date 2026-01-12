@@ -83,23 +83,58 @@ export function preFilterByEnergy(experiences: Experience[], nivelEnergia?: stri
 }
 
 /**
+ * Result of min_people filter with metadata about excluded experiences
+ */
+export interface MinPeopleFilterResult {
+  filtered: Experience[];
+  excludedByMinPeople: {
+    title: string;
+    minPeople: number;
+  }[];
+  nextThreshold: number | null; // minimum people needed to unlock more experiences
+}
+
+/**
  * Pre-filter experiences based on MIN_PEOPLE requirement
  * Only show experiences where the user's group size meets the minimum
+ * Returns metadata about excluded experiences for AI suggestions
  * @exported for use in route.ts fast path
  */
-export function preFilterByMinPeople(experiences: Experience[], personas: number): Experience[] {
+export function preFilterByMinPeople(experiences: Experience[], personas: number): MinPeopleFilterResult {
   if (!personas || personas <= 0) {
-    return experiences;
+    return {
+      filtered: experiences,
+      excludedByMinPeople: [],
+      nextThreshold: null,
+    };
   }
 
-  return experiences.filter(exp => {
+  const filtered: Experience[] = [];
+  const excludedByMinPeople: { title: string; minPeople: number }[] = [];
+
+  for (const exp of experiences) {
     const minPeople = exp.minPeople ?? 1;
     if (minPeople > personas) {
       console.log(`[MIN-PEOPLE] Excluded "${exp.title}" (requires ${minPeople}, user has ${personas})`);
-      return false;
+      excludedByMinPeople.push({ title: exp.title, minPeople });
+    } else {
+      filtered.push(exp);
     }
-    return true;
-  });
+  }
+
+  // Calculate next threshold: the minimum min_people among excluded experiences
+  let nextThreshold: number | null = null;
+  if (excludedByMinPeople.length > 0) {
+    nextThreshold = Math.min(...excludedByMinPeople.map(e => e.minPeople));
+  }
+
+  console.log(`[MIN-PEOPLE] Excluded ${excludedByMinPeople.length} experiences. Next threshold: ${nextThreshold}`);
+
+  return {
+    filtered,
+    excludedByMinPeople,
+    nextThreshold,
+  };
 }
 
 /**
