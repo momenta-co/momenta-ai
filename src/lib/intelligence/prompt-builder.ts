@@ -57,6 +57,39 @@ MATRIZ DE PRIORIDADES PARA SCORING (MUY IMPORTANTE)
      * arte_creatividad → taller, cerámica, pintura
      * aventura → outdoor, activo, adrenalina
 
+     🔎 CATEGORÍAS ESPECÍFICAS - PRIORIZA por palabra clave en TÍTULO:
+     Si categoria es específica, PRIORIZA experiencias que contengan estas palabras en el título:
+     * italiana → PRIORIZA experiencias con "Pasta" en título (score +30)
+     * japonesa → PRIORIZA experiencias con "Sushi" en título (score +30)
+     * mexicana → PRIORIZA experiencias con "Tamalitos" o "Mexicano" en título (score +30)
+     * parrilla → PRIORIZA experiencias con "Parrillero" en título (score +30)
+     * saludable → PRIORIZA experiencias con "Saludable" en título (score +30)
+     * reposteria → PRIORIZA experiencias con "Cake" en título (score +30)
+     * cafe → PRIORIZA experiencias con "Café" en título (score +30)
+     * vino → PRIORIZA experiencias con "Vino" en título (score +30)
+     * cerveza → PRIORIZA experiencias con "Cerveza" o "Cervecera" en título (score +30)
+     * licores → PRIORIZA experiencias con "Licores" en título (score +30)
+     * cocteles → PRIORIZA experiencias con "Coctelería" en título (score +30)
+
+     ⚠️ CRÍTICO: Si la categoría es específica (italiana, japonesa, etc.), la experiencia que coincida
+     DEBE estar en el TOP 3 de recomendaciones. No la pongas en posición 4 o 5.
+
+     🍽️ REGLA DE COHERENCIA GASTRONÓMICA:
+     Si la categoría es de COMIDA (italiana, japonesa, mexicana, parrilla, saludable, reposteria)
+     o de BEBIDAS (cafe, vino, cerveza, licores, cocteles):
+     → TODAS las 5 recomendaciones DEBEN ser de COCINA o BEBIDAS
+     → NO incluyas: masajes, spa, yoga, cerámica, kintsugi, manualidades, aventura
+     → Solo incluye experiencias con tags: Cocina, Gastronómico, o relacionados con comida/bebida
+     → Busca en el título/categorías: Pasta, Sushi, Tamalitos, Parrillero, Café, Vino, Cerveza, Coctelería, Cata, Chef, Brunch
+
+     🏔️ REGLA ESCAPADA CULINARIA (MUY IMPORTANTE):
+     Si la ciudad es "Cerca a Bogotá" Y la categoría es "cocina" o "gastronomia":
+     → PRIORIZA experiencias con "Neusa" en el título (score +40)
+     → "Taller de Cocina En Neusa" DEBE estar en el TOP 2 de recomendaciones
+     → "Taller de Manualidades En Neusa" también es buena opción para escapadas
+     → Estas son experiencias de ESCAPADA culinaria, perfectas para momentos íntimos fuera de la ciudad
+     → Razón: El Neusa ofrece un ambiente tranquilo y especial para cocinar juntos
+
    - Presupuesto (5%): Solo como restricción suave
      * bajo < 100,000 COP
      * medio 100,000-250,000 COP
@@ -150,10 +183,12 @@ Devuelve SOLO JSON válido:
    - Ni más ni menos de 5
    - Si no hay 5 experiencias que encajen perfecto, incluye las mejores disponibles
 
-2️⃣ IDs ÚNICOS OBLIGATORIOS:
+2️⃣ IDs Y TÍTULOS ÚNICOS OBLIGATORIOS:
    - NUNCA repitas el mismo experienceId
+   - NUNCA repitas el mismo TÍTULO de experiencia (aunque tenga diferente ID)
    - Usa 5 IDs DIFERENTES: ej. exp-0, exp-2, exp-5, exp-8, exp-12
-   - ❌ Si repites un ID (ej. exp-3 dos veces), LA RESPUESTA SERÁ RECHAZADA
+   - ❌ Si repites un ID o un título, LA RESPUESTA SERÁ RECHAZADA
+   - ⚠️ REVISA la lista de experiencias: si ves el mismo título dos veces, SOLO usa UNO de ellos
 
 3️⃣ RESPETAR NIVEL DE ENERGÍA:
    - Si nivelEnergia=slow_cozy → ❌ NO incluyas: parapente, escalada, deportes, aventura
@@ -164,9 +199,21 @@ Devuelve SOLO JSON válido:
    - Ordena por total score (mayor primero)
 
 🧘 REGLA ESPECIAL - YOGA/BIENESTAR PARA AMIGAS:
-Si el tipoGrupo es "amigos" (especialmente amigas), SIEMPRE incluye al menos
+Si generoGrupo es "femenino", SIEMPRE incluye al menos
 UNA experiencia de yoga, spa o bienestar entre las 5 recomendaciones.
-El yoga con amigas es MUY popular - puede ser Hot Yoga, Yoga & Brunch, Spa Day, etc.`;
+El yoga con amigas es MUY popular - puede ser Hot Yoga, Yoga & Brunch, Spa Day, etc.
+
+🍺 REGLA ESPECIAL - PRIORIZACIÓN PARA GRUPOS MASCULINOS:
+Si generoGrupo es "masculino" (amigos, parceros, los muchachos):
+→ PRIORIZAR (poner en TOP 3): catas de cerveza, cocteles, licores, parrilla, aventura
+→ NEUTRAL (mostrar pero no primero): cocina, arte, talleres creativos
+→ DESPRIORIZR (score bajo, posiciones 4-5 o no incluir): yoga, spa, aromaterapia, skincare
+→ Las experiencias outdoor/aventura son buenas pero NO son prioridad sobre bebidas
+
+Ejemplo para grupo masculino:
+✅ TOP recomendaciones: "Cata Cervecera", "Taller de Coctelería", "Cata de Licores"
+⚠️ Incluir si no hay más: "Taller de Pintura y Vino" (tiene vino)
+❌ Evitar o poner al final: "Hot Yoga", "Spa Day", "Aromaterapia"`;
 }
 
 /**
@@ -188,6 +235,7 @@ CONTEXTO DEL USUARIO
 
 🟡 PRIORIDAD 2 (ALTO):
 - Tipo de Grupo: ${userContext.tipoGrupo}
+- Género del Grupo: ${userContext.generoGrupo || 'no_especificado'}
 - Ocasión: ${userContext.ocasion || 'No especificada'}
 - Categoría: ${userContext.categoria || 'Abierta a sugerencias'}
 - Presupuesto: ${userContext.presupuesto || 'No prioritario'}
@@ -287,6 +335,20 @@ NO INCLUYAS:
 - "Vuelo en Parapente" → priority3 = 15 ❌
 - "Escape Room" → priority3 = 25 ❌
 
+🔴 EJEMPLO 3: Usuario busca "cocina + cerca de Bogotá + íntimo" (ESCAPADA CULINARIA)
+→ Ciudad: "Cerca a Bogotá"
+→ Categoría: cocina
+→ nivelEnergia: calm_mindful
+
+OBLIGATORIO INCLUIR EN TOP 2:
+- "Taller de Cocina En Neusa" → priority2 = 100, priority3 = 95 ✅ (ESCAPADA + COCINA + ÍNTIMO)
+- "Taller de Manualidades En Neusa" → priority2 = 85 ✅ (buena alternativa)
+
+TAMBIÉN INCLUYE:
+- Otras experiencias de cocina disponibles
+
+⚠️ CRÍTICO: Si el usuario pide escapada + cocina, "Taller de Cocina En Neusa" DEBE estar en posición 1 o 2.
+
 ⚠️ REGLA: Si una experiencia contradice el nivel de energía, NO LA INCLUYAS en las 5 recomendaciones.
 
 ═══════════════════════════════════════════════════
@@ -297,9 +359,10 @@ Devuelve 5 experiencias en JSON válido.
 Escribe "reasons" como amiga entusiasta, NO como robot.
 Asegúrate de que las experiencias recomendadas REALMENTE encajen con el nivel de energía solicitado.
 
-🧘 IMPORTANTE PARA PLANES CON AMIGAS:
-Si el tipoGrupo es "amigos", INCLUYE al menos UNA experiencia de yoga/bienestar/spa.
-Yoga con amigas es muy popular (Hot Yoga, Yoga & Brunch, Spa Day, etc.).
+🧘 IMPORTANTE - PRIORIZACIÓN POR GÉNERO:
+- Si generoGrupo es "femenino": INCLUYE al menos UNA experiencia de yoga/bienestar/spa
+- Si generoGrupo es "masculino": PRIORIZA bebidas (cerveza, cocteles, licores) y EVITA yoga/spa
+- Si generoGrupo es "mixto" o "no_especificado": mantén balance
 `;
 
   return contextDescription + experiencesDescription + instructions;

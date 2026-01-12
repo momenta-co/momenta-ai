@@ -32,6 +32,27 @@ const USER_EXCLUSION_KEYWORDS: Record<string, string[]> = {
 };
 
 /**
+ * Pre-filter to remove duplicate experiences by title
+ * Keeps only the first occurrence of each title
+ */
+export function deduplicateByTitle(experiences: Experience[]): Experience[] {
+  const seenTitles = new Set<string>();
+  const unique: Experience[] = [];
+
+  for (const exp of experiences) {
+    const normalizedTitle = exp.title.toLowerCase().trim();
+    if (!seenTitles.has(normalizedTitle)) {
+      seenTitles.add(normalizedTitle);
+      unique.push(exp);
+    } else {
+      console.log(`[DEDUPE] Removed duplicate title: "${exp.title}" (ID: ${exp.id})`);
+    }
+  }
+
+  return unique;
+}
+
+/**
  * Pre-filter experiences based on energy level HARD EXCLUSIONS
  * This removes experiences that should NEVER be recommended for certain energy levels
  * @exported for use in route.ts fast path
@@ -59,6 +80,61 @@ export function preFilterByEnergy(experiences: Experience[], nivelEnergia?: stri
 
     return !shouldExclude;
   });
+}
+
+/**
+ * Result of min_people filter with metadata about excluded experiences
+ */
+export interface MinPeopleFilterResult {
+  filtered: Experience[];
+  excludedByMinPeople: {
+    title: string;
+    minPeople: number;
+  }[];
+  nextThreshold: number | null; // minimum people needed to unlock more experiences
+}
+
+/**
+ * Pre-filter experiences based on MIN_PEOPLE requirement
+ * Only show experiences where the user's group size meets the minimum
+ * Returns metadata about excluded experiences for AI suggestions
+ * @exported for use in route.ts fast path
+ */
+export function preFilterByMinPeople(experiences: Experience[], personas: number): MinPeopleFilterResult {
+  if (!personas || personas <= 0) {
+    return {
+      filtered: experiences,
+      excludedByMinPeople: [],
+      nextThreshold: null,
+    };
+  }
+
+  const filtered: Experience[] = [];
+  const excludedByMinPeople: { title: string; minPeople: number }[] = [];
+
+  for (const exp of experiences) {
+    const minPeople = exp.minPeople ?? 1;
+    if (minPeople > personas) {
+      console.log(`[MIN-PEOPLE] Excluded "${exp.title}" (requires ${minPeople}, user has ${personas})`);
+      excludedByMinPeople.push({ title: exp.title, minPeople });
+    } else {
+      filtered.push(exp);
+    }
+  }
+
+  // Calculate next threshold: the minimum min_people among excluded experiences
+  let nextThreshold: number | null = null;
+  if (excludedByMinPeople.length > 0) {
+    nextThreshold = Math.min(...excludedByMinPeople.map(e => e.minPeople));
+  }
+
+  console.log(`[MIN-PEOPLE] Excluded ${excludedByMinPeople.length} experiences. Next threshold: ${nextThreshold}`);
+
+  return {
+    filtered,
+    excludedByMinPeople,
+    nextThreshold,
+  };
 }
 
 /**
@@ -142,9 +218,13 @@ export async function generateAIRecommendations(
   }
 
   try {
+    // PRE-FILTER 0: Remove duplicate titles from the list
+    let filteredExperiences = deduplicateByTitle(experiences);
+    console.log(`[AI Service] Dedupe pre-filter: ${experiences.length} → ${filteredExperiences.length} experiences`);
+
     // PRE-FILTER 1: Remove experiences that contradict energy level
-    let filteredExperiences = preFilterByEnergy(experiences, userContext.nivelEnergia);
-    console.log(`[AI Service] Energy pre-filter: ${experiences.length} → ${filteredExperiences.length} experiences`);
+    filteredExperiences = preFilterByEnergy(filteredExperiences, userContext.nivelEnergia);
+    console.log(`[AI Service] Energy pre-filter: ${filteredExperiences.length} experiences`);
 
     // PRE-FILTER 2: Remove experiences the user explicitly wants to avoid
     if (userContext.evitar && userContext.evitar.length > 0) {
@@ -176,7 +256,7 @@ export async function generateAIRecommendations(
 
     const recommendations = mapAIResponseToRecommendations(
       aiResponse,
-      experiences
+      experiencesToUse
     );
 
     return recommendations;
@@ -196,6 +276,7 @@ function mapAIResponseToRecommendations(
   experiences: Experience[]
 ): Recommendation[] {
   const seenIds = new Set<string>();
+  const seenTitles = new Set<string>();
   const recommendations: Recommendation[] = [];
 
   // First pass: get unique recommendations from AI response
@@ -215,12 +296,21 @@ function mapAIResponseToRecommendations(
       continue;
     }
 
-    // Filter out duplicates - only keep the first occurrence
+    // Filter out duplicates by ID - only keep the first occurrence
     if (seenIds.has(experience.id)) {
-      console.warn(`Duplicate experience filtered: ${experience.id} (${experience.title})`);
+      console.warn(`Duplicate experience ID filtered: ${experience.id} (${experience.title})`);
       continue;
     }
+
+    // Filter out duplicates by TITLE - handles cases where same experience has different IDs
+    const normalizedTitle = experience.title.toLowerCase().trim();
+    if (seenTitles.has(normalizedTitle)) {
+      console.warn(`Duplicate experience TITLE filtered: ${experience.title} (ID: ${experience.id})`);
+      continue;
+    }
+
     seenIds.add(experience.id);
+    seenTitles.add(normalizedTitle);
 
     // Convert priority-based scores to legacy format for frontend compatibility
     const scoreBreakdown: ScoringBreakdown = {

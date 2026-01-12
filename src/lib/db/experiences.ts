@@ -36,7 +36,7 @@ function transformDbExperience(dbExp: any): Experience {
     categories: tags,
     price,
     duration: formatDuration(dbExp.duration_minutes),
-    minPeople: null, // Not in database schema
+    minPeople: dbExp.min_people ?? 1,
     location: dbExp.city,
   };
 }
@@ -62,6 +62,7 @@ export async function getAllExperiences(): Promise<Experience[]> {
         tags: true,
         image_url: true,
         source_url: true,
+        min_people: true,
       },
       orderBy: {
         created_at: 'desc',

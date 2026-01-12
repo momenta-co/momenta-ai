@@ -1,8 +1,8 @@
 import {
   extractAccumulatedContext
 } from '@/lib/intelligence/context-extractor';
+import { devToolsEnabledModel } from '@/lib/intelligence/model';
 import { buildSystemPromptWithContext } from '@/lib/prompts';
-import { openai } from '@ai-sdk/openai';
 import { stepCountIs, streamText, convertToModelMessages } from 'ai';
 import { getRecommendations, requestFeedback } from './tools';
 
@@ -134,6 +134,8 @@ function createDelayedStreamResponse(text: string): Response {
 export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
   const messages = await convertToModelMessages(rawMessages);
+  console.log(messages);
+  
 
   // Get user messages for context
   const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
@@ -155,7 +157,7 @@ export async function POST(req: Request) {
   let lastRecommendationIds: string[] = [];
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model: devToolsEnabledModel,
     system: systemPromptWithContext,
     messages,
     stopWhen: stepCountIs(5),
