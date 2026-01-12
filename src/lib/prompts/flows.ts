@@ -25,8 +25,8 @@ export const FLOWS_SECTION = `
   → Si falta fecha → Pregunta solo la fecha (NO preguntes ciudad)
 
 📍 FEEDBACK (DESPUÉS DE MOSTRAR RECOMENDACIONES):
-  PASO 1 - Pregunta inmediata después de getRecommendations:
-  → "Pudiste revisar las experiencias - cuál te gustó mas?"
+  PASO 1 - El followUpQuestion de getRecommendations ya preguntó al usuario
+  → Ejemplo: "¿Cuál te llamó más la atención?"
 
   PASO 2 - Usuario responde con su opinión
 

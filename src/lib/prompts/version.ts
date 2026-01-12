@@ -9,6 +9,7 @@ export const PROMPT_VERSION = '1.8.0';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
+  '1.0.1': 'Added introMessage and followUpQuestion to getRecommendations for structured UI rendering (intro → carousel → question)',
   '1.1.0': 'Added specific category flow: Chat AI passes specific categories (italiana, japonesa, etc.) to getRecommendations, and AI service prioritizes matching experiences',
   '1.2.0': 'Added duplicate title filtering in AI service and prompt instructions to prevent same experience appearing twice',
   '1.2.1': 'Fixed bug: mapAIResponseToRecommendations now uses filtered experiences list (experiencesToUse) to match AI indices correctly',
