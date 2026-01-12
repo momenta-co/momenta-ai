@@ -1,8 +1,13 @@
-import { devToolsMiddleware } from '@ai-sdk/devtools';
 import { openai } from '@ai-sdk/openai';
 import { wrapLanguageModel } from 'ai';
 
-export const devToolsEnabledModel = wrapLanguageModel({
-  model: openai('gpt-4o-mini'),
-  middleware: devToolsMiddleware(),
-});
+const baseModel = openai('gpt-4o-mini');
+
+// Only use devtools in development - conditional require to avoid production errors
+export const devToolsEnabledModel = process.env.NODE_ENV === 'development'
+  ? wrapLanguageModel({
+    model: baseModel,
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    middleware: require('@ai-sdk/devtools').devToolsMiddleware(),
+  })
+  : baseModel;

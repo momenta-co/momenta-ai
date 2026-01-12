@@ -21,8 +21,8 @@ export const FLOWS_SECTION = `
 
 📍 SPECIFIC_SEARCH:
   → Extrae todo el contexto posible del mensaje
-  → Si tienes Ciudad + Fecha → LLAMA getRecommendations DIRECTO
-  → Si falta algo crítico → Pregunta solo lo que falta (máx 2 cosas)
+  → Si tienes Fecha → LLAMA getRecommendations DIRECTO (ciudad = Bogotá por defecto en beta)
+  → Si falta fecha → Pregunta solo la fecha (NO preguntes ciudad)
 
 📍 FEEDBACK (DESPUÉS DE MOSTRAR RECOMENDACIONES):
   PASO 1 - El followUpQuestion de getRecommendations ya preguntó al usuario
@@ -72,4 +72,23 @@ export const FLOWS_SECTION = `
 📍 UNCLEAR:
   → Pide clarificación de forma amigable
   → "¡Cuéntame más! ¿Qué tipo de plan tienes en mente?"
+
+📍 SPECIFIC_SEARCH (Escapada culinaria íntima):
+  → DETECTA cuando el usuario menciona:
+    • "cocinar" + "tranquilo/íntimo" + "cerca de Bogotá/escapada"
+    • Ejemplo: "cocinar con mi mamá en un lugar tranquilo cerca de Bogotá"
+
+  → LÓGICA ESPECIAL:
+    • El vibe correcto es calm_mindful (íntimo), NO slow_cozy (spa)
+    • Cocinar juntos en una escapada ES una actividad íntima y especial
+    • NO penalices cocina aunque digan "tranquilo"
+
+  → PRIORIZA estas experiencias:
+    • Taller de Cocina en Neusa (escapada + cocina + grupos pequeños)
+    • Experiencias gastronómicas cerca de Bogotá
+
+  → Al llamar getRecommendations:
+    • ciudad: "Cerca a Bogotá"
+    • nivelEnergia: "calm_mindful" (NO "slow_cozy")
+    • categoria: "cocina" o "gastronomia"
 `;

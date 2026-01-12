@@ -134,6 +134,8 @@ function createDelayedStreamResponse(text: string): Response {
 export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
   const messages = await convertToModelMessages(rawMessages);
+  console.log(messages);
+
 
   // Extraer contexto acumulado de TODOS los mensajes del usuario
   const accumulatedContext = extractAccumulatedContext(messages);
