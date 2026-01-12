@@ -83,6 +83,26 @@ export function preFilterByEnergy(experiences: Experience[], nivelEnergia?: stri
 }
 
 /**
+ * Pre-filter experiences based on MIN_PEOPLE requirement
+ * Only show experiences where the user's group size meets the minimum
+ * @exported for use in route.ts fast path
+ */
+export function preFilterByMinPeople(experiences: Experience[], personas: number): Experience[] {
+  if (!personas || personas <= 0) {
+    return experiences;
+  }
+
+  return experiences.filter(exp => {
+    const minPeople = exp.minPeople ?? 1;
+    if (minPeople > personas) {
+      console.log(`[MIN-PEOPLE] Excluded "${exp.title}" (requires ${minPeople}, user has ${personas})`);
+      return false;
+    }
+    return true;
+  });
+}
+
+/**
  * Pre-filter experiences based on USER EXPLICIT EXCLUSIONS
  * When user says "NO yoga" or "sin spa", this filters those experiences out
  * @exported for use in route.ts fast path

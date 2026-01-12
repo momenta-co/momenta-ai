@@ -1,5 +1,5 @@
 import { getExperiencesByCity } from "@/lib/db/experiences";
-import { generateAIRecommendations, preFilterByEnergy, preFilterByUserExclusions } from "@/lib/intelligence/ai-service";
+import { generateAIRecommendations, preFilterByEnergy, preFilterByMinPeople, preFilterByUserExclusions } from "@/lib/intelligence/ai-service";
 import { NivelEnergia, Presupuesto, TipoGrupo, UserContext } from "@/lib/intelligence/types";
 import { tool } from "ai";
 import z from "zod";
@@ -51,6 +51,13 @@ export const getRecommendations = tool({
         const beforeUserFilter = experiences.length;
         experiences = preFilterByUserExclusions(experiences, params.evitar);
         console.log(`[getRecommendations] User exclusion pre-filter: ${beforeUserFilter} → ${experiences.length} experiences (evitar: ${params.evitar.join(', ')})`);
+      }
+
+      // PRE-FILTER 3: Remove experiences where min_people > user's group size
+      if (params.personas && params.personas > 0) {
+        const beforeMinPeopleFilter = experiences.length;
+        experiences = preFilterByMinPeople(experiences, params.personas);
+        console.log(`[getRecommendations] Min people pre-filter: ${beforeMinPeopleFilter} → ${experiences.length} experiences (personas: ${params.personas})`);
       }
 
       if (!experiences || experiences.length === 0) {

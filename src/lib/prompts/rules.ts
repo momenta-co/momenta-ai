@@ -33,4 +33,11 @@ export const RULES_SECTION = `
    → USA nivelEnergia=calm_mindful (íntimo/especial), NO slow_cozy (spa/masaje)
    → NO penalices cocina por el vibe "tranquilo" - cocinar juntos ES una actividad íntima
    → La combinación cocina + escapada + íntimo = Neusa es la opción ideal
+
+10. FILTRO MIN_PEOPLE (mínimo de personas):
+   → NUNCA recomiendes experiencias donde min_people sea MAYOR al número de personas del usuario
+   → Si usuario dice "somos 2" y la experiencia requiere mínimo 4 → NO mostrar esa experiencia
+   → Si usuario dice "somos 6" y la experiencia requiere mínimo 4 → SÍ mostrar (6 >= 4)
+   → SIEMPRE verifica que: personas_del_usuario >= min_people de la experiencia
+   → Si no sabes cuántas personas son, PREGUNTA antes de recomendar experiencias con min_people alto
 `;

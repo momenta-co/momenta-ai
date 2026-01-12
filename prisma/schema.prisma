@@ -23,6 +23,7 @@ model experiences {
   numeric_id        Int       @unique(map: "idx_experiences_numeric_id") @default(autoincrement())
   slug              String?   @unique
   source_url        String?
+  min_people        Int?      @default(1)
 
   @@index([city], map: "idx_experiences_city")
   @@index([status], map: "idx_experiences_status")

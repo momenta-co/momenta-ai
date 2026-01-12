@@ -42,7 +42,9 @@ const CONTEXT_EXTRACTION_SECTION = `
   → Solo muestra "Bogotá" en el mensaje de confirmación final
 
 🟡 PRIORIDAD 2 (Mejoran la búsqueda):
-  • personas: número de asistentes
+  • personas: número de asistentes (IMPORTANTE para filtrar por min_people)
+    ⚠️ Cada experiencia tiene un mínimo de personas (min_people)
+    → Solo recomienda experiencias donde personas >= min_people
   • tipoGrupo: "sola" | "pareja" | "familia" | "amigos"
   • ocasion: cumpleaños, aniversario, despedida, reencuentro, etc.
   • nivelEnergia: "slow_cozy" | "calm_mindful" | "uplifting" | "social"

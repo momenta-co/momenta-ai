@@ -134,6 +134,8 @@ function createDelayedStreamResponse(text: string): Response {
 export async function POST(req: Request) {
   const { messages: rawMessages } = await req.json();
   const messages = await convertToModelMessages(rawMessages);
+  console.log(messages);
+  
 
   // Get user messages for context
   const userMessages = messages.filter((m: { role: string }) => m.role === 'user');
