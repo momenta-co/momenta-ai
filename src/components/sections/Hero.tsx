@@ -2,7 +2,7 @@
 
 import ExperienceCarousel from '@/components/organisms/ExperienceCarousel';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Chat } from '../templates/Chat';
 
 export const Hero = () => {
@@ -20,7 +20,7 @@ export const Hero = () => {
         >
           {/* Left Column - Chat Interface */}
           <motion.div
-            className="flex flex-col h-full w-full max-h-[83vh]"
+            className="flex flex-col h-full w-full max-h-full gap-4"
             animate={{
               flex: messageCount > 0 ? '1 1 100%' : '1 1 50%',
             }}

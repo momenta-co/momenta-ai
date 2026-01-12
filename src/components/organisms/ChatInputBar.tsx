@@ -87,7 +87,7 @@ export default function ChatInputBar({
           rows={1}
           className={cn(
             'w-full bg-transparent',
-            'text-neutral-1000 text-sm leading-relaxed',
+            'text-neutral-1000 text-xs md:text-md leading-relaxed',
             'focus:outline-none',
             'resize-none',
             'font-light pl-6 pr-16',
@@ -96,7 +96,7 @@ export default function ChatInputBar({
         />
         {/* Rotating placeholder overlay */}
         {messageCount === 0 && !input && !isFocused && (
-          <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 pointer-events-none">
+          <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 pointer-events-none max-w-[80%]">
             <RotatingPlaceholder />
           </div>
         )}

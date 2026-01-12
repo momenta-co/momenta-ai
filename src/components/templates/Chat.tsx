@@ -54,11 +54,11 @@ export function Chat({ onMessagesChange }: ChatProps) {
   }, [stop]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <>
       <Conversation>
-        <ConversationContent>
+        <ConversationContent className="h-full w-full p-0">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center flex-1 gap-8">
+            <div className="flex flex-col items-center justify-between flex-1">
               {/* Title */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
@@ -203,7 +203,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
         </ConversationContent>
       </Conversation>
 
-      <div className="pt-4">
+      <div>
         <div className="max-w-3xl mx-auto">
           <ChatInputBar
             input={input}
@@ -215,6 +215,6 @@ export function Chat({ onMessagesChange }: ChatProps) {
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }
