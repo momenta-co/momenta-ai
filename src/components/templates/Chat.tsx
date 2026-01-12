@@ -6,11 +6,6 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
-  PromptInput,
-  PromptInputSubmit,
-  PromptInputTextarea,
-} from "@/components/ai-elements/prompt-input";
-import {
   Tool,
   ToolContent,
   ToolHeader,
@@ -23,6 +18,7 @@ import React from 'react';
 import RotatingTitleWord from '../atoms/RotatingTitleWord';
 import VoiceSphere from '../atoms/VoiceSphere';
 import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
+import ChatInputBar from '../organisms/ChatInputBar';
 
 interface ChatProps {
   onMessagesChange?: (messageCount: number) => void;
@@ -30,7 +26,7 @@ interface ChatProps {
 
 export function Chat({ onMessagesChange }: ChatProps) {
   const [input, setInput] = React.useState("");
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, stop } = useChat();
 
   console.log('Chat messages: ', messages);
 
@@ -42,6 +38,20 @@ export function Chat({ onMessagesChange }: ChatProps) {
       onMessagesChange(messages.length);
     }
   }, [messages.length, onMessagesChange]);
+
+  // Handle submit from ChatInputBar
+  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input.trim() && !isLoading) {
+      sendMessage({ text: input });
+      setInput("");
+    }
+  }, [input, isLoading, sendMessage]);
+
+  // Handle stop button click
+  const handleStop = React.useCallback(() => {
+    stop?.();
+  }, [stop]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -193,27 +203,17 @@ export function Chat({ onMessagesChange }: ChatProps) {
         </ConversationContent>
       </Conversation>
 
-      <div className="p-4">
-        <PromptInput
-          onSubmit={(message, event) => {
-            event.preventDefault();
-            if (message.text) {
-              sendMessage({ text: message.text });
-              setInput("");
-            }
-          }}
-          className="max-w-3xl mx-auto flex gap-2 items-end"
-        >
-          <PromptInputTextarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            disabled={isLoading}
-            rows={1}
-            className="flex-1"
+      <div className="pt-4">
+        <div className="max-w-3xl mx-auto">
+          <ChatInputBar
+            input={input}
+            setInput={setInput}
+            isLoading={isLoading}
+            messageCount={messages.length}
+            onSubmit={handleSubmit}
+            onStop={handleStop}
           />
-          <PromptInputSubmit disabled={isLoading} />
-        </PromptInput>
+        </div>
       </div>
     </div>
   );
