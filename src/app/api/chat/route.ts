@@ -3,7 +3,7 @@ import {
 } from '@/lib/intelligence/context-extractor';
 import { devToolsEnabledModel } from '@/lib/intelligence/model';
 import { buildSystemPromptWithContext } from '@/lib/prompts';
-import { RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
+import { RecommendationsToolOutput, FeedbackToolOutput } from '@/lib/intelligence/tool-types';
 import { convertToModelMessages, StepResult, streamText } from 'ai';
 import { getRecommendations, requestFeedback } from './tools';
 
@@ -127,10 +127,10 @@ function createDelayedStreamResponse(text: string): Response {
 // CUSTOM STOP CONDITION
 // ============================================
 /**
- * Stop immediately after getRecommendations tool succeeds
+ * Stop immediately after getRecommendations or requestFeedback tool succeeds
  * This prevents the LLM from generating duplicate text after the tool call
  */
-function stopAfterRecommendations({ steps }: { steps: StepResult<any>[] }): boolean {
+function stopAfterToolCompletion({ steps }: { steps: StepResult<any>[] }): boolean {
   if (steps.length === 0) return false;
 
   const lastStep = steps[steps.length - 1];
@@ -143,7 +143,15 @@ function stopAfterRecommendations({ steps }: { steps: StepResult<any>[] }): bool
     return output?.status === 'success';
   });
 
-  return hasSuccessfulRecommendations || false;
+  // Check if the last step had a successful requestFeedback tool call
+  const hasSuccessfulFeedback = lastStep.toolResults?.some((result) => {
+    if (result.toolName !== 'requestFeedback') return false;
+
+    const output = result.output as FeedbackToolOutput;
+    return output?.success === true;
+  });
+
+  return hasSuccessfulRecommendations || hasSuccessfulFeedback || false;
 }
 
 // ============================================
@@ -175,7 +183,7 @@ export async function POST(req: Request) {
       getRecommendations,
       requestFeedback,
     },
-    stopWhen: stopAfterRecommendations,
+    stopWhen: stopAfterToolCompletion,
   });
 
   return result.toUIMessageStreamResponse();

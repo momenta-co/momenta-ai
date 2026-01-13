@@ -11,13 +11,14 @@ import {
   ToolHeader,
   ToolInput,
 } from "@/components/ai-elements/tool";
-import { RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
+import { RecommendationsToolOutput, FeedbackToolOutput } from '@/lib/intelligence/tool-types';
 import { useChat } from "@ai-sdk/react";
 import { motion } from 'framer-motion';
 import React from 'react';
 import RotatingTitleWord from '../atoms/RotatingTitleWord';
 import VoiceSphere from '../atoms/VoiceSphere';
 import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
+import FeedbackForm from '../organisms/FeedbackForm';
 import ChatInputBar from '../organisms/ChatInputBar';
 
 interface ChatProps {
@@ -109,12 +110,28 @@ export function Chat({ onMessagesChange }: ChatProps) {
                         (p) => p.type === "tool-getRecommendations"
                       ) ?? -1;
 
+                      // Check if there's a successful requestFeedback tool call
+                      // If so, we'll skip text parts that come after it (they duplicate the message)
+                      const hasSuccessfulFeedback = message.parts?.some(
+                        (p) => p.type === "tool-requestFeedback" &&
+                          p.state === "output-available" &&
+                          (p.output as FeedbackToolOutput | undefined)?.success
+                      );
+                      const feedbackIndex = message.parts?.findIndex(
+                        (p) => p.type === "tool-requestFeedback"
+                      ) ?? -1;
+
                       return message.parts?.map((part, i) => {
                         switch (part.type) {
                           case "text":
                             // Skip text parts that come after a successful recommendations tool
                             // (they duplicate the intro/followUp that's already in the tool output)
                             if (hasSuccessfulRecommendations && i > recommendationsIndex) {
+                              return null;
+                            }
+                            // Skip text parts that come after a successful feedback tool
+                            // (they duplicate the message that's already in the tool output)
+                            if (hasSuccessfulFeedback && i > feedbackIndex) {
                               return null;
                             }
                             return (
@@ -194,6 +211,44 @@ export function Chat({ onMessagesChange }: ChatProps) {
                               </Tool>
                             );
                           }
+
+                          case "tool-requestFeedback": {
+                            const output = part.output as FeedbackToolOutput | undefined;
+
+                            // Show feedback form when tool succeeds
+                            if (part.state === "output-available" && output?.success && output.showFeedbackForm) {
+                              return (
+                                <div key={part.toolCallId || `${message.id}-${i}`} className="space-y-4">
+                                  {/* Context message from LLM */}
+                                  {output.message && (
+                                    <MessageResponse>
+                                      {output.message}
+                                    </MessageResponse>
+                                  )}
+                                  {/* Feedback form */}
+                                  <FeedbackForm
+                                    messageId={message.id}
+                                    recommendationIds={output.context?.recommendationIds}
+                                    userSentiment={output.context?.userSentiment}
+                                    onSubmitSuccess={() => {
+                                      console.log('[Chat] Feedback submitted successfully');
+                                    }}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            // Fallback: Show generic loading state
+                            return (
+                              <Tool key={part.toolCallId || `${message.id}-${i}`}>
+                                <ToolHeader type={part.type} state={part.state} />
+                                <ToolContent>
+                                  <ToolInput input={part.input} />
+                                </ToolContent>
+                              </Tool>
+                            );
+                          }
+
                           default:
                             return null;
                         }

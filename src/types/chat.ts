@@ -32,6 +32,8 @@ export interface CarouselExperience {
 
 export interface FeedbackData {
   email: string;
+  fullname: string;
+  instagram?: string;
   likedRecommendations: boolean;
   comment?: string;
   recommendationIds: string[];
