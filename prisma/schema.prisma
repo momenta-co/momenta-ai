@@ -55,6 +55,8 @@ model beta_feedback {
   comments              String?
   created_at            DateTime?            @default(now()) @db.Timestamp(6)
   ip                    String?
+  fullname              String?
+  instagram_handle      String?
   recommendation_runs   recommendation_runs? @relation(fields: [recommendation_run_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([created_at], map: "idx_beta_feedback_created")

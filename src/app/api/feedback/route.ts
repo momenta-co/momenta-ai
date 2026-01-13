@@ -9,7 +9,9 @@ import prisma from '@/lib/db/prisma';
 
 // Validation schema
 const feedbackSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.email('Invalid email format'),
+  fullname: z.string().min(1, 'Full name is required'),
+  instagram: z.string().optional(),
   likedRecommendations: z.boolean(),
   comment: z.string().max(500).optional(),
   recommendationIds: z.array(z.string()),
@@ -19,6 +21,11 @@ const feedbackSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Extract IP address from request headers
+    const forwarded = request.headers.get('x-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+    const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
+
     // Parse request body
     const body = await request.json();
 
@@ -35,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, likedRecommendations, comment, recommendationIds, messageId } = validation.data;
+    const { email, fullname, instagram, likedRecommendations, comment, recommendationIds, messageId } = validation.data;
 
     // Check for duplicate submission (same email + messageId within last 10 minutes)
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
@@ -70,8 +77,11 @@ export async function POST(request: NextRequest) {
     const feedback = await prisma.beta_feedback.create({
       data: {
         email,
+        fullname,
+        instagram_handle: instagram || null,
         liked_recommendations: likedRecommendations,
         comments: commentWithMetadata,
+        ip,
         user_id: null, // No authentication yet
         recommendation_run_id: null, // Optional linkage
       },
