@@ -1,6 +1,6 @@
+import prisma from '@/lib/db/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import prisma from '@/lib/db/prisma';
 
 /**
  * API Route: POST /api/feedback
@@ -9,15 +9,16 @@ import prisma from '@/lib/db/prisma';
 
 // Validation schema
 const feedbackSchema = z.object({
-  email: z.email('Invalid email format'),
-  fullname: z.string().min(1, 'Full name is required'),
+  email: z.string().email('Invalid email format').optional(),
+  fullname: z.string().min(1, 'Full name is required').optional(),
   instagram: z.string().optional(),
-  likedRecommendations: z.boolean(),
+  likedRecommendations: z.boolean().optional(),
   comment: z.string().max(500).optional(),
   recommendationIds: z.array(z.string()),
   messageId: z.string(),
   sessionId: z.string().optional(),
   chatLogs: z.array(z.any()).optional(),
+  isOmitted: z.boolean().optional(), // Flag to indicate if form was omitted
 });
 
 export async function POST(request: NextRequest) {
@@ -43,44 +44,59 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, fullname, instagram, likedRecommendations, comment, recommendationIds, messageId, chatLogs } = validation.data;
+    const { email, fullname, instagram, likedRecommendations, comment, recommendationIds, messageId, chatLogs, isOmitted } = validation.data;
 
-    // Check for duplicate submission (same email + messageId within last 10 minutes)
-    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-    const existingFeedback = await prisma.beta_feedback.findFirst({
-      where: {
-        email,
-        created_at: {
-          gte: tenMinutesAgo,
-        },
-        comments: {
-          contains: messageId, // Store messageId in comments field for now
-        },
-      },
-    });
+    // For non-omitted submissions, validate required fields
+    if (!isOmitted) {
+      if (!email || !fullname) {
+        return NextResponse.json(
+          {
+            error: 'Missing required fields',
+            message: 'Email and fullname are required for feedback submission',
+          },
+          { status: 400 }
+        );
+      }
 
-    if (existingFeedback) {
-      return NextResponse.json(
-        {
-          error: 'Duplicate submission detected',
-          message: 'You have already submitted feedback recently',
+      // Check for duplicate submission (same email + messageId within last 10 minutes)
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      const existingFeedback = await prisma.beta_feedback.findFirst({
+        where: {
+          email,
+          created_at: {
+            gte: tenMinutesAgo,
+          },
+          comments: {
+            contains: messageId,
+          },
         },
-        { status: 409 }
-      );
+      });
+
+      if (existingFeedback) {
+        return NextResponse.json(
+          {
+            error: 'Duplicate submission detected',
+            message: 'You have already submitted feedback recently',
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // Store comment with messageId prefix for tracking
-    const commentWithMetadata = comment
-      ? `[MSG:${messageId}][IDs:${recommendationIds.join(',')}] ${comment}`
-      : `[MSG:${messageId}][IDs:${recommendationIds.join(',')}]`;
+    const commentWithMetadata = isOmitted
+      ? `[OMITTED][MSG:${messageId}][IDs:${recommendationIds.join(',')}]`
+      : comment
+        ? `[MSG:${messageId}][IDs:${recommendationIds.join(',')}] ${comment}`
+        : `[MSG:${messageId}][IDs:${recommendationIds.join(',')}]`;
 
     // Insert feedback into database
     const feedback = await prisma.beta_feedback.create({
       data: {
-        email,
-        fullname,
+        email: email || 'omitted@momenta.co',
+        fullname: fullname || 'Omitted',
         instagram_handle: instagram || null,
-        liked_recommendations: likedRecommendations,
+        liked_recommendations: likedRecommendations ?? null,
         comments: commentWithMetadata,
         ip,
         chat_logs: chatLogs || {},
@@ -93,7 +109,9 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         feedbackId: feedback.id,
-        message: '¡Gracias por tu feedback! Ya estás participando en el sorteo.',
+        message: isOmitted
+          ? 'Chat logs saved successfully'
+          : '¡Gracias por tu feedback! Ya estás participando en el sorteo.',
       },
       { status: 201 }
     );

@@ -32,15 +32,16 @@ export interface CarouselExperience {
 }
 
 export interface FeedbackData {
-  email: string;
-  fullname: string;
+  email?: string;
+  fullname?: string;
   instagram?: string;
-  likedRecommendations: boolean;
+  likedRecommendations?: boolean;
   comment?: string;
   recommendationIds: string[];
   messageId: string;
   sessionId?: string;
   chatLogs?: UIMessage[];
+  isOmitted?: boolean;
 }
 
 export interface FeedbackSubmissionResponse {

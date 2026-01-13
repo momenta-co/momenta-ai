@@ -5,12 +5,7 @@ import {
   ConversationContent
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-} from "@/components/ai-elements/tool";
+import { Loader } from "@/components/ai-elements/loader";
 import { RecommendationsToolOutput, FeedbackToolOutput } from '@/lib/intelligence/tool-types';
 import { useChat } from "@ai-sdk/react";
 import { motion } from 'framer-motion';
@@ -142,29 +137,18 @@ export function Chat({ onMessagesChange }: ChatProps) {
                             // Show progressive loading states from generator
                             if (output?.status === 'loading') {
                               return (
-                                <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                  <ToolHeader type={part.type} state={part.state} />
-                                  <ToolContent>
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                      <span className="animate-pulse">●</span>
-                                      <span>{output.message}</span>
-                                    </div>
-                                  </ToolContent>
-                                </Tool>
+                                <div key={part.toolCallId || `${message.id}-${i}`} className="flex items-center gap-2 text-muted-foreground py-2">
+                                  <Loader size={16} />
+                                </div>
                               );
                             }
 
                             // Show error state
                             if (output?.status === 'error') {
                               return (
-                                <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                  <ToolHeader type={part.type} state="output-error" />
-                                  <ToolContent>
-                                    <div className="text-destructive">
-                                      {output.error || 'Error generando recomendaciones'}
-                                    </div>
-                                  </ToolContent>
-                                </Tool>
+                                <div key={part.toolCallId || `${message.id}-${i}`} className="text-destructive py-2">
+                                  {output.error || 'Error generando recomendaciones'}
+                                </div>
                               );
                             }
 
@@ -200,12 +184,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
 
                             // Fallback: Show generic loading state while tool is initializing
                             return (
-                              <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                <ToolHeader type={part.type} state={part.state} />
-                                <ToolContent>
-                                  <ToolInput input={part.input} />
-                                </ToolContent>
-                              </Tool>
+                              <div key={part.toolCallId || `${message.id}-${i}`} className="flex items-center gap-2 text-muted-foreground py-2">
+                                <Loader size={16} />
+                              </div>
                             );
                           }
 
@@ -238,12 +219,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
 
                             // Fallback: Show generic loading state
                             return (
-                              <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                <ToolHeader type={part.type} state={part.state} />
-                                <ToolContent>
-                                  <ToolInput input={part.input} />
-                                </ToolContent>
-                              </Tool>
+                              <div key={part.toolCallId || `${message.id}-${i}`} className="flex items-center gap-2 text-muted-foreground py-2">
+                                <Loader size={16} />
+                              </div>
                             );
                           }
 

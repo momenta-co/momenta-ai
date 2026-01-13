@@ -137,7 +137,30 @@ export default function FeedbackForm({
     }
   };
 
-  const handleDismiss = () => {
+  const handleDismiss = async () => {
+    // Send chat logs even when form is omitted
+    const feedbackData: FeedbackData = {
+      recommendationIds,
+      messageId,
+      sessionId: typeof window !== 'undefined' ? window.sessionStorage.getItem('session_id') || undefined : undefined,
+      chatLogs: chatLogs.length > 0 ? chatLogs : undefined,
+      isOmitted: true,
+    };
+
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(feedbackData),
+      });
+      // Don't wait for response, just set state
+    } catch (error) {
+      console.error('[FeedbackForm] Error sending omitted chat logs:', error);
+      // Still show omitted state even if API call fails
+    }
+
     setSubmissionState('omitted');
   };
 
@@ -562,13 +585,34 @@ export default function FeedbackForm({
           )}
         </AnimatePresence>
 
-        {/* Submit button */}
+        {/* Submit and Omit buttons */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="mt-4 flex justify-end"
+          className="mt-4 flex justify-between items-center"
         >
+          {/* Omit button */}
+          <motion.button
+            type="button"
+            onClick={handleDismiss}
+            disabled={submissionState === 'loading'}
+            whileHover={{ scale: submissionState === 'loading' ? 1 : 1.02 }}
+            whileTap={{ scale: submissionState === 'loading' ? 1 : 0.98 }}
+            className={`
+                text-neutral-600 rounded-full px-4 py-2
+                font-sans text-sm font-medium
+                transition-all duration-300
+                ${submissionState === 'loading'
+                ? 'opacity-50 cursor-not-allowed'
+                : 'hover:text-neutral-800 hover:bg-neutral-100'
+              }
+              `}
+          >
+            Omitir
+          </motion.button>
+
+          {/* Submit button */}
           <motion.button
             type="submit"
             disabled={!fullname || !email || !thumbsSelection || submissionState === 'loading'}
