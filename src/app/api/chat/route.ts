@@ -3,7 +3,8 @@ import {
 } from '@/lib/intelligence/context-extractor';
 import { devToolsEnabledModel } from '@/lib/intelligence/model';
 import { buildSystemPromptWithContext } from '@/lib/prompts';
-import { convertToModelMessages, stepCountIs, streamText } from 'ai';
+import { RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
+import { convertToModelMessages, StepResult, streamText } from 'ai';
 import { getRecommendations, requestFeedback } from './tools';
 
 // ============================================
@@ -123,6 +124,29 @@ function createDelayedStreamResponse(text: string): Response {
 }
 
 // ============================================
+// CUSTOM STOP CONDITION
+// ============================================
+/**
+ * Stop immediately after getRecommendations tool succeeds
+ * This prevents the LLM from generating duplicate text after the tool call
+ */
+function stopAfterRecommendations({ steps }: { steps: StepResult<any>[] }): boolean {
+  if (steps.length === 0) return false;
+
+  const lastStep = steps[steps.length - 1];
+
+  // Check if the last step had a successful getRecommendations tool call
+  const hasSuccessfulRecommendations = lastStep.toolResults?.some((result) => {
+    if (result.toolName !== 'getRecommendations') return false;
+
+    const output = result.output as RecommendationsToolOutput;
+    return output?.status === 'success';
+  });
+
+  return hasSuccessfulRecommendations || false;
+}
+
+// ============================================
 // SYSTEM PROMPT - Now managed in modular files
 // See: src/lib/prompts/
 // ============================================
@@ -151,7 +175,7 @@ export async function POST(req: Request) {
       getRecommendations,
       requestFeedback,
     },
-    stopWhen: stepCountIs(5),
+    stopWhen: stopAfterRecommendations,
   });
 
   return result.toUIMessageStreamResponse();
