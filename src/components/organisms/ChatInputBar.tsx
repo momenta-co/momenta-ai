@@ -13,22 +13,19 @@ import { Loader2, Send, Square } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ChatInputBarProps {
-  input: string;
-  setInput: (value: string) => void;
   isLoading: boolean;
   messageCount: number;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (input: string) => void;
   onStop?: () => void;
 }
 
 export default function ChatInputBar({
-  input,
-  setInput,
   isLoading,
   messageCount,
   onSubmit,
   onStop,
 }: ChatInputBarProps) {
+  const [input, setInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -42,8 +39,10 @@ export default function ChatInputBar({
   // Handle submit from PromptInput - adapt to parent's interface
   const handleSubmit = useCallback(
     (message: PromptInputMessage, event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
       if (message.text.trim() && !isLoading) {
-        onSubmit(event);
+        onSubmit(message.text);
+        setInput('');
       }
     },
     [isLoading, onSubmit]
@@ -87,7 +86,7 @@ export default function ChatInputBar({
           rows={1}
           className={cn(
             'w-full bg-transparent',
-            'text-neutral-1000 text-xs md:text-md leading-relaxed',
+            'text-neutral-1000 text-base md:text-md leading-relaxed',
             'focus:outline-none',
             'resize-none',
             'font-light pl-6 pr-16',
