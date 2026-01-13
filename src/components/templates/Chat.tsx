@@ -5,19 +5,15 @@ import {
   ConversationContent
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-} from "@/components/ai-elements/tool";
-import { RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
+import { Loader } from "@/components/ai-elements/loader";
+import { RecommendationsToolOutput, FeedbackToolOutput } from '@/lib/intelligence/tool-types';
 import { useChat } from "@ai-sdk/react";
 import { motion } from 'framer-motion';
 import React from 'react';
 import RotatingTitleWord from '../atoms/RotatingTitleWord';
 import VoiceSphere from '../atoms/VoiceSphere';
 import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
+import FeedbackForm from '../organisms/FeedbackForm';
 import ChatInputBar from '../organisms/ChatInputBar';
 
 interface ChatProps {
@@ -25,7 +21,6 @@ interface ChatProps {
 }
 
 export function Chat({ onMessagesChange }: ChatProps) {
-  const [input, setInput] = React.useState("");
   const { messages, sendMessage, status, stop } = useChat();
 
   console.log('Chat messages: ', messages);
@@ -40,13 +35,11 @@ export function Chat({ onMessagesChange }: ChatProps) {
   }, [messages.length, onMessagesChange]);
 
   // Handle submit from ChatInputBar
-  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = React.useCallback((input: string) => {
     if (input.trim() && !isLoading) {
       sendMessage({ text: input });
-      setInput("");
     }
-  }, [input, isLoading, sendMessage]);
+  }, [isLoading, sendMessage]);
 
   // Handle stop button click
   const handleStop = React.useCallback(() => {
@@ -100,23 +93,39 @@ export function Chat({ onMessagesChange }: ChatProps) {
                     ? (() => {
                       // Check if there's a successful getRecommendations tool call
                       // If so, we'll skip text parts that come after it (they duplicate the carousel)
-                      // const hasSuccessfulRecommendations = message.parts?.some(
-                      //   (p) => p.type === "tool-getRecommendations" &&
-                      //     p.state === "output-available" &&
-                      //     p.output
-                      // );
-                      // const recommendationsIndex = message.parts?.findIndex(
-                      //   (p) => p.type === "tool-getRecommendations"
-                      // ) ?? -1;
+                      const hasSuccessfulRecommendations = message.parts?.some(
+                        (p) => p.type === "tool-getRecommendations" &&
+                          p.state === "output-available" &&
+                          p.output
+                      );
+                      const recommendationsIndex = message.parts?.findIndex(
+                        (p) => p.type === "tool-getRecommendations"
+                      ) ?? -1;
+
+                      // Check if there's a successful requestFeedback tool call
+                      // If so, we'll skip text parts that come after it (they duplicate the message)
+                      const hasSuccessfulFeedback = message.parts?.some(
+                        (p) => p.type === "tool-requestFeedback" &&
+                          p.state === "output-available" &&
+                          (p.output as FeedbackToolOutput | undefined)?.success
+                      );
+                      const feedbackIndex = message.parts?.findIndex(
+                        (p) => p.type === "tool-requestFeedback"
+                      ) ?? -1;
 
                       return message.parts?.map((part, i) => {
                         switch (part.type) {
                           case "text":
                             // Skip text parts that come after a successful recommendations tool
                             // (they duplicate the intro/followUp that's already in the tool output)
-                            // if (hasSuccessfulRecommendations && i > recommendationsIndex) {
-                            //   return null;
-                            // }
+                            if (hasSuccessfulRecommendations && i > recommendationsIndex) {
+                              return null;
+                            }
+                            // Skip text parts that come after a successful feedback tool
+                            // (they duplicate the message that's already in the tool output)
+                            if (hasSuccessfulFeedback && i > feedbackIndex) {
+                              return null;
+                            }
                             return (
                               <MessageResponse key={`${message.id}-${i}`}>
                                 {part.text}
@@ -128,29 +137,18 @@ export function Chat({ onMessagesChange }: ChatProps) {
                             // Show progressive loading states from generator
                             if (output?.status === 'loading') {
                               return (
-                                <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                  <ToolHeader type={part.type} state={part.state} />
-                                  <ToolContent>
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                      <span className="animate-pulse">●</span>
-                                      <span>{output.message}</span>
-                                    </div>
-                                  </ToolContent>
-                                </Tool>
+                                <div key={part.toolCallId || `${message.id}-${i}`} className="flex items-center gap-2 text-muted-foreground py-2">
+                                  <Loader size={16} />
+                                </div>
                               );
                             }
 
                             // Show error state
                             if (output?.status === 'error') {
                               return (
-                                <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                  <ToolHeader type={part.type} state="output-error" />
-                                  <ToolContent>
-                                    <div className="text-destructive">
-                                      {output.error || 'Error generando recomendaciones'}
-                                    </div>
-                                  </ToolContent>
-                                </Tool>
+                                <div key={part.toolCallId || `${message.id}-${i}`} className="text-destructive py-2">
+                                  {output.error || 'Error generando recomendaciones'}
+                                </div>
                               );
                             }
 
@@ -158,6 +156,12 @@ export function Chat({ onMessagesChange }: ChatProps) {
                             if (part.state === "output-available" && output?.status === 'success') {
                               return (
                                 <div key={part.toolCallId || `${message.id}-${i}`} className="space-y-4">
+                                  {/* More people suggestion */}
+                                  {output.morePeopleSuggestion && (
+                                    <MessageResponse>
+                                      {output.morePeopleSuggestion}
+                                    </MessageResponse>
+                                  )}
                                   {/* Intro message */}
                                   {output.introMessage && (
                                     <MessageResponse>
@@ -180,14 +184,47 @@ export function Chat({ onMessagesChange }: ChatProps) {
 
                             // Fallback: Show generic loading state while tool is initializing
                             return (
-                              <Tool key={part.toolCallId || `${message.id}-${i}`}>
-                                <ToolHeader type={part.type} state={part.state} />
-                                <ToolContent>
-                                  <ToolInput input={part.input} />
-                                </ToolContent>
-                              </Tool>
+                              <div key={part.toolCallId || `${message.id}-${i}`} className="flex items-center gap-2 text-muted-foreground py-2">
+                                <Loader size={16} />
+                              </div>
                             );
                           }
+
+                          case "tool-requestFeedback": {
+                            const output = part.output as FeedbackToolOutput | undefined;
+
+                            // Show feedback form when tool succeeds
+                            if (part.state === "output-available" && output?.success && output.showFeedbackForm) {
+                              return (
+                                <div key={part.toolCallId || `${message.id}-${i}`} className="space-y-4">
+                                  {/* Context message from LLM */}
+                                  {output.message && (
+                                    <MessageResponse>
+                                      {output.message}
+                                    </MessageResponse>
+                                  )}
+                                  {/* Feedback form */}
+                                  <FeedbackForm
+                                    messageId={message.id}
+                                    recommendationIds={output.context?.recommendationIds}
+                                    userSentiment={output.context?.userSentiment}
+                                    chatLogs={messages}
+                                    onSubmitSuccess={() => {
+                                      console.log('[Chat] Feedback submitted successfully');
+                                    }}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            // Fallback: Show generic loading state
+                            return (
+                              <div key={part.toolCallId || `${message.id}-${i}`} className="flex items-center gap-2 text-muted-foreground py-2">
+                                <Loader size={16} />
+                              </div>
+                            );
+                          }
+
                           default:
                             return null;
                         }
@@ -206,8 +243,6 @@ export function Chat({ onMessagesChange }: ChatProps) {
       <div>
         <div className="max-w-3xl mx-auto">
           <ChatInputBar
-            input={input}
-            setInput={setInput}
             isLoading={isLoading}
             messageCount={messages.length}
             onSubmit={handleSubmit}

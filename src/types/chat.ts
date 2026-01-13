@@ -1,4 +1,5 @@
 import type { Experience } from '@/types/experience';
+import type { UIMessage } from 'ai';
 
 export interface AudioVisualizerData {
   volume: number;
@@ -31,12 +32,16 @@ export interface CarouselExperience {
 }
 
 export interface FeedbackData {
-  email: string;
-  likedRecommendations: boolean;
+  email?: string;
+  fullname?: string;
+  instagram?: string;
+  likedRecommendations?: boolean;
   comment?: string;
   recommendationIds: string[];
   messageId: string;
   sessionId?: string;
+  chatLogs?: UIMessage[];
+  isOmitted?: boolean;
 }
 
 export interface FeedbackSubmissionResponse {
