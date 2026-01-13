@@ -230,6 +230,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
                                     messageId={message.id}
                                     recommendationIds={output.context?.recommendationIds}
                                     userSentiment={output.context?.userSentiment}
+                                    chatLogs={messages}
                                     onSubmitSuccess={() => {
                                       console.log('[Chat] Feedback submitted successfully');
                                     }}

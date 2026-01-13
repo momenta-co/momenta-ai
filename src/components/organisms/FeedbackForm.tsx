@@ -4,12 +4,14 @@ import type { FeedbackData, FeedbackSubmissionResponse } from '@/types/chat';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import type { UIMessage } from 'ai';
 
 interface FeedbackFormProps {
   messageId: string;
   recommendationIds?: string[];
   userSentiment?: 'positive' | 'negative' | 'neutral';
   onSubmitSuccess?: () => void;
+  chatLogs?: UIMessage[];
 }
 
 export default function FeedbackForm({
@@ -17,6 +19,7 @@ export default function FeedbackForm({
   recommendationIds = [],
   userSentiment,
   onSubmitSuccess,
+  chatLogs = [],
 }: FeedbackFormProps) {
   // State
   const [fullname, setFullname] = useState('');
@@ -95,6 +98,7 @@ export default function FeedbackForm({
       recommendationIds,
       messageId,
       sessionId: typeof window !== 'undefined' ? window.sessionStorage.getItem('session_id') || undefined : undefined,
+      chatLogs: chatLogs.length > 0 ? chatLogs : undefined,
     };
 
     try {
@@ -139,7 +143,7 @@ export default function FeedbackForm({
 
   // WhatsApp link helper
   const getWhatsAppLink = () => {
-    const phoneNumber = '573112138496';
+    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER || '573112138496';
 
     let message = 'Hola! Me gustaría continuar con la reserva para estas experiencias:\n\n';
 

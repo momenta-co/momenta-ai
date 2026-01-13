@@ -1,4 +1,5 @@
 import type { Experience } from '@/types/experience';
+import type { UIMessage } from 'ai';
 
 export interface AudioVisualizerData {
   volume: number;
@@ -39,6 +40,7 @@ export interface FeedbackData {
   recommendationIds: string[];
   messageId: string;
   sessionId?: string;
+  chatLogs?: UIMessage[];
 }
 
 export interface FeedbackSubmissionResponse {

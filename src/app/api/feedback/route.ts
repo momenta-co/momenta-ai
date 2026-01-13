@@ -17,6 +17,7 @@ const feedbackSchema = z.object({
   recommendationIds: z.array(z.string()),
   messageId: z.string(),
   sessionId: z.string().optional(),
+  chatLogs: z.array(z.any()).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, fullname, instagram, likedRecommendations, comment, recommendationIds, messageId } = validation.data;
+    const { email, fullname, instagram, likedRecommendations, comment, recommendationIds, messageId, chatLogs } = validation.data;
 
     // Check for duplicate submission (same email + messageId within last 10 minutes)
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
@@ -82,8 +83,9 @@ export async function POST(request: NextRequest) {
         liked_recommendations: likedRecommendations,
         comments: commentWithMetadata,
         ip,
-        user_id: null, // No authentication yet
-        recommendation_run_id: null, // Optional linkage
+        chat_logs: chatLogs || {},
+        user_id: null,
+        recommendation_run_id: null,
       },
     });
 

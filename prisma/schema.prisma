@@ -57,6 +57,7 @@ model beta_feedback {
   ip                    String?
   fullname              String?
   instagram_handle      String?
+  chat_logs             Json?
   recommendation_runs   recommendation_runs? @relation(fields: [recommendation_run_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([created_at], map: "idx_beta_feedback_created")
