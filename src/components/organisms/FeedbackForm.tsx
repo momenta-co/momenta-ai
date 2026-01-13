@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, X, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import type { FeedbackData, FeedbackSubmissionResponse } from '@/types/chat';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface FeedbackFormProps {
   messageId: string;
@@ -22,11 +22,15 @@ export default function FeedbackForm({
   const [fullname, setFullname] = useState('');
   const [instagram, setInstagram] = useState('');
   const [email, setEmail] = useState('');
+  const [submittedData, setSubmittedData] = useState<{
+    fullname: string;
+    email: string;
+    instagram?: string;
+  } | null>(null);
   const [thumbsSelection, setThumbsSelection] = useState<'up' | 'down' | null>(null);
   const [comment, setComment] = useState('');
-  const [submissionState, setSubmissionState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [submissionState, setSubmissionState] = useState<'idle' | 'loading' | 'success' | 'error' | 'omitted'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isDismissed, setIsDismissed] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [fullnameError, setFullnameError] = useState<string | null>(null);
 
@@ -107,15 +111,17 @@ export default function FeedbackForm({
       if (response.ok && result.success) {
         setSubmissionState('success');
 
+        // Save submitted data for WhatsApp message
+        setSubmittedData({
+          fullname: fullname.trim(),
+          email: email.trim(),
+          instagram: instagram.trim() || undefined,
+        });
+
         // Call success callback
         if (onSubmitSuccess) {
           onSubmitSuccess();
         }
-
-        // Auto-hide after 2 seconds
-        setTimeout(() => {
-          setIsDismissed(true);
-        }, 2000);
       } else {
         setSubmissionState('error');
         setErrorMessage(result.error || 'Error al enviar feedback');
@@ -128,13 +134,30 @@ export default function FeedbackForm({
   };
 
   const handleDismiss = () => {
-    setIsDismissed(true);
+    setSubmissionState('omitted');
   };
 
-  // Don't render if dismissed
-  if (isDismissed) {
-    return null;
-  }
+  // WhatsApp link helper
+  const getWhatsAppLink = () => {
+    const phoneNumber = '573112138496';
+
+    let message = 'Hola! Me gustaría continuar con la reserva para estas experiencias:\n\n';
+
+    // Add recommendation IDs
+    if (recommendationIds.length > 0) {
+      message += `Experiencia${recommendationIds.length > 1 ? 's' : ''} de interés: ${recommendationIds.join(', ')}\n\n`;
+    }
+
+    // Add user data if form was submitted
+    if (submittedData) {
+      message += `Att: ${submittedData.fullname} - ${submittedData.email}`;
+    }
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+
+    return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  };
 
   // Success state
   if (submissionState === 'success') {
@@ -144,7 +167,7 @@ export default function FeedbackForm({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative bg-gradient-to-br from-success-50 to-secondary-50 backdrop-blur-xl rounded-3xl border border-success-200/60 shadow-2xl shadow-success-700/10 p-8 md:p-10 overflow-hidden"
+        className="relative bg-linear-to-br from-success-50 to-secondary-50 backdrop-blur-xl rounded-3xl border border-success-200/60 shadow-2xl shadow-success-700/10 p-8 md:p-10 overflow-hidden"
       >
         {/* Decorative background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -152,60 +175,37 @@ export default function FeedbackForm({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 0.12, scale: 1 }}
             transition={{ duration: 1.2 }}
-            className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-to-br from-success-700 to-secondary-700 blur-3xl"
+            className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-linear-to-br from-success-700 to-secondary-700 blur-3xl"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 0.08, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.2 }}
-            className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-gradient-to-tr from-secondary-700 to-success-700 blur-3xl"
+            className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-linear-to-tr from-secondary-700 to-success-700 blur-3xl"
           />
         </div>
 
         <div className="relative z-10 text-center">
-          {/* Success icon with sparkle animation */}
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-            className="inline-block mb-6 relative"
-          >
-            <CheckCircle2 className="w-16 h-16 text-success-700 mx-auto" strokeWidth={1.5} />
-
-            {/* Floating sparkles */}
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{
-                  opacity: [0, 1, 0],
-                  scale: [0, 1, 0],
-                  x: [0, Math.cos(i * 60 * Math.PI / 180) * 50],
-                  y: [0, Math.sin(i * 60 * Math.PI / 180) * 50],
-                }}
-                transition={{
-                  delay: 0.4 + i * 0.1,
-                  duration: 1.2,
-                  ease: 'easeOut'
-                }}
-                className="absolute top-1/2 left-1/2"
-              >
-                <Sparkles className="w-4 h-4 text-secondary-700" fill="currentColor" />
-              </motion.div>
-            ))}
-          </motion.div>
-
           {/* Success message */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
           >
-            <h3 className="font-serif text-2xl md:text-3xl text-neutral-900 mb-2 leading-tight">
-              ¡Gracias!
+            <h3 className="font-serif text-2xl md:text-3xl text-neutral-900 mb-4 leading-tight">
+              ¡Gracias por toda la info - Nos ayudas un montón!
             </h3>
-            <p className="font-sans text-base md:text-lg text-success-800">
-              Ya estás participando en el sorteo 🎉
+            <p className="font-sans text-base md:text-lg text-success-800 leading-relaxed">
+              Anunciaremos al ganador del giveaway de la experiencia el 21 de enero por IG! Si quieres continuar con la reserva,{' '}
+              <a
+                href={getWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-medium hover:text-success-900 transition-colors"
+              >
+                dale clic a este link
+              </a>{' '}
+              y Marce te ayudará a confirmarla.
             </p>
           </motion.div>
 
@@ -214,7 +214,60 @@ export default function FeedbackForm({
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            className="w-16 h-1 bg-gradient-to-r from-secondary-700 to-secondary-900 mx-auto mt-6 rounded-full"
+            className="w-16 h-1 bg-linear-to-r from-secondary-700 to-secondary-900 mx-auto mt-6 rounded-full"
+          />
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Omitted state
+  if (submissionState === 'omitted') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="relative bg-linear-to-br from-neutral-50 to-neutral-100 backdrop-blur-xl rounded-3xl border border-neutral-200/60 shadow-2xl shadow-neutral-700/10 p-8 md:p-10 overflow-hidden"
+      >
+        {/* Decorative background glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 0.12, scale: 1 }}
+            transition={{ duration: 1.2 }}
+            className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-linear-to-br from-neutral-700 to-neutral-500 blur-3xl"
+          />
+        </div>
+
+        <div className="relative z-10 text-center">
+          {/* Message */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            <p className="font-sans text-base md:text-lg text-neutral-800 leading-relaxed">
+              Si quieres continuar con la reserva,{' '}
+              <a
+                href={getWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-medium hover:text-neutral-900 transition-colors"
+              >
+                dale clic a este link
+              </a>{' '}
+              y Marce te ayudará a confirmarla.
+            </p>
+          </motion.div>
+
+          {/* Decorative accent line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="w-16 h-1 bg-linear-to-r from-neutral-700 to-neutral-900 mx-auto mt-6 rounded-full"
           />
         </div>
       </motion.div>
