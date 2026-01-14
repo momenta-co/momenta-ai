@@ -5,8 +5,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { Chat } from '../templates/Chat';
 
-export const Hero = () => {
+interface HeroProps {
+  onMessagesChange?: (messageCount: number) => void;
+}
+
+export const Hero = ({ onMessagesChange }: HeroProps) => {
   const [messageCount, setMessageCount] = useState(0);
+
+  const handleMessagesChange = (count: number) => {
+    setMessageCount(count);
+    onMessagesChange?.(count);
+  };
 
   return (
     <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
@@ -26,7 +35,7 @@ export const Hero = () => {
             }}
             transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            <Chat onMessagesChange={setMessageCount} />
+            <Chat onMessagesChange={handleMessagesChange} />
           </motion.div>
 
           {/* Right Column - Featured Experience Carousel */}
