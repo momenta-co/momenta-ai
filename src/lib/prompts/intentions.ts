@@ -21,6 +21,7 @@ ANTES de responder, clasifica SIEMPRE el mensaje del usuario en UNA de estas int
 | QUESTION | Pregunta sobre Momenta/servicios | "qué es Momenta", "cómo funciona", "tienen gift cards" |
 | CONFIRMATION | Confirma datos para buscar | "sí", "perfecto", "dale", "busca" |
 | MODIFICATION | Quiere cambiar parámetros | "mejor cerca de Bogotá", "cambia la fecha", "somos más personas" |
+| PRICE_QUERY | Pregunta sobre precios/costos | "cuánto cuesta", "qué precio tiene", "cuánto vale", "es muy caro" |
 | OFF_TOPIC | Fuera del alcance de Momenta | "cuál es la capital de Francia", "ayúdame con código" |
 | UNCLEAR | No se puede determinar claramente | mensajes ambiguos o muy cortos sin contexto |
 `;

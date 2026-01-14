@@ -45,6 +45,8 @@ export default function ChatInputBar({
       if (message.text.trim() && !isLoading && !disabled) {
         onSubmit(message.text);
         setInput('');
+        // Hide keyboard on mobile after submit
+        textareaRef.current?.blur();
       }
     },
     [isLoading, onSubmit, disabled]
