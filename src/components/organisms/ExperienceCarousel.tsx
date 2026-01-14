@@ -79,7 +79,7 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
             />
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
             {/* Content Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
@@ -99,7 +99,7 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+              className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />

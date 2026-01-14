@@ -49,7 +49,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
   return (
     <>
       <Conversation>
-        <ConversationContent className="h-full w-full p-0">
+        <ConversationContent>
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-between flex-1">
               {/* Title */}
