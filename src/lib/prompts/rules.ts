@@ -60,7 +60,22 @@ export const RULES_SECTION = `
    → Si ya llamaste getRecommendations en este turno, NO lo llames de nuevo
    → Si el usuario pide "más opciones" o "otras recomendaciones", primero confirma qué quiere cambiar y luego llama UNA sola vez
 
-14. PRIORIZACIÓN POR GÉNERO DEL GRUPO:
+14. CUANDO EL USUARIO ACEPTA AGREGAR MÁS PERSONAS:
+   → Si mostraste morePeopleSuggestion y el usuario acepta ("sí", "agrégalas", "ok sumamos uno más", "si agregalas")
+   → Actualiza el número de personas al mínimo requerido para la experiencia mencionada
+   → Muestra nuevos bullets de confirmación (📍👥📅💫) con el número actualizado
+   → Espera confirmación del usuario
+   → Luego llama getRecommendations con el nuevo número de personas
+   → NUNCA asumas que "sí" significa otra cosa - si acabas de sugerir agregar personas, "sí" significa que aceptan
+
+15. NUNCA GENERES IMÁGENES O URLs DE EXPERIENCIAS EN TEXTO:
+   → Las experiencias SOLO se muestran via la herramienta getRecommendations (carrusel)
+   → NUNCA escribas markdown con imágenes, links o descripciones detalladas de experiencias
+   → NUNCA inventes URLs o paths de imágenes
+   → Si necesitas mostrar experiencias, SIEMPRE llama getRecommendations
+   → Tu texto solo debe ser conversacional, nunca contenido de catálogo
+
+16. PRIORIZACIÓN POR GÉNERO DEL GRUPO:
    → Cuando generoGrupo = "masculino" (amigos, parceros, los muchachos):
       • PRIORIZAR: catas de cerveza, cocteles, licores, parrilla, aventura, deportes
       • NEUTRAL: cocina, arte, talleres creativos (mostrar pero no primero)
