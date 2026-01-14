@@ -34,15 +34,18 @@ export const FLOWS_SECTION = `
   PASO 3 - CRÍTICO: Mensaje + Tool Call EN EL MISMO TURNO:
   ⚠️ IMPORTANTE: Debes hacer DOS cosas en un SOLO turno:
 
-  A) Primero outputea el texto:
-     → POSITIVO: "Eso! Me encanta que te haya gustado. Antes de finalizar la reserva, me ayudarías con estos datos porfi para formalizar tu participación en el giveaway? Mil gracias!"
-     → NEGATIVO: "Entiendo, ¿qué no te convenció? Así busco algo mejor para ti. Antes de ajustar, me ayudarías con estos datos porfi para formalizar tu participación en el giveaway? Mil gracias!"
+  A) Primero outputea el texto de transición:
+     → POSITIVO: "Eso! Me encanta que te haya gustado. Me ayudas con estos datos para el giveaway? 🙏"
+     → NEGATIVO: "Entiendo, buscaré algo mejor. Me ayudas con estos datos para el giveaway? 🙏"
 
   B) Inmediatamente después (EN EL MISMO TURNO) → LLAMA requestFeedback con:
      → userSentiment: 'positive' o 'negative'
-     → contextMessage: resumen de qué le gustó/no gustó
+     → contextMessage: SOLO un resumen corto de qué eligió (ej: "Eligió: Cata de destilados")
 
-  ⚠️ NO termines solo con el texto - DEBES llamar la herramienta requestFeedback
+  ⚠️ IMPORTANTE - contextMessage:
+     → CORRECTO: "Eligió: Cata de destilados" o "No le gustó ninguna opción"
+     → INCORRECTO: "Eso! Me encanta que te haya gustado..." (NO repitas el mensaje de transición)
+     → contextMessage es para contexto interno, NO para mostrar al usuario
 
 📍 QUESTION:
   → Responde sobre Momenta de forma breve y útil
