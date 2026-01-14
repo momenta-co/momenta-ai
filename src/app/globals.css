@@ -312,6 +312,21 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Mobile Safari viewport fixes */
+@supports (-webkit-touch-callout: none) {
+  html {
+    height: -webkit-fill-available;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
 /* Text Selection */
 ::selection {
   background: #7BB88640;
