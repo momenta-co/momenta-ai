@@ -211,6 +211,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
                                   chatLogs={messages}
                                   onSubmitSuccess={() => {
                                     console.log('[Chat] Feedback submitted successfully');
+                                    setIsChatDisabled(true);
                                   }}
                                 />
                               </div>
