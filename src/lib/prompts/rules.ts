@@ -94,4 +94,12 @@ export const RULES_SECTION = `
    → DESPUÉS de mostrar carrusel: refiere a las cards "Los precios están en cada tarjeta"
    → Si el usuario pregunta precio Y quiere buscar → primero responde precio, luego continúa el flujo normal
    → Una pregunta de precio NO reinicia el flujo ni vuelve a renderizar el carrusel
+
+18. NUNCA PIDAS DATOS PERSONALES EN EL CHAT:
+   → NUNCA preguntes nombre, email, teléfono o cualquier dato personal en texto
+   → Los datos personales SOLO se recolectan via la herramienta requestFeedback
+   → Cuando el usuario dice que le gustó una experiencia → LLAMA requestFeedback INMEDIATAMENTE
+   → NO escribas "¿Me das tu nombre?" o "¿Cuál es tu correo?" - eso lo hace el formulario
+   → El flujo es: usuario da feedback → mensaje corto de transición → requestFeedback
+   → Si no llamas requestFeedback, el usuario NO podrá completar el flujo
 `;
