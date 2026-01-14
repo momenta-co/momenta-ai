@@ -93,14 +93,14 @@ export function Categories() {
   const category = categories[activeCategory];
 
   return (
-    <section className="py-24 bg-sage-light/20">
+    <section className="py-24 bg-primary/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="text-sage text-sm font-medium uppercase tracking-wider">
+          <span className="text-primary text-sm font-medium uppercase tracking-wider">
             Categorías
           </span>
-          <h2 className="mt-2 font-serif text-3xl md:text-4xl lg:text-5xl text-charcoal">
+          <h2 className="mt-2 font-serif text-3xl md:text-4xl lg:text-5xl text-foreground">
             Encuentra tu experiencia ideal
           </h2>
         </div>
@@ -112,19 +112,19 @@ export function Categories() {
               key={cat.id}
               onClick={() => handleCategoryClick(index)}
               className={cn(
-                "relative flex items-center gap-2 px-6 py-3 rounded-full transition-all",
+                "relative flex items-center gap-2 px-6 py-3 rounded-full transition-all cursor-pointer",
                 activeCategory === index
-                  ? "bg-charcoal text-cream"
-                  : "bg-white text-charcoal/70 hover:bg-charcoal/10"
+                  ? "bg-foreground text-white"
+                  : "bg-white text-foreground/70 hover:bg-foreground/10"
               )}
             >
               <cat.icon className="h-5 w-5" />
               <span className="font-medium">{cat.name}</span>
               {/* Progress Ring */}
               {activeCategory === index && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1 bg-charcoal/20 rounded-full overflow-hidden">
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-1 bg-foreground/20 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-sage transition-all duration-100"
+                    className="h-full bg-primary transition-all duration-100"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -147,13 +147,13 @@ export function Categories() {
               className="object-cover transition-all duration-500"
               unoptimized
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-foreground/60 to-transparent" />
             {/* Tags */}
             <div className="absolute bottom-6 left-6 right-6 flex flex-wrap gap-2">
               {category.experiences.map((exp) => (
                 <span
                   key={exp}
-                  className="bg-cream/90 text-charcoal px-3 py-1 rounded-full text-sm"
+                  className="bg-white/90 text-foreground px-3 py-1 rounded-full text-sm"
                 >
                   {exp}
                 </span>
@@ -164,19 +164,19 @@ export function Categories() {
           {/* Description */}
           <div>
             <div className="inline-flex items-center gap-2 mb-4">
-              <category.icon className="h-8 w-8 text-sage" />
-              <span className="text-sage font-medium">{category.name}</span>
+              <category.icon className="h-8 w-8 text-primary" />
+              <span className="text-primary font-medium">{category.name}</span>
             </div>
-            <h3 className="font-serif text-3xl md:text-4xl text-charcoal leading-tight">
+            <h3 className="font-serif text-3xl md:text-4xl text-foreground leading-tight">
               {category.description}
             </h3>
-            <p className="mt-6 text-charcoal/60 text-lg">
+            <p className="mt-6 text-foreground/60 text-lg">
               Explora nuestra colección de experiencias {category.name.toLowerCase()}
               diseñadas para crear momentos únicos e inolvidables.
             </p>
             <Button
               asChild
-              className="mt-8 bg-sage hover:bg-sage/90 text-white rounded-full px-8"
+              className="mt-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8"
             >
               <Link href={`/experiencias?cat=${category.id}`}>
                 Ver experiencias

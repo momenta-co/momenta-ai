@@ -4,7 +4,7 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 
 export function CTA() {
   return (
-    <section className="py-24 bg-sage relative overflow-hidden">
+    <section className="py-24 bg-primary relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -24,7 +24,7 @@ export function CTA() {
           <Button
             asChild
             size="lg"
-            className="bg-charcoal text-white hover:bg-charcoal/90 rounded-full px-8 h-14 text-lg"
+            className="bg-sidebar text-white hover:bg-sidebar/90 rounded-full px-8 h-14 text-lg"
           >
             <Link href="/experiencias">
               Explorar Experiencias
@@ -35,7 +35,7 @@ export function CTA() {
             asChild
             size="lg"
             variant="outline"
-            className="border-charcoal/60 text-charcoal bg-white/90 hover:bg-white rounded-full px-8 h-14 text-lg"
+            className="border-foreground/60 text-foreground bg-white/90 hover:bg-white rounded-full px-8 h-14 text-lg"
           >
             <a
               href="https://wa.me/573001234567?text=Hola,%20me%20interesa%20conocer%20más%20sobre%20las%20experiencias%20de%20Momenta"

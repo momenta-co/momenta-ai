@@ -112,6 +112,7 @@ export default function ChatInputBar({
                 'shrink-0 w-11 h-11 rounded-full',
                 'bg-red-100 text-red-600',
                 'flex items-center justify-center',
+                'cursor-pointer',
                 'hover:bg-red-200 hover:scale-105',
                 'transition-all duration-300',
                 'active:scale-95'
@@ -128,6 +129,7 @@ export default function ChatInputBar({
                 'shrink-0 w-11 h-11 rounded-full',
                 'bg-neutral-300/80 text-neutral-600',
                 'flex items-center justify-center',
+                'cursor-pointer',
                 'hover:bg-neutral-400/80 hover:scale-105',
                 'disabled:opacity-30 disabled:cursor-not-allowed',
                 'transition-all duration-300',

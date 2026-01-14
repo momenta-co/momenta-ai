@@ -238,7 +238,7 @@ export default function BetaSignup() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="text-xs text-red-500"
+                  className="text-xs text-destructive"
                 >
                   {error}
                 </motion.p>
@@ -250,15 +250,15 @@ export default function BetaSignup() {
               type="submit"
               disabled={!email || isSubmitting}
               className="
-                w-full text-white rounded-full
+                w-full bg-primary text-primary-foreground rounded-full
                 px-6 py-4 mt-2
                 font-sans text-sm font-medium tracking-widest uppercase
-                transition-colors
+                transition-all duration-300
                 flex items-center justify-center gap-2
-                hover:opacity-90
-                disabled:cursor-not-allowed
+                cursor-pointer
+                hover:bg-primary/90
+                disabled:opacity-50 disabled:cursor-not-allowed
               "
-              style={{ backgroundColor: '#1E3A5F' }}
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

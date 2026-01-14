@@ -1,10 +1,11 @@
 'use client';
 
 import type { FeedbackData, FeedbackSubmissionResponse } from '@/types/chat';
+import type { RecommendationsSuccessOutput } from '@/lib/intelligence/tool-types';
+import type { UIMessage } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import type { UIMessage } from 'ai';
 
 interface FeedbackFormProps {
   messageId: string;
@@ -32,7 +33,7 @@ export default function FeedbackForm({
   } | null>(null);
   const [thumbsSelection, setThumbsSelection] = useState<'up' | 'down' | null>(null);
   const [comment, setComment] = useState('');
-  const [submissionState, setSubmissionState] = useState<'idle' | 'loading' | 'success' | 'error' | 'omitted'>('idle');
+  const [submissionState, setSubmissionState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [fullnameError, setFullnameError] = useState<string | null>(null);
@@ -137,42 +138,52 @@ export default function FeedbackForm({
     }
   };
 
-  const handleDismiss = async () => {
-    // Send chat logs even when form is omitted
-    const feedbackData: FeedbackData = {
-      recommendationIds,
-      messageId,
-      sessionId: typeof window !== 'undefined' ? window.sessionStorage.getItem('session_id') || undefined : undefined,
-      chatLogs: chatLogs.length > 0 ? chatLogs : undefined,
-      isOmitted: true,
-    };
-
-    try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(feedbackData),
-      });
-      // Don't wait for response, just set state
-    } catch (error) {
-      console.error('[FeedbackForm] Error sending omitted chat logs:', error);
-      // Still show omitted state even if API call fails
-    }
-
-    setSubmissionState('omitted');
-  };
 
   // WhatsApp link helper
   const getWhatsAppLink = () => {
     const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER || '573112138496';
 
-    let message = 'Hola! Me gustaría continuar con la reserva para estas experiencias:\n\n';
+    let message = 'Hola! Me gustaría continuar con la reserva en Momenta:\n\n';
 
     // Add recommendation IDs
     if (recommendationIds.length > 0) {
       message += `Experiencia${recommendationIds.length > 1 ? 's' : ''} de interés: ${recommendationIds.join(', ')}\n\n`;
+    }
+
+    // Extract context from tool outputs in chat logs
+    if (chatLogs.length > 0) {
+      // Find the getRecommendations tool output with context
+      const recommendationsPart = chatLogs
+        .flatMap(msg => msg.parts || [])
+        .find((part): part is any =>
+          part.type === 'tool-getRecommendations' &&
+          part.state === 'output-available'
+        );
+
+      if (recommendationsPart?.output) {
+        const output = recommendationsPart.output as RecommendationsSuccessOutput;
+
+        if (output.status === 'success' && output.context) {
+          const context = output.context;
+
+          // Add number of people if available
+          if (context.personas) {
+            message += `Número de personas: ${context.personas}\n`;
+          }
+
+          // Add date if available
+          if (context.fecha) {
+            message += `Fecha: ${context.fecha}\n`;
+          }
+
+          // Add city if available
+          if (context.ciudad) {
+            message += `Ciudad: ${context.ciudad}\n`;
+          }
+
+          message += '\n';
+        }
+      }
     }
 
     // Add user data if form was submitted
@@ -242,59 +253,6 @@ export default function FeedbackForm({
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
             className="w-16 h-1 bg-linear-to-r from-secondary-700 to-secondary-900 mx-auto mt-6 rounded-full"
-          />
-        </div>
-      </motion.div>
-    );
-  }
-
-  // Omitted state
-  if (submissionState === 'omitted') {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative bg-linear-to-br from-neutral-50 to-neutral-100 backdrop-blur-xl rounded-3xl border border-neutral-200/60 shadow-2xl shadow-neutral-700/10 p-8 md:p-10 overflow-hidden"
-      >
-        {/* Decorative background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.12, scale: 1 }}
-            transition={{ duration: 1.2 }}
-            className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-linear-to-br from-neutral-700 to-neutral-500 blur-3xl"
-          />
-        </div>
-
-        <div className="relative z-10 text-center">
-          {/* Message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            <p className="font-sans text-base md:text-lg text-neutral-800 leading-relaxed">
-              Si quieres continuar con la reserva,{' '}
-              <a
-                href={getWhatsAppLink()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline font-medium hover:text-neutral-900 transition-colors"
-              >
-                dale clic a este link
-              </a>{' '}
-              y Marce te ayudará a confirmarla.
-            </p>
-          </motion.div>
-
-          {/* Decorative accent line */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="w-16 h-1 bg-linear-to-r from-neutral-700 to-neutral-900 mx-auto mt-6 rounded-full"
           />
         </div>
       </motion.div>
@@ -391,8 +349,7 @@ export default function FeedbackForm({
                 htmlFor="instagram"
                 className="block font-sans text-sm font-medium text-neutral-800 tracking-wide uppercase"
               >
-                Usuario de Instagram{' '}
-                <span className="text-neutral-500 font-normal lowercase">(opcional)</span>
+                Usuario de Instagram
               </label>
               <input
                 type="text"
@@ -462,7 +419,7 @@ export default function FeedbackForm({
           <div className="flex flex-col gap-6 md:gap-2 max-h-full">
             {/* Thumbs selection */}
             <motion.div
-              className='flex-col gap-2 md:flex-row md:justify-between items-center'
+              className='flex flex-col gap-2 md:flex-row md:justify-between items-center'
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
@@ -482,7 +439,7 @@ export default function FeedbackForm({
                         w-20 h-20 rounded-full flex items-center justify-center cursor-pointer
                         transition-all duration-300 relative overflow-hidden
                         ${thumbsSelection === 'up'
-                        ? 'bg-linear-to-br from-secondary-600 to-secondary-800 text-white shadow-xl shadow-secondary-700/40'
+                        ? 'bg-linear-to-br from-secondary-600 to-primary-700 text-white shadow-xl shadow-secondary-700/40'
                         : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 border-2 border-neutral-200'
                       }
                       `}
@@ -544,8 +501,7 @@ export default function FeedbackForm({
                 htmlFor="comment"
                 className="block font-sans text-sm font-medium text-neutral-800 tracking-wide uppercase"
               >
-                Cualquier feedback adicional que nos ayude a mejorar ❤️{' '}
-                <span className="text-neutral-500 font-normal lowercase">(opcional)</span>
+                Cualquier feedback adicional que nos ayude a mejorar ❤️
               </label>
               <textarea
                 id="comment"
@@ -585,34 +541,13 @@ export default function FeedbackForm({
           )}
         </AnimatePresence>
 
-        {/* Submit and Omit buttons */}
+        {/* Submit button */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="mt-4 flex justify-between items-center"
+          className="mt-4 flex justify-end"
         >
-          {/* Omit button */}
-          <motion.button
-            type="button"
-            onClick={handleDismiss}
-            disabled={submissionState === 'loading'}
-            whileHover={{ scale: submissionState === 'loading' ? 1 : 1.02 }}
-            whileTap={{ scale: submissionState === 'loading' ? 1 : 0.98 }}
-            className={`
-                text-neutral-600 rounded-full px-4 py-2
-                font-sans text-sm font-medium
-                transition-all duration-300
-                ${submissionState === 'loading'
-                ? 'opacity-50 cursor-not-allowed'
-                : 'hover:text-neutral-800 hover:bg-neutral-100'
-              }
-              `}
-          >
-            Omitir
-          </motion.button>
-
-          {/* Submit button */}
           <motion.button
             type="submit"
             disabled={!fullname || !email || !thumbsSelection || submissionState === 'loading'}
@@ -624,6 +559,7 @@ export default function FeedbackForm({
                 shadow-lg shadow-primary-700/30
                 transition-all duration-300
                 flex items-center justify-center gap-3
+                cursor-pointer
                 ${(!fullname || !email || !thumbsSelection || submissionState === 'loading')
                 ? 'opacity-50 cursor-not-allowed'
                 : 'hover:bg-primary-800 hover:shadow-xl hover:shadow-primary-700/40'
@@ -637,7 +573,7 @@ export default function FeedbackForm({
               </>
             ) : (
               <>
-                <span>Enviar feedback</span>
+                <span>Enviar</span>
                 <motion.div
                   animate={{ x: [0, 4, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}

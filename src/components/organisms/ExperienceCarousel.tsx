@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
 import type { CarouselExperience } from '@/types/chat';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { memo, useEffect, useState } from 'react';
 
 const carouselExperiences: CarouselExperience[] = [
   {
@@ -79,10 +79,10 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
             />
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
             {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+            <div className="absolute bottom-0 left-0 right-0 p-10 text-white tracking-tighter">
               <h2 className="text-[32px] font-serif font-normal mb-0 leading-tight">
                 {experience.title}
               </h2>
@@ -99,7 +99,7 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
+              className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${index === currentSlide ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />

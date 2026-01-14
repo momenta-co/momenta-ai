@@ -36,7 +36,7 @@ export function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out",
         isScrolled
-          ? "bg-cream/95 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.04)]"
+          ? "bg-background/95 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.04)]"
           : "bg-transparent"
       )}
     >
@@ -47,10 +47,10 @@ export function Navbar() {
           <div className="flex items-center justify-start">
             <a
               href="/experiencias"
-              className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
+              className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
             >
               Experiencias
-              <span className="absolute -bottom-1 left-0 w-0 bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 ease-out" />
             </a>
           </div>
 
@@ -77,10 +77,10 @@ export function Navbar() {
           <div className="flex items-center justify-end">
             <Link
               href="/login"
-              className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-charcoal/70 hover:text-charcoal transition-colors duration-300"
+              className="group relative text-[13px] font-medium tracking-[0.12em] uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
             >
               Waiting List
-              <span className="absolute -bottom-1 left-0 w-0 bg-sage-dark group-hover:w-full transition-all duration-300 ease-out" />
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 ease-out" />
             </Link>
           </div>
         </div>
@@ -104,7 +104,7 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-charcoal w-9 h-9">
+                <Button variant="ghost" size="icon" className="text-foreground w-9 h-9">
                   <Menu className="h-5 w-5" strokeWidth={1.5} />
                   <span className="sr-only">Menú</span>
                 </Button>
@@ -112,7 +112,7 @@ export function Navbar() {
               <SheetTitle className="hidden">
                 Momenta Menú
               </SheetTitle>
-              <SheetContent side="left" className="bg-cream w-full sm:max-w-sm border-l border-sage/10">
+              <SheetContent side="left" className="bg-background w-full sm:max-w-sm border-l border-primary/10">
                 <div className="flex flex-col h-full pt-8">
                   {/* Mobile Menu Logo */}
                   <Link
@@ -140,7 +140,7 @@ export function Navbar() {
                         key={item.name}
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className="text-md font-medium tracking-wide uppercase text-charcoal/70"
+                        className="text-md font-medium tracking-wide uppercase text-foreground/70 hover:text-foreground transition-colors"
                         style={{
                           animationDelay: `${(index + 1) * 50}ms`,
                         }}

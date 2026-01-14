@@ -75,7 +75,7 @@ export const QueueItemContent = ({
 }: QueueItemContentProps) => (
   <span
     className={cn(
-      "line-clamp-1 grow break-words",
+      "line-clamp-1 grow wrap-break-word",
       completed
         ? "text-muted-foreground/50 line-through"
         : "text-muted-foreground",
@@ -215,7 +215,7 @@ export const QueueSectionTrigger = ({
   <CollapsibleTrigger asChild>
     <button
       className={cn(
-        "group flex w-full items-center justify-between rounded-md bg-muted/40 px-3 py-2 text-left font-medium text-muted-foreground text-sm transition-colors hover:bg-muted",
+        "group flex w-full items-center justify-between rounded-md bg-muted/40 px-3 py-2 text-left font-medium text-muted-foreground text-sm transition-colors cursor-pointer hover:bg-muted",
         className
       )}
       type="button"

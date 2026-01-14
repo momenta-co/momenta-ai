@@ -26,7 +26,7 @@ const values = [
 
 export function About() {
   return (
-    <section className="py-24 bg-charcoal">
+    <section className="py-24 bg-sidebar">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
@@ -40,31 +40,31 @@ export function About() {
               />
             </div>
             {/* Floating Card */}
-            <div className="absolute -bottom-8 -right-8 bg-cream p-6 rounded-xl shadow-xl max-w-[280px]">
-              <p className="font-serif text-2xl text-charcoal italic">
+            <div className="absolute -bottom-8 -right-8 bg-white p-6 rounded-xl shadow-xl max-w-[280px]">
+              <p className="font-serif text-2xl text-foreground italic">
                 &quot;Because when an experience is felt, it&apos;s remembered.&quot;
               </p>
               <div className="mt-4 flex items-center gap-2">
-                <div className="w-8 h-0.5 bg-sage" />
-                <span className="text-sm text-charcoal/60">Momenta</span>
+                <div className="w-8 h-0.5 bg-primary" />
+                <span className="text-sm text-foreground/60">Momenta</span>
               </div>
             </div>
           </div>
 
           {/* Content */}
           <div>
-            <span className="text-sage text-sm font-medium uppercase tracking-wider">
+            <span className="text-primary text-sm font-medium uppercase tracking-wider">
               Sobre Nosotros
             </span>
-            <h2 className="mt-4 font-serif text-3xl md:text-4xl lg:text-5xl text-cream leading-tight">
+            <h2 className="mt-4 font-serif text-3xl md:text-4xl lg:text-5xl text-white leading-tight">
               Creemos en el arte de conectar con propósito
             </h2>
-            <p className="mt-6 text-sage-light/80 text-lg leading-relaxed">
+            <p className="mt-6 text-secondary/80 text-lg leading-relaxed">
               En Momenta, cada detalle es una declaración de intención.
               Nos inspira una estética atemporal, una elegancia silenciosa y una
               forma de crear que privilegia lo esencial sobre lo excesivo.
             </p>
-            <p className="mt-4 text-sage-light/80 leading-relaxed">
+            <p className="mt-4 text-secondary/80 leading-relaxed">
               No buscamos llamar la atención, sino dejar una impresión duradera.
               Somos tu aliado para transformar momentos ordinarios en recuerdos
               extraordinarios.
@@ -74,14 +74,14 @@ export function About() {
             <div className="mt-10 space-y-6">
               {values.map((value) => (
                 <div key={value.title} className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-sage/20 flex items-center justify-center">
-                    <value.icon className="h-6 w-6 text-sage" />
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                    <value.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-serif text-lg text-cream">
+                    <h4 className="font-serif text-lg text-white">
                       {value.title}
                     </h4>
-                    <p className="mt-1 text-sage-light/60 text-sm">
+                    <p className="mt-1 text-secondary/60 text-sm">
                       {value.description}
                     </p>
                   </div>
@@ -91,7 +91,7 @@ export function About() {
 
             <Button
               asChild
-              className="mt-10 bg-sage hover:bg-sage/90 text-white rounded-full px-8"
+              className="mt-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8"
             >
               <Link href="/nosotros">
                 Conocer más
