@@ -1,15 +1,38 @@
 'use client';
 
 import ExperienceCarousel from '@/components/organisms/ExperienceCarousel';
+import BetaWelcomeModal from '@/components/organisms/BetaWelcomeModal';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Chat } from '../templates/Chat';
+
+const BETA_MODAL_KEY = 'momenta_beta_welcome_seen';
 
 export const Hero = () => {
   const [messageCount, setMessageCount] = useState(0);
+  const [showBetaModal, setShowBetaModal] = useState(false);
+
+  useEffect(() => {
+    // Check if user has already seen the modal
+    const hasSeenModal = localStorage.getItem(BETA_MODAL_KEY);
+    if (!hasSeenModal) {
+      setShowBetaModal(true);
+    }
+  }, []);
+
+  const handleCloseBetaModal = () => {
+    localStorage.setItem(BETA_MODAL_KEY, 'true');
+    setShowBetaModal(false);
+  };
 
   return (
-    <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
+    <>
+      {/* Beta Welcome Modal */}
+      {showBetaModal && (
+        <BetaWelcomeModal onClose={handleCloseBetaModal} />
+      )}
+
+      <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
       <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8 overflow-hidden">
         <motion.div
           className="flex flex-col lg:flex-row w-full h-full"
@@ -46,5 +69,6 @@ export const Hero = () => {
         </motion.div>
       </div>
     </section>
+    </>
   );
 }
