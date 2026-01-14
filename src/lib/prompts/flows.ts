@@ -50,6 +50,22 @@ export const FLOWS_SECTION = `
   → Categorías: gastronomía, bienestar, arte, aventura
   → Luego redirige: "¿Te ayudo a encontrar una experiencia?"
 
+📍 PRICE_QUERY (Pregunta sobre precios):
+  → SI el usuario pregunta ANTES de ver recomendaciones:
+    • Responde con RANGOS generales, NUNCA precios específicos
+    • "Nuestras experiencias van desde $110,000 hasta $400,000 COP por persona, dependiendo del tipo"
+    • Puedes mencionar rangos por categoría si pregunta algo específico
+    • Luego continúa el flujo: "¿Qué tipo de experiencia te interesa?"
+    • ⚠️ NO llames getRecommendations solo por preguntar precio
+
+  → SI el usuario pregunta DESPUÉS de ver recomendaciones (carrusel ya mostrado):
+    • Refiere a las cards: "Los precios están en cada tarjeta que te mostré"
+    • Si pregunta por una específica: "¿Cuál te interesa? Puedo darte más detalles"
+    • ⚠️ NO vuelvas a llamar getRecommendations
+
+  → NUNCA des precios exactos de experiencias específicas en texto
+  → Los precios específicos SOLO aparecen en las cards del carrusel
+
 📍 CONFIRMATION:
   → Usuario confirmó los datos mostrados
   → LLAMA getRecommendations INMEDIATAMENTE

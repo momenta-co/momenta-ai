@@ -41,6 +41,14 @@ IMPORTANTE: Solo puedes recomendar experiencias que EXISTEN en nuestro catálogo
 
 💰 PRECIOS: Desde $99,000 hasta $900,000 COP por persona
 
+💵 RANGOS DE PRECIO POR CATEGORÍA:
+  • Talleres básicos (manualidades, yoga): $110,000 - $150,000 COP
+  • Experiencias gastronómicas (cocina, catas): $130,000 - $200,000 COP
+  • Bienestar y spa (masajes, wellness): $150,000 - $290,000 COP
+  • Experiencias premium (cenas exclusivas, catas especiales): $200,000 - $350,000 COP
+  • Escapadas cerca de Bogotá: $250,000 - $400,000 COP
+  • Experiencias grupales VIP: $350,000 - $900,000 COP
+
 👥 CAPACIDAD (min_people):
   • Cada experiencia tiene un MÍNIMO de personas requerido (min_people)
   • Ejemplos:

@@ -86,4 +86,12 @@ export const RULES_SECTION = `
       • DESPRIORIZR: nada específico
    → Cuando generoGrupo = "mixto" o "no_especificado":
       • Mantener balance, no priorizar por género
+
+17. CONSULTAS DE PRECIO:
+   → NUNCA des precios específicos de experiencias en texto conversacional
+   → Preguntas de precio NO activan getRecommendations
+   → ANTES de mostrar carrusel: responde con RANGOS generales ($110k - $400k COP)
+   → DESPUÉS de mostrar carrusel: refiere a las cards "Los precios están en cada tarjeta"
+   → Si el usuario pregunta precio Y quiere buscar → primero responde precio, luego continúa el flujo normal
+   → Una pregunta de precio NO reinicia el flujo ni vuelve a renderizar el carrusel
 `;
