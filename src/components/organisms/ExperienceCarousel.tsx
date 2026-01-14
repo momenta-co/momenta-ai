@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
 import type { CarouselExperience } from '@/types/chat';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { memo, useEffect, useState } from 'react';
 
 const carouselExperiences: CarouselExperience[] = [
   {
@@ -82,7 +82,7 @@ const ExperienceCarousel = memo(function ExperienceCarousel() {
             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
             {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+            <div className="absolute bottom-0 left-0 right-0 p-10 text-white tracking-tighter">
               <h2 className="text-[32px] font-serif font-normal mb-0 leading-tight">
                 {experience.title}
               </h2>

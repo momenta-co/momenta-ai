@@ -18,8 +18,8 @@ export const Hero = ({ onMessagesChange }: HeroProps) => {
   };
 
   return (
-    <section className="relative h-screen flex flex-col bg-neutral-100 pt-20">
-      <div className="flex-1 flex items-stretch px-8 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-8 overflow-hidden">
+    <section className="relative h-screen flex flex-col bg-neutral-100 pt-16 lg:pt-20">
+      <div className="flex-1 flex items-stretch px-2 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-0 lg:py-8 overflow-hidden">
         <motion.div
           className="flex flex-col lg:flex-row w-full h-full"
           animate={{
@@ -29,7 +29,7 @@ export const Hero = ({ onMessagesChange }: HeroProps) => {
         >
           {/* Left Column - Chat Interface */}
           <motion.div
-            className="flex flex-col h-full w-full max-h-full gap-4"
+            className="flex flex-col h-full w-full max-h-full gap-4 pb-2"
             animate={{
               flex: messageCount > 0 ? '1 1 100%' : '1 1 50%',
             }}
