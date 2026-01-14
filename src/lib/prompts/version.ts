@@ -5,7 +5,7 @@
  * This helps track changes and debug issues related to prompt modifications.
  */
 
-export const PROMPT_VERSION = '1.8.0';
+export const PROMPT_VERSION = '1.9.0';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
@@ -21,9 +21,10 @@ export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.6.0': 'Filtro min_people: cada experiencia tiene un mínimo de personas requerido. No recomendar experiencias donde min_people > personas del usuario.',
   '1.7.0': 'Sugerencia de más personas: cuando hay experiencias excluidas por min_people, sugiere al usuario que agregando más personas podrían acceder a más opciones.',
   '1.8.0': 'Priorización por género: cuando el grupo es masculino, prioriza bebidas/parrilla/aventura. Cuando es femenino, prioriza bienestar/spa/brunch.',
+  '1.9.0': 'Confirmación obligatoria: SIEMPRE mostrar bullets (📍👥📅💫) antes de llamar getRecommendations, aunque el usuario dé todo el contexto en un mensaje. Eliminada ambigüedad en flows.ts.',
 };
 
-export const LAST_UPDATED = '2026-01-11';
+export const LAST_UPDATED = '2026-01-13';
 
 export const CONTRIBUTORS = [
   // Add your name when you make significant prompt changes
