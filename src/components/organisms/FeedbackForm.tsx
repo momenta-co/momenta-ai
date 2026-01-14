@@ -1,6 +1,7 @@
 'use client';
 
 import type { FeedbackData, FeedbackSubmissionResponse } from '@/types/chat';
+import type { RecommendationsSuccessOutput } from '@/lib/intelligence/tool-types';
 import type { UIMessage } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
@@ -142,11 +143,47 @@ export default function FeedbackForm({
   const getWhatsAppLink = () => {
     const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER || '573112138496';
 
-    let message = 'Hola! Me gustaría continuar con la reserva para estas experiencias:\n\n';
+    let message = 'Hola! Me gustaría continuar con la reserva en Momenta:\n\n';
 
     // Add recommendation IDs
     if (recommendationIds.length > 0) {
       message += `Experiencia${recommendationIds.length > 1 ? 's' : ''} de interés: ${recommendationIds.join(', ')}\n\n`;
+    }
+
+    // Extract context from tool outputs in chat logs
+    if (chatLogs.length > 0) {
+      // Find the getRecommendations tool output with context
+      const recommendationsPart = chatLogs
+        .flatMap(msg => msg.parts || [])
+        .find((part): part is any =>
+          part.type === 'tool-getRecommendations' &&
+          part.state === 'output-available'
+        );
+
+      if (recommendationsPart?.output) {
+        const output = recommendationsPart.output as RecommendationsSuccessOutput;
+
+        if (output.status === 'success' && output.context) {
+          const context = output.context;
+
+          // Add number of people if available
+          if (context.personas) {
+            message += `Número de personas: ${context.personas}\n`;
+          }
+
+          // Add date if available
+          if (context.fecha) {
+            message += `Fecha: ${context.fecha}\n`;
+          }
+
+          // Add city if available
+          if (context.ciudad) {
+            message += `Ciudad: ${context.ciudad}\n`;
+          }
+
+          message += '\n';
+        }
+      }
     }
 
     // Add user data if form was submitted
