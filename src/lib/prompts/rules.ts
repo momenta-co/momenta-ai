@@ -55,7 +55,12 @@ export const RULES_SECTION = `
    → Solo llama getRecommendations DESPUÉS de que el usuario confirme ("sí", "dale", "perfecto", "busca", etc.)
    → Este paso NUNCA se salta, sin excepciones
 
-13. PRIORIZACIÓN POR GÉNERO DEL GRUPO:
+13. UNA SOLA LLAMADA A getRecommendations POR TURNO:
+   → NUNCA llames getRecommendations más de una vez en el mismo turno
+   → Si ya llamaste getRecommendations en este turno, NO lo llames de nuevo
+   → Si el usuario pide "más opciones" o "otras recomendaciones", primero confirma qué quiere cambiar y luego llama UNA sola vez
+
+14. PRIORIZACIÓN POR GÉNERO DEL GRUPO:
    → Cuando generoGrupo = "masculino" (amigos, parceros, los muchachos):
       • PRIORIZAR: catas de cerveza, cocteles, licores, parrilla, aventura, deportes
       • NEUTRAL: cocina, arte, talleres creativos (mostrar pero no primero)
