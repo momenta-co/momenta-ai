@@ -41,7 +41,7 @@ export const Hero = ({ onMessagesChange }: HeroProps) => {
         <BetaWelcomeModal onClose={handleCloseBetaModal} />
       )}
 
-      <section className="relative h-screen flex flex-col bg-neutral-100 pt-16 lg:pt-20">
+      <section className="relative h-dvh flex flex-col bg-neutral-100 pt-16 lg:pt-20 overflow-hidden" style={{ minHeight: '-webkit-fill-available' } as React.CSSProperties}>
         <div className="flex-1 flex items-stretch px-2 lg:px-16 max-w-[1400px] mx-auto w-full h-full py-0 lg:py-8 overflow-hidden">
           <motion.div
             className="flex flex-col lg:flex-row w-full h-full"
