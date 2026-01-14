@@ -22,6 +22,7 @@ interface ChatProps {
 
 export function Chat({ onMessagesChange }: ChatProps) {
   const { messages, sendMessage, status, stop } = useChat();
+  const [isChatDisabled, setIsChatDisabled] = React.useState(false);
 
   console.log('Chat messages: ', messages);
 
@@ -211,6 +212,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
                                     chatLogs={messages}
                                     onSubmitSuccess={() => {
                                       console.log('[Chat] Feedback submitted successfully');
+                                      setIsChatDisabled(true);
                                     }}
                                   />
                                 </div>
@@ -247,6 +249,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
             messageCount={messages.length}
             onSubmit={handleSubmit}
             onStop={handleStop}
+            disabled={isChatDisabled}
           />
         </div>
       </div>
