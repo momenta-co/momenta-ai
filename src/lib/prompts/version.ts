@@ -5,7 +5,7 @@
  * This helps track changes and debug issues related to prompt modifications.
  */
 
-export const PROMPT_VERSION = '1.9.2';
+export const PROMPT_VERSION = '1.9.8';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
@@ -24,9 +24,15 @@ export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.9.0': 'Confirmación obligatoria: SIEMPRE mostrar bullets (📍👥📅💫) antes de llamar getRecommendations, aunque el usuario dé todo el contexto en un mensaje. Eliminada ambigüedad en flows.ts.',
   '1.9.1': 'Regla de una sola llamada: NUNCA llamar getRecommendations más de una vez por turno. Previene doble renderizado del carrusel.',
   '1.9.2': 'Flujo morePeopleSuggestion: cuando usuario acepta agregar personas, actualizar cantidad y mostrar bullets. Prohibido generar imágenes/URLs en texto.',
+  '1.9.3': 'PRICE_QUERY: nueva intención para consultas de precio. Responde con rangos generales, nunca precios específicos. No re-renderiza carrusel por preguntas de precio.',
+  '1.9.4': 'Regla 18: NUNCA pedir datos personales en chat. Nombre/email/teléfono SOLO via requestFeedback. Refuerza flujo obligatorio de feedback.',
+  '1.9.5': 'Fix contextMessage duplicado: contextMessage debe ser resumen corto (ej: "Eligió: Cata"), NO el mensaje de transición. Evita doble renderizado.',
+  '1.9.6': 'Regla 19: NUNCA confirmar disponibilidad. El equipo confirma via WhatsApp después de seleccionar experiencia. Refuerzo Regla 15: NUNCA re-listar experiencias en texto.',
+  '1.9.7': 'Flujo FEEDBACK reforzado: cuando usuario dice que le gusta una opción, llamar requestFeedback INMEDIATAMENTE. PROHIBIDO hacer preguntas adicionales.',
+  '1.9.8': 'Fix redundancia: si usuario ya dijo "me gusta opción X", NO volver a preguntar "¿cuál te gustó más?". Refuerzo en Regla 1.',
 };
 
-export const LAST_UPDATED = '2026-01-13';
+export const LAST_UPDATED = '2026-01-14';
 
 export const CONTRIBUTORS = [
   // Add your name when you make significant prompt changes
