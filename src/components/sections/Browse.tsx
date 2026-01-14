@@ -30,7 +30,7 @@ const BrowseFormSection = styled.section`
   position: relative;
   padding: clamp(4rem, 8vw, 6rem) 0;
   margin: 0 0 4rem 0;
-  background: #faf9f6;
+  background: #F7F8FA;
   border-radius: 0;
   box-sizing: border-box;
   width: 100%;
@@ -109,11 +109,11 @@ const BrowseImagePlaceholder = styled.div`
   height: 100%;
   background: linear-gradient(
     135deg,
-    rgba(232, 197, 71, 0.15) 0%,
-    rgba(240, 214, 117, 0.2) 25%,
-    rgba(123, 167, 204, 0.15) 50%,
-    rgba(232, 197, 71, 0.1) 75%,
-    rgba(123, 167, 204, 0.2) 100%
+    rgba(123, 184, 134, 0.15) 0%,
+    rgba(146, 168, 137, 0.2) 25%,
+    rgba(123, 184, 134, 0.15) 50%,
+    rgba(105, 165, 118, 0.1) 75%,
+    rgba(146, 168, 137, 0.2) 100%
   );
   background-size: 200% 200%;
   animation: gradientShift 8s ease infinite;
@@ -169,7 +169,7 @@ const BrowseImage = styled.img`
 const BrowseSectionTitle = styled.h3`
   font-size: clamp(1.75rem, 4vw, 2.25rem);
   font-weight: 500;
-  color: #1a1a1a;
+  color: #222A11;
   margin: 0;
   font-family: 'Merriweather', Georgia, serif;
   line-height: 1.3;
@@ -179,7 +179,7 @@ const BrowseSectionTitle = styled.h3`
 
 const BrowseSectionSubtitle = styled.p`
   font-size: clamp(1rem, 1.8vw, 1.125rem);
-  color: #666666;
+  color: #92A889;
   margin: 0;
   font-family: 'Merriweather', Georgia, serif;
   line-height: 1.6;
@@ -231,7 +231,7 @@ const FormField = styled.div`
 const FormLabel = styled.label`
   font-size: 0.875rem;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #222A11;
   font-family: 'Merriweather', Georgia, serif;
   letter-spacing: -0.005em;
 `;
@@ -239,9 +239,9 @@ const FormLabel = styled.label`
 const FormSelect = styled.select`
   padding: 0.875rem 1.125rem;
   background: #ffffff;
-  border: 1px solid rgba(26, 26, 26, 0.12);
+  border: 1px solid #E2E5EB;
   border-radius: 12px;
-  color: #1a1a1a;
+  color: #222A11;
   font-size: clamp(0.875rem, 1vw, 0.9375rem);
   font-family: 'Merriweather', Georgia, serif;
   cursor: pointer;
@@ -253,21 +253,21 @@ const FormSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #E8C547;
-    box-shadow: 0 0 0 3px rgba(232, 197, 71, 0.1);
+    border-color: #7BB886;
+    box-shadow: 0 0 0 3px rgba(123, 184, 134, 0.1);
   }
 
   &:hover {
-    border-color: rgba(26, 26, 26, 0.2);
+    border-color: #92A889;
   }
 `;
 
 const FormInput = styled.input`
   padding: 0.875rem 1.125rem;
   background: #ffffff;
-  border: 1px solid rgba(26, 26, 26, 0.12);
+  border: 1px solid #E2E5EB;
   border-radius: 12px;
-  color: #1a1a1a;
+  color: #222A11;
   font-size: clamp(0.875rem, 1vw, 0.9375rem);
   font-family: 'Merriweather', Georgia, serif;
   transition: all 0.2s ease;
@@ -277,23 +277,17 @@ const FormInput = styled.input`
   height: 48px;
 
   &::placeholder {
-    color: #999999;
+    color: #92A889;
   }
 
   &:focus {
     outline: none;
-    border-color: #E8C547;
-    box-shadow: 0 0 0 3px rgba(232, 197, 71, 0.1);
+    border-color: #7BB886;
+    box-shadow: 0 0 0 3px rgba(123, 184, 134, 0.1);
   }
 
   &:hover {
-    border-color: rgba(26, 26, 26, 0.2);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: #E8C547;
-    box-shadow: 0 0 0 3px rgba(255, 217, 15, 0.15);
+    border-color: #92A889;
   }
 
   &[type="number"] {
@@ -309,8 +303,8 @@ const FormInput = styled.input`
 
 const BrowseSubmitButton = styled.button`
   padding: 0.875rem clamp(2rem, 3vw, 2.5rem);
-  background: #E8C547;
-  color: #1a1a1a;
+  background: #7BB886;
+  color: #3A4138;
   border: none;
   border-radius: 12px;
   font-size: clamp(0.9375rem, 1.2vw, 1rem);
@@ -327,9 +321,9 @@ const BrowseSubmitButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background: #F0D675;
+    background: #69A576;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(232, 197, 71, 0.3);
+    box-shadow: 0 2px 8px rgba(123, 184, 134, 0.3);
   }
 
   &:disabled {
@@ -341,7 +335,7 @@ const BrowseSubmitButton = styled.button`
 
 const FormError = styled.div`
   font-size: 0.8125rem;
-  color: #d32f2f;
+  color: #C43C3C;
   margin-top: 0.25rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 `;

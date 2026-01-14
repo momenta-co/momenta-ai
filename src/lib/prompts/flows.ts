@@ -21,8 +21,9 @@ export const FLOWS_SECTION = `
 
 📍 SPECIFIC_SEARCH:
   → Extrae todo el contexto posible del mensaje
-  → Si tienes Fecha → LLAMA getRecommendations DIRECTO (ciudad = Bogotá por defecto en beta)
+  → Si tienes Fecha → MUESTRA mensaje de confirmación con bullets (📍👥📅💫)
   → Si falta fecha → Pregunta solo la fecha (NO preguntes ciudad)
+  → ⚠️ NUNCA llames getRecommendations sin mostrar bullets y recibir confirmación del usuario
 
 📍 FEEDBACK (DESPUÉS DE MOSTRAR RECOMENDACIONES):
   PASO 1 - Pregunta inmediata después de getRecommendations:

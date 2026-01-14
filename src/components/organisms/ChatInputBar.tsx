@@ -17,6 +17,7 @@ interface ChatInputBarProps {
   messageCount: number;
   onSubmit: (input: string) => void;
   onStop?: () => void;
+  disabled?: boolean;
 }
 
 export default function ChatInputBar({
@@ -24,6 +25,7 @@ export default function ChatInputBar({
   messageCount,
   onSubmit,
   onStop,
+  disabled = false,
 }: ChatInputBarProps) {
   const [input, setInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -40,12 +42,12 @@ export default function ChatInputBar({
   const handleSubmit = useCallback(
     (message: PromptInputMessage, event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (message.text.trim() && !isLoading) {
+      if (message.text.trim() && !isLoading && !disabled) {
         onSubmit(message.text);
         setInput('');
       }
     },
-    [isLoading, onSubmit]
+    [isLoading, onSubmit, disabled]
   );
 
   // Handle stop button click
@@ -84,13 +86,15 @@ export default function ChatInputBar({
           onBlur={() => setIsFocused(false)}
           placeholder=""
           rows={1}
+          disabled={disabled}
           className={cn(
             'w-full bg-transparent',
             'text-neutral-1000 text-base md:text-md leading-relaxed',
             'focus:outline-none',
             'resize-none',
             'font-light pl-6 pr-16',
-            'field-sizing-content'
+            'field-sizing-content',
+            disabled && 'opacity-50 cursor-not-allowed'
           )}
         />
         {/* Rotating placeholder overlay */}
@@ -108,6 +112,7 @@ export default function ChatInputBar({
                 'shrink-0 w-11 h-11 rounded-full',
                 'bg-red-100 text-red-600',
                 'flex items-center justify-center',
+                'cursor-pointer',
                 'hover:bg-red-200 hover:scale-105',
                 'transition-all duration-300',
                 'active:scale-95'
@@ -119,11 +124,12 @@ export default function ChatInputBar({
           ) : (
             <button
               type="submit"
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || disabled}
               className={cn(
                 'shrink-0 w-11 h-11 rounded-full',
                 'bg-neutral-300/80 text-neutral-600',
                 'flex items-center justify-center',
+                'cursor-pointer',
                 'hover:bg-neutral-400/80 hover:scale-105',
                 'disabled:opacity-30 disabled:cursor-not-allowed',
                 'transition-all duration-300',
