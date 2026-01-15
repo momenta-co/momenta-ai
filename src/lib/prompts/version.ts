@@ -5,7 +5,7 @@
  * This helps track changes and debug issues related to prompt modifications.
  */
 
-export const PROMPT_VERSION = '1.10.4';
+export const PROMPT_VERSION = '1.10.5';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
@@ -36,6 +36,7 @@ export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.10.2': 'OFF_TOPIC mejorado: respuestas cálidas que conecten con alternativas del catálogo. Nunca ser cortante.',
   '1.10.3': 'Regla 21 ampliada: cuando usuario pide "detalles", preguntar de cuál experiencia. No generar contenido ni re-renderizar.',
   '1.10.4': 'Regla 15 reforzada: PROHIBIDO generar contenido de catálogo en texto. Ejemplos explícitos de qué NO hacer.',
+  '1.10.5': 'Reglas críticas al INICIO del prompt: prohibición de contenido de catálogo con máxima prioridad.',
 };
 
 export const LAST_UPDATED = '2026-01-14';
