@@ -76,7 +76,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="relative w-48 lg:w-72 h-48 lg:h-72 -ml-4"
+                className="relative w-48 lg:w-52 h-48 lg:h-52 -ml-4"
               >
                 <VoiceSphere />
               </motion.div>
