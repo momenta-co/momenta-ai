@@ -37,6 +37,7 @@ export default function FeedbackForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [fullnameError, setFullnameError] = useState<string | null>(null);
+  const [commentError, setCommentError] = useState<string | null>(null);
 
   // Pre-fill thumbs based on user sentiment
   useEffect(() => {
@@ -84,6 +85,11 @@ export default function FeedbackForm({
 
     if (!thumbsSelection) {
       setErrorMessage('Por favor selecciona una opción (👍 o 👎)');
+      return;
+    }
+
+    if (!comment || comment.trim().length === 0) {
+      setCommentError('Por favor ingresa tu feedback');
       return;
     }
 
@@ -501,7 +507,7 @@ export default function FeedbackForm({
                 htmlFor="comment"
                 className="block font-sans text-sm font-medium text-neutral-800 tracking-wide uppercase"
               >
-                Cualquier feedback adicional que nos ayude a mejorar ❤️
+                Cualquier feedback adicional que nos ayude a mejorar ❤️ <span className="text-danger-700">*</span>
               </label>
               <textarea
                 id="comment"
@@ -509,20 +515,36 @@ export default function FeedbackForm({
                 onChange={(e) => {
                   if (e.target.value.length <= 500) {
                     setComment(e.target.value);
+                    if (commentError && e.target.value) {
+                      setCommentError(null);
+                    }
                   }
                 }}
                 placeholder="¿Qué mejorarías? ¿Qué te gustaría ver?"
                 rows={2}
-                className="
-                    w-full h-[70%] bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2
+                className={`
+                    w-full h-[70%] bg-neutral-50 border rounded-lg px-3 py-2
                     font-sans text-sm text-neutral-900
                     placeholder:text-neutral-400 placeholder:italic
                     focus:outline-none focus:border-primary-700 focus:bg-white
                     hover:border-neutral-300
                     transition-all duration-300 resize-none
-                  "
+                    ${commentError ? 'border-danger-700 bg-danger-50' : 'border-neutral-200'}
+                  `}
                 disabled={submissionState === 'loading'}
               />
+              <AnimatePresence>
+                {commentError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-xs text-danger-700 font-sans"
+                  >
+                    {commentError}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
         </div>
@@ -550,9 +572,9 @@ export default function FeedbackForm({
         >
           <motion.button
             type="submit"
-            disabled={!fullname || !email || !thumbsSelection || submissionState === 'loading'}
-            whileHover={{ scale: !fullname || !email || !thumbsSelection || submissionState === 'loading' ? 1 : 1.02 }}
-            whileTap={{ scale: !fullname || !email || !thumbsSelection || submissionState === 'loading' ? 1 : 0.98 }}
+            disabled={!fullname || !email || !thumbsSelection || !comment || submissionState === 'loading'}
+            whileHover={{ scale: !fullname || !email || !thumbsSelection || !comment || submissionState === 'loading' ? 1 : 1.02 }}
+            whileTap={{ scale: !fullname || !email || !thumbsSelection || !comment || submissionState === 'loading' ? 1 : 0.98 }}
             className={`
                 bg-primary-700 text-white rounded-full px-5 py-2.5
                 font-sans text-lg font-medium tracking-wide
@@ -560,7 +582,7 @@ export default function FeedbackForm({
                 transition-all duration-300
                 flex items-center justify-center gap-3
                 cursor-pointer
-                ${(!fullname || !email || !thumbsSelection || submissionState === 'loading')
+                ${(!fullname || !email || !thumbsSelection || !comment || submissionState === 'loading')
                 ? 'opacity-50 cursor-not-allowed'
                 : 'hover:bg-primary-800 hover:shadow-xl hover:shadow-primary-700/40'
               }
