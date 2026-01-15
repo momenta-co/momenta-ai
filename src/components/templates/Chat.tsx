@@ -21,7 +21,7 @@ interface ChatProps {
 }
 
 export function Chat({ onMessagesChange }: ChatProps) {
-  const { messages, sendMessage, status, stop } = useChat();
+  const { messages, sendMessage, status } = useChat();
   const [isChatDisabled, setIsChatDisabled] = React.useState(false);
 
   console.log('Chat messages: ', messages);
@@ -41,11 +41,6 @@ export function Chat({ onMessagesChange }: ChatProps) {
       sendMessage({ text: input });
     }
   }, [isLoading, sendMessage]);
-
-  // Handle stop button click
-  const handleStop = React.useCallback(() => {
-    stop?.();
-  }, [stop]);
 
   return (
     <>
@@ -185,7 +180,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
                           // Fallback: Show generic loading state while tool is initializing
                           return (
                             <div key={part.toolCallId || `${message.id}-${i}`} className="py-2">
-                              <Shimmer className="text-md">Preparando recomendaciones personalizadas...</Shimmer>
+                              <Shimmer className="text-md">Preparando recomendaciones para ti...</Shimmer>
                             </div>
                           );
                         }
@@ -250,7 +245,6 @@ export function Chat({ onMessagesChange }: ChatProps) {
             isLoading={isLoading}
             messageCount={messages.length}
             onSubmit={handleSubmit}
-            onStop={handleStop}
             disabled={isChatDisabled}
           />
         </div>

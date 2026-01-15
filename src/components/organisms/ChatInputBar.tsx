@@ -2,21 +2,20 @@
 
 import {
   PromptInput,
-  PromptInputButton,
   PromptInputTextarea,
   type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input';
+import { Loader } from '@/components/ai-elements/loader';
 import RotatingPlaceholder from '@/components/atoms/RotatingPlaceholder';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { Loader2, Send, Square } from 'lucide-react';
+import { Send } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ChatInputBarProps {
   isLoading: boolean;
   messageCount: number;
   onSubmit: (input: string) => void;
-  onStop?: () => void;
   disabled?: boolean;
 }
 
@@ -24,7 +23,6 @@ export default function ChatInputBar({
   isLoading,
   messageCount,
   onSubmit,
-  onStop,
   disabled = false,
 }: ChatInputBarProps) {
   const [input, setInput] = useState('');
@@ -51,11 +49,6 @@ export default function ChatInputBar({
     },
     [isLoading, onSubmit, disabled]
   );
-
-  // Handle stop button click
-  const handleStop = useCallback(() => {
-    onStop?.();
-  }, [onStop]);
 
   return (
     <motion.div
@@ -88,7 +81,7 @@ export default function ChatInputBar({
           onBlur={() => setIsFocused(false)}
           placeholder=""
           rows={1}
-          disabled={disabled}
+          disabled={disabled || isLoading}
           className={cn(
             'w-full bg-transparent',
             'text-neutral-1000 text-base md:text-md leading-relaxed',
@@ -96,7 +89,7 @@ export default function ChatInputBar({
             'resize-none',
             'font-light pl-6 pr-16',
             'field-sizing-content',
-            disabled && 'opacity-50 cursor-not-allowed'
+            (disabled || isLoading) && 'opacity-50 cursor-not-allowed'
           )}
         />
         {/* Rotating placeholder overlay */}
@@ -107,45 +100,27 @@ export default function ChatInputBar({
         )}
         {/* Absolutely positioned submit button */}
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          {isLoading && onStop ? (
-            <PromptInputButton
-              onClick={handleStop}
-              className={cn(
-                'shrink-0 w-11 h-11 rounded-full',
-                'bg-red-100 text-red-600',
-                'flex items-center justify-center',
-                'cursor-pointer',
-                'hover:bg-red-200 hover:scale-105',
-                'transition-all duration-300',
-                'active:scale-95'
-              )}
-              aria-label="Detener"
-            >
-              <Square className="w-4 h-4" strokeWidth={2} />
-            </PromptInputButton>
-          ) : (
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading || disabled}
-              className={cn(
-                'shrink-0 w-11 h-11 rounded-full',
-                'bg-neutral-300/80 text-neutral-600',
-                'flex items-center justify-center',
-                'cursor-pointer',
-                'hover:bg-neutral-400/80 hover:scale-105',
-                'disabled:opacity-30 disabled:cursor-not-allowed',
-                'transition-all duration-300',
-                'active:scale-95'
-              )}
-              aria-label="Enviar"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" strokeWidth={2} />
-              ) : (
-                <Send className="w-4 h-4" strokeWidth={2} />
-              )}
-            </button>
-          )}
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading || disabled}
+            className={cn(
+              'shrink-0 w-11 h-11 rounded-full',
+              'bg-neutral-300/80 text-neutral-600',
+              'flex items-center justify-center',
+              'cursor-pointer',
+              'hover:bg-neutral-400/80 hover:scale-105',
+              'disabled:opacity-30 disabled:cursor-not-allowed',
+              'transition-all duration-300',
+              'active:scale-95'
+            )}
+            aria-label="Enviar"
+          >
+            {isLoading ? (
+              <Loader size={16} />
+            ) : (
+              <Send className="w-4 h-4" strokeWidth={2} />
+            )}
+          </button>
         </div>
       </PromptInput>
     </motion.div>
