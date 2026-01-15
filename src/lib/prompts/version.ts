@@ -5,7 +5,7 @@
  * This helps track changes and debug issues related to prompt modifications.
  */
 
-export const PROMPT_VERSION = '1.10.1';
+export const PROMPT_VERSION = '1.10.2';
 
 export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.0.0': 'Initial modularization - extracted catalog, intentions, flows, examples, and rules',
@@ -33,6 +33,7 @@ export const PROMPT_CHANGELOG: Record<string, string> = {
   '1.9.9': 'Regla 20: Cuando público incluye niños, excluir automáticamente experiencias con alcohol (evitar: ["alcohol"]).',
   '1.10.0': 'Regla 21: Conversación fluida post-carrusel. Si usuario pide consejo, responder conversacionalmente sin re-renderizar cards.',
   '1.10.1': 'Refuerzo Reglas 12 y 13: PROHIBIDO llamar getRecommendations sin confirmación previa. MÁXIMO 1 llamada por turno.',
+  '1.10.2': 'OFF_TOPIC mejorado: respuestas cálidas que conecten con alternativas del catálogo. Nunca ser cortante.',
 };
 
 export const LAST_UPDATED = '2026-01-14';
