@@ -4,7 +4,7 @@ import {
   Conversation,
   ConversationContent
 } from "@/components/ai-elements/conversation";
-import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import { Message, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { FeedbackToolOutput, RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
 import { useChat } from "@ai-sdk/react";
@@ -21,7 +21,7 @@ interface ChatProps {
 }
 
 export function Chat({ onMessagesChange }: ChatProps) {
-  const { messages, sendMessage, status, stop } = useChat();
+  const { messages, sendMessage, status } = useChat();
   const [isChatDisabled, setIsChatDisabled] = React.useState(false);
 
   console.log('Chat messages: ', messages);
@@ -41,11 +41,6 @@ export function Chat({ onMessagesChange }: ChatProps) {
       sendMessage({ text: input });
     }
   }, [isLoading, sendMessage]);
-
-  // Handle stop button click
-  const handleStop = React.useCallback(() => {
-    stop?.();
-  }, [stop]);
 
   return (
     <>
@@ -71,9 +66,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full text-lg"
+                className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full text-lg max-w-[70%] lg:max-w-full"
               >
-                Cuéntame qué experiencia buscas - Yo te recomiendo!
+                Descubre experiencias increíbles con mi ayuda. Solo escribe qué tipo de actividad buscas y te mostraré las mejores opciones!
               </motion.p>
 
               {/* 3D Sphere */}
@@ -185,7 +180,7 @@ export function Chat({ onMessagesChange }: ChatProps) {
                           // Fallback: Show generic loading state while tool is initializing
                           return (
                             <div key={part.toolCallId || `${message.id}-${i}`} className="py-2">
-                              <Shimmer className="text-md">Preparando recomendaciones personalizadas...</Shimmer>
+                              <Shimmer className="text-md">Preparando recomendaciones para ti...</Shimmer>
                             </div>
                           );
                         }
@@ -250,7 +245,6 @@ export function Chat({ onMessagesChange }: ChatProps) {
             isLoading={isLoading}
             messageCount={messages.length}
             onSubmit={handleSubmit}
-            onStop={handleStop}
             disabled={isChatDisabled}
           />
         </div>

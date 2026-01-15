@@ -184,6 +184,19 @@ export async function POST(req: Request) {
       requestFeedback,
     },
     stopWhen: stopAfterToolCompletion,
+    onStepFinish: ({ toolCalls }) => {
+      // Log duplicate tool calls for debugging
+      if (toolCalls && toolCalls.length > 1) {
+        const toolNames = toolCalls.map(tc => tc.toolName);
+        const duplicates = toolNames.filter((name, index) => toolNames.indexOf(name) !== index);
+        if (duplicates.length > 0) {
+          console.warn('[DUPLICATE TOOL CALLS DETECTED]', {
+            duplicates,
+            allCalls: toolNames
+          });
+        }
+      }
+    }
   });
 
   return result.toUIMessageStreamResponse();
