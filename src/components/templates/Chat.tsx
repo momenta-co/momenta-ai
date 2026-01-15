@@ -4,7 +4,7 @@ import {
   Conversation,
   ConversationContent
 } from "@/components/ai-elements/conversation";
-import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import { Message, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { FeedbackToolOutput, RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
 import { useChat } from "@ai-sdk/react";
@@ -66,9 +66,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full text-lg"
+                className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full text-lg max-w-[70%] lg:max-w-full"
               >
-                Cuéntame qué experiencia buscas - Yo te recomiendo!
+                Descubre experiencias increíbles con mi ayuda. Solo escribe qué tipo de actividad buscas y te mostraré las mejores opciones!
               </motion.p>
 
               {/* 3D Sphere */}
