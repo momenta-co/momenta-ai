@@ -1,5 +1,6 @@
 import type { Experience, UserContext } from './types';
 import { generateScoringInstructions, ENERGY_TAG_MAPPING, GROUP_TAG_MAPPING } from './tag-mapping';
+import { SYNONYM_AWARENESS_SECTION } from './search-synonyms';
 
 export interface PromptConfig {
   temperature: number;
@@ -135,6 +136,35 @@ MATRIZ DE PRIORIDADES PARA SCORING (MUY IMPORTANTE)
    - Tipo de Conexión: Refuerza el tipo de grupo
 
 ═══════════════════════════════════════════════════
+🎯 REGLA: EXPLÍCITO > INFERIDO (MUY IMPORTANTE)
+═══════════════════════════════════════════════════
+
+Lo que el usuario DICE EXPLÍCITAMENTE tiene prioridad ABSOLUTA sobre inferencias.
+
+EJEMPLO CRÍTICO:
+Usuario: "quiero naturaleza"
+❌ INCORRECTO: Recomendar "Masaje en Casa" primero (porque es "relajante")
+✅ CORRECTO: Priorizar experiencias outdoor, Neusa, campo, aventura al aire libre
+
+SCORING AJUSTADO:
+- Match explícito en título/descripción/categoría: +40 puntos adicionales
+- Inferencia contextual: máximo +20 puntos
+- NUNCA una inferencia puede superar un match explícito
+
+PALABRAS CLAVE EXPLÍCITAS A RESPETAR:
+- "naturaleza" → PRIORIZA: outdoor, Neusa, campo, aire libre. NO: masaje, spa, indoor
+- "spa" → PRIORIZA: bienestar, masaje, relajación. NO: aventura, cocina, outdoor
+- "cerveza" → PRIORIZA: cata cervecera. NO: vino, cocteles, licores
+- "sushi" → PRIORIZA: cocina japonesa. NO: italiana, mexicana
+- "aventura" → PRIORIZA: outdoor, parapente, activo. NO: spa, masaje, yoga
+- "yoga" → PRIORIZA: yoga, bienestar activo. NO: aventura extrema
+- "cocina" → PRIORIZA: talleres de cocina. NO: catas de bebida (a menos que lo pidan)
+
+⚠️ SI EL USUARIO DICE UNA PALABRA CLAVE ESPECÍFICA:
+Esa categoría DEBE estar en el TOP 3 de recomendaciones.
+NO la relegues a posición 4 o 5 por inferencias de "vibe" o "energía".
+
+═══════════════════════════════════════════════════
 CÓMO ESCRIBIR "reasons" (CRÍTICO)
 ═══════════════════════════════════════════════════
 
@@ -202,6 +232,8 @@ Devuelve SOLO JSON válido:
 Si generoGrupo es "femenino", SIEMPRE incluye al menos
 UNA experiencia de yoga, spa o bienestar entre las 5 recomendaciones.
 El yoga con amigas es MUY popular - puede ser Hot Yoga, Yoga & Brunch, Spa Day, etc.
+
+${SYNONYM_AWARENESS_SECTION}
 
 🍺 REGLA ESPECIAL - PRIORIZACIÓN PARA GRUPOS MASCULINOS:
 Si generoGrupo es "masculino" (amigos, parceros, los muchachos):

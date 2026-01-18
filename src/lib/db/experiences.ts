@@ -18,12 +18,13 @@ function transformDbExperience(dbExp: any): Experience {
     return mins > 0 ? `${hours} horas ${mins} minutos` : `${hours} horas`;
   };
 
-  // Calculate price from min/max
+  // Calculate price from min/max - Issue #1: Add "Desde" prefix
   const price = dbExp.price_min
     ? {
       amount: dbExp.price_min.toString(),
       currency: 'COP',
       unit: 'por persona',
+      prefix: 'Desde', // Indicates this is the minimum price
     }
     : null;
 
@@ -79,9 +80,10 @@ export async function getAllExperiences(): Promise<Experience[]> {
 /**
  * Fetch experiences by city or location tag
  * @param city - City name (e.g., "Bogotá", "Medellín") or "Cerca a Bogotá"
+ * @param excludeCities - Optional array of cities to exclude (e.g., ["Bogotá"] for "fuera de Bogotá")
  * @returns Array of Experience objects for that city/location
  */
-export async function getExperiencesByCity(city: string): Promise<Experience[]> {
+export async function getExperiencesByCity(city: string, excludeCities?: string[]): Promise<Experience[]> {
   try {
     // Handle "Cerca a Bogotá" as a tag filter
     const isCercaBogota = city.toLowerCase().includes('cerca') && city.toLowerCase().includes('bogot');
@@ -98,18 +100,49 @@ export async function getExperiencesByCity(city: string): Promise<Experience[]> 
       });
 
       // Filter experiences that have "Cerca a Bogotá" tag
-      const cercaExperiences = allExperiences.filter((exp: any) => {
+      let cercaExperiences = allExperiences.filter((exp: any) => {
         const tags = Array.isArray(exp.tags) ? exp.tags : [];
         return tags.some((tag: string) =>
           tag.toLowerCase().includes('cerca') && tag.toLowerCase().includes('bogot')
         );
       });
 
+      // Issue #3: If user wants to exclude certain cities (e.g., "fuera de Bogotá"),
+      // filter out experiences that are IN those cities
+      if (excludeCities && excludeCities.length > 0) {
+        cercaExperiences = cercaExperiences.filter((exp: any) => {
+          const expCity = exp.city?.toLowerCase() || '';
+          const tags = Array.isArray(exp.tags) ? exp.tags : [];
+
+          // Check if experience is in any excluded city
+          for (const excludeCity of excludeCities) {
+            const excludeLower = excludeCity.toLowerCase();
+            // Check city field
+            if (expCity.includes(excludeLower)) {
+              return false;
+            }
+            // Check tags for "En [Ciudad]"
+            const hasExcludedCityTag = tags.some((tag: string) =>
+              tag.toLowerCase().includes('en ' + excludeLower) ||
+              tag.toLowerCase() === excludeLower
+            );
+            if (hasExcludedCityTag) {
+              return false;
+            }
+          }
+          return true;
+        });
+        console.log(`[getExperiencesByCity] After excluding ${excludeCities.join(', ')}: ${cercaExperiences.length} experiences`);
+      }
+
       console.log(`[getExperiencesByCity] Found ${cercaExperiences.length} "Cerca a Bogotá" experiences`);
 
-      // If we have fewer than 8 "Cerca a Bogotá" experiences, also include Bogotá experiences
-      // This ensures we have enough variety for recommendations
-      if (cercaExperiences.length < 8) {
+      // If we have fewer than 8 "Cerca a Bogotá" experiences AND no city exclusions,
+      // also include Bogotá experiences. But if user explicitly excluded Bogotá, don't add them back!
+      const shouldAddBogotaFallback = cercaExperiences.length < 8 &&
+        (!excludeCities || !excludeCities.some(c => c.toLowerCase().includes('bogot')));
+
+      if (shouldAddBogotaFallback) {
         const bogotaExperiences = allExperiences.filter((exp: any) => {
           const city = exp.city?.toLowerCase() || '';
           const tags = Array.isArray(exp.tags) ? exp.tags : [];
