@@ -65,7 +65,7 @@ export default function ChatInputBar({
           '*:data-[slot=input-group]:rounded-3xl *:data-[slot=input-group]:border-0 *:data-[slot=input-group]:shadow-none min-h-16',
           isFocused
             ? 'border-primary-700'
-            : 'border-neutral-300'
+            : 'border-primary-700/60'
         )}
       >
         <PromptInputTextarea
