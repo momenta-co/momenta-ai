@@ -17,6 +17,8 @@ interface ChatInputBarProps {
   messageCount: number;
   onSubmit: (input: string) => void;
   disabled?: boolean;
+  value?: string;
+  onInputChange?: (value: string) => void;
 }
 
 export default function ChatInputBar({
@@ -24,15 +26,25 @@ export default function ChatInputBar({
   messageCount,
   onSubmit,
   disabled = false,
+  value: externalValue,
+  onInputChange,
 }: ChatInputBarProps) {
-  const [input, setInput] = useState('');
+  const [internalInput, setInternalInput] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-focus when loading stops
+  // Use external value if provided, otherwise use internal state
+  const input = externalValue !== undefined ? externalValue : internalInput;
+  const setInput = onInputChange || setInternalInput;
+
+  // Auto-focus when loading stops (desktop only)
   useEffect(() => {
     if (!isLoading && textareaRef.current) {
-      textareaRef.current.focus();
+      // Only auto-focus on desktop (screens wider than 768px)
+      const isMobile = window.innerWidth < 768;
+      if (!isMobile) {
+        textareaRef.current.focus();
+      }
     }
   }, [isLoading]);
 
@@ -47,7 +59,7 @@ export default function ChatInputBar({
         textareaRef.current?.blur();
       }
     },
-    [isLoading, onSubmit, disabled]
+    [isLoading, onSubmit, disabled, setInput]
   );
 
   return (
@@ -102,13 +114,13 @@ export default function ChatInputBar({
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <button
             type="submit"
-            disabled={!input.trim() || isLoading || disabled}
+            disabled={isLoading || disabled}
             className={cn(
-              'shrink-0 w-11 h-11 rounded-full',
-              'bg-neutral-300/80 text-neutral-600',
+              'shrink-0 w-10 h-10 rounded-full',
+              'bg-primary-700/40 text-neutral-600',
               'flex items-center justify-center',
               'cursor-pointer',
-              'hover:bg-neutral-400/80 hover:scale-105',
+              'hover:bg-primary-700/60 hover:scale-105',
               'disabled:opacity-30 disabled:cursor-not-allowed',
               'transition-all duration-300',
               'active:scale-95'

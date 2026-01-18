@@ -8,10 +8,10 @@ import { Message, MessageResponse } from "@/components/ai-elements/message";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { FeedbackToolOutput, RecommendationsToolOutput } from '@/lib/intelligence/tool-types';
 import { useChat } from "@ai-sdk/react";
-import { motion } from 'framer-motion';
 import React from 'react';
-import RotatingTitleWord from '../atoms/RotatingTitleWord';
-import VoiceSphere from '../atoms/VoiceSphere';
+import styled from 'styled-components';
+import { ExperienceTile } from '../molecules/ExperienceTile';
+import MessageAssistant from '../molecules/MessageAssistant';
 import ChatInputBar from '../organisms/ChatInputBar';
 import { ExperienceRecommendations } from '../organisms/ExperienceRecommendations';
 import FeedbackForm from '../organisms/FeedbackForm';
@@ -20,9 +20,57 @@ interface ChatProps {
   onMessagesChange?: (messageCount: number) => void;
 }
 
+const ExperienceGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-height: calc(100vh - 400px);
+
+  @media (max-width: 1200px) {
+    gap: 4px;
+  }
+
+  @media (max-width: 768px) {
+    max-height: calc(100vh - 350px);
+  }
+`;
+
+const ExperienceTileContainer = styled.div`
+  aspect-ratio: 1;
+  width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+`;
+
+const experienceImages = [
+  {
+    url: 'https://d3p3fw3rutb1if.cloudfront.net/photos/acc473bf-d2a0-4192-a53c-53e833937274',
+    query: 'Necesito desconectarme del estrés con algo relajante'
+  },
+  {
+    query: 'Quiero aprender a preparar comida japonesa desde cero'
+  },
+  {
+    url: 'https://d3p3fw3rutb1if.cloudfront.net/photos/11b96394-2874-4558-bca2-cf828621730a',
+    query: 'Busco una experiencia tranquila y cultural para dos'
+  },
+  {
+    query: 'Organizamos un cumpleaños con algo dulce y especial'
+  },
+  {
+    url: 'https://d3p3fw3rutb1if.cloudfront.net/photos/7e7f14d5-790d-4411-80dd-5834e9894677',
+    query: 'Quiero una cita diferente combinando arte y vino'
+  },
+  {
+    query: 'Necesito una actividad de team building para mi equipo'
+  },
+];
+
 export function Chat({ onMessagesChange }: ChatProps) {
   const { messages, sendMessage, status } = useChat();
   const [isChatDisabled, setIsChatDisabled] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState('');
 
   console.log('Chat messages: ', messages);
 
@@ -39,48 +87,37 @@ export function Chat({ onMessagesChange }: ChatProps) {
   const handleSubmit = React.useCallback((input: string) => {
     if (input.trim() && !isLoading) {
       sendMessage({ text: input });
+      setInputValue('');
     }
   }, [isLoading, sendMessage]);
+
+  // Handle tile click - pre-fill input with suggested query
+  const handleTileClick = React.useCallback((query: string) => {
+    setInputValue(query);
+  }, []);
 
   return (
     <>
       <Conversation>
-        <ConversationContent>
+        <ConversationContent className="p-2 md:p-0">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-between flex-1 gap-6 lg:gap-8">
-              {/* Title */}
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full"
-                style={{ fontSize: 'clamp(2rem, 5vw, 40px)' }}
-              >
-                La manera más{' '}<RotatingTitleWord />
-                <br />
-                de vivir tu tiempo libre
-              </motion.h1>
-
-              {/* Subtitle */}
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full text-lg max-w-[70%] lg:max-w-full"
-              >
-                Descubre experiencias increíbles con mi ayuda. Solo escribe qué tipo de actividad buscas y te mostraré las mejores opciones!
-              </motion.p>
-
-              {/* 3D Sphere */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="relative w-48 lg:w-52 h-48 lg:h-52 -ml-4"
-              >
-                <VoiceSphere />
-              </motion.div>
-            </div>
+            <Message from="assistant">
+              <MessageAssistant>
+                Hola! Descubre experiencias increíbles con mi ayuda. Solo escribe qué tipo de actividad buscas y te mostraré las mejores opciones. Qué tienes en mente?
+              </MessageAssistant>
+              <ExperienceGrid>
+                {experienceImages.map((experience, index) => (
+                  <ExperienceTileContainer key={index}>
+                    <ExperienceTile
+                      imageUrl={experience.url}
+                      label={!experience.url ? experience.query : undefined}
+                      alt={`Experience ${index + 1}`}
+                      onClick={() => handleTileClick(experience.query)}
+                    />
+                  </ExperienceTileContainer>
+                ))}
+              </ExperienceGrid>
+            </Message>
           ) : (
             messages.map((message) => (
               <Message key={message.id} from={message.role}>
@@ -122,9 +159,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
                             return null;
                           }
                           return (
-                            <MessageResponse key={`${message.id}-${i}`} className="bg-secondary/50 rounded-2xl rounded-bl-none w-fit px-4 py-3">
+                            <MessageAssistant key={`${message.id}-${i}`}>
                               {part.text}
-                            </MessageResponse>
+                            </MessageAssistant>
                           );
                         case "tool-getRecommendations": {
                           const output = part.output as RecommendationsToolOutput | undefined;
@@ -153,15 +190,15 @@ export function Chat({ onMessagesChange }: ChatProps) {
                               <div key={part.toolCallId || `${message.id}-${i}`} className="space-y-4">
                                 {/* More people suggestion */}
                                 {output.morePeopleSuggestion && (
-                                  <MessageResponse className="bg-secondary/50 rounded-2xl rounded-bl-none w-fit px-4 py-3">
+                                  <MessageAssistant>
                                     {output.morePeopleSuggestion}
-                                  </MessageResponse>
+                                  </MessageAssistant>
                                 )}
                                 {/* Intro message */}
                                 {output.introMessage && (
-                                  <MessageResponse className="bg-secondary/50 rounded-2xl rounded-bl-none w-fit px-4 py-3">
+                                  <MessageAssistant>
                                     {output.introMessage}
-                                  </MessageResponse>
+                                  </MessageAssistant>
                                 )}
                                 {/* Recommendations carousel */}
                                 {output.recommendations && output.recommendations.length > 0 && (
@@ -169,9 +206,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
                                 )}
                                 {/* Follow-up question */}
                                 {output.followUpQuestion && (
-                                  <MessageResponse className="bg-secondary/50 rounded-2xl rounded-bl-none w-fit px-4 py-3">
+                                  <MessageAssistant>
                                     {output.followUpQuestion}
-                                  </MessageResponse>
+                                  </MessageAssistant>
                                 )}
                               </div>
                             );
@@ -194,9 +231,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
                               <div key={part.toolCallId || `${message.id}-${i}`} className="space-y-4">
                                 {/* Context message from LLM */}
                                 {output.message && (
-                                  <MessageResponse className="bg-secondary/50 rounded-2xl rounded-bl-none w-fit px-4 py-3">
+                                  <MessageAssistant>
                                     {output.message}
-                                  </MessageResponse>
+                                  </MessageAssistant>
                                 )}
                                 {/* Feedback form */}
                                 <FeedbackForm
@@ -240,13 +277,18 @@ export function Chat({ onMessagesChange }: ChatProps) {
       </Conversation>
 
       <div>
-        <div className="max-w-3xl mx-auto">
+        <div className="p-2 md:p-0 max-w-3xl mx-auto flex flex-col gap-2">
           <ChatInputBar
             isLoading={isLoading}
             messageCount={messages.length}
             onSubmit={handleSubmit}
             disabled={isChatDisabled}
+            value={inputValue}
+            onInputChange={setInputValue}
           />
+          <p className="text-center text-neutral-400 text-xs tracking-tight">
+            Momenta está en beta, todo feedback que nos puedas dar es súper valioso para mejorar!
+          </p>
         </div>
       </div>
     </>
