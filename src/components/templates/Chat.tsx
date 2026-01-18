@@ -240,13 +240,16 @@ export function Chat({ onMessagesChange }: ChatProps) {
       </Conversation>
 
       <div>
-        <div className="max-w-3xl mx-auto">
+        <div className="p-2 md:p-0 max-w-3xl mx-auto flex flex-col gap-2">
           <ChatInputBar
             isLoading={isLoading}
             messageCount={messages.length}
             onSubmit={handleSubmit}
             disabled={isChatDisabled}
           />
+          <p className="text-center text-neutral-400 text-xs tracking-tight">
+            Momenta está en beta, todo feedback que nos puedas dar es súper valioso para mejorar!
+          </p>
         </div>
       </div>
     </>
