@@ -15,7 +15,7 @@ export default function RotatingTitleWord() {
         setCurrentIndex((prev) => (prev + 1) % titleWords.length);
         setIsAnimating(false);
       }, 400);
-    }, 5000); // Synchronized with carousel
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);

@@ -21,8 +21,8 @@ export default function RotatingPlaceholder() {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % suggestions.length);
         setIsAnimating(false);
-      }, 300);
-    }, 4000);
+      }, 400);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
