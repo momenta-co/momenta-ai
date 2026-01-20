@@ -52,7 +52,7 @@ export const Hero = ({ onMessagesChange }: HeroProps) => {
           >
             {/* Left Column - Chat Interface */}
             <motion.div
-              className="flex flex-col h-full w-full max-h-full gap-4 pb-2"
+              className="flex flex-col h-full w-full max-h-full gap-4"
               animate={{
                 flex: messageCount > 0 ? '1 1 100%' : '1 1 50%',
               }}

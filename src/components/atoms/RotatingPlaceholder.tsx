@@ -21,8 +21,8 @@ export default function RotatingPlaceholder() {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % suggestions.length);
         setIsAnimating(false);
-      }, 300);
-    }, 4000);
+      }, 400);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -30,7 +30,7 @@ export default function RotatingPlaceholder() {
   return (
     <span
       className={`
-        text-neutral-700/40 text-sm sm:text-lg font-light leading-tight transition-all duration-300 pointer-events-none
+        text-neutral-500 text-sm sm:text-md font-light transition-all duration-300 pointer-events-none
         ${isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}
       `}
     >
