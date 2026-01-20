@@ -2,6 +2,7 @@ export interface Price {
   amount: string;
   currency: string;
   unit: string;
+  prefix?: string; // "Desde" to indicate minimum price
 }
 
 export interface Experience {

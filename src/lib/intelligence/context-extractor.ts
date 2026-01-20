@@ -136,6 +136,19 @@ const CIUDAD_PATTERNS: { pattern: RegExp; ciudad: string }[] = [
   { pattern: /\b(en\s+)?(bogot[áa]?|vogota|bog)\b/i, ciudad: 'Bogotá' },
 ];
 
+// ============================================
+// PATRONES DE EXCLUSIÓN DE CIUDAD (Issue #3)
+// "no Bogotá", "fuera de Bogotá", "sin Bogotá" → excluir experiencias EN Bogotá
+// ============================================
+const CITY_EXCLUSION_PATTERNS: { pattern: RegExp; exclude: string; prefer: string }[] = [
+  { pattern: /\bno\s+(en\s+)?bogot[áa]\b/i, exclude: 'Bogotá', prefer: 'Cerca a Bogotá' },
+  { pattern: /\bfuera\s+de\s+bogot[áa]\b/i, exclude: 'Bogotá', prefer: 'Cerca a Bogotá' },
+  { pattern: /\bsin\s+bogot[áa]\b/i, exclude: 'Bogotá', prefer: 'Cerca a Bogotá' },
+  { pattern: /\bque\s+no\s+sea\s+(en\s+)?bogot[áa]\b/i, exclude: 'Bogotá', prefer: 'Cerca a Bogotá' },
+  { pattern: /\bnada\s+(en|de)\s+bogot[áa]\b/i, exclude: 'Bogotá', prefer: 'Cerca a Bogotá' },
+  { pattern: /\bno\s+quiero\s+(en\s+)?bogot[áa]\b/i, exclude: 'Bogotá', prefer: 'Cerca a Bogotá' },
+];
+
 // Patrones para fechas
 const FECHA_PATTERNS = [
   /\b(hoy|mañana|manana|pasado\s+mañana)\b/i,
@@ -254,6 +267,7 @@ export interface ExtractedContext {
   nivelEnergia?: NivelEnergia;
   modalidad?: Modalidad;
   evitar?: string[]; // Cosas a evitar: ["yoga", "spa", "aventura", etc.]
+  evitarCiudades?: string[]; // Ciudades a evitar: ["Bogotá"] cuando dicen "fuera de Bogotá"
 
   // Estado del flujo
   userConfirmed?: boolean; // Si el usuario ya confirmó el resumen
@@ -332,7 +346,27 @@ export function extractAccumulatedContext(
           }
         }
 
-        // Extraer ciudad
+        // Extraer exclusiones de ciudad PRIMERO (Issue #3)
+        // "fuera de Bogotá", "no Bogotá" → excluir Bogotá, preferir "Cerca a Bogotá"
+        for (const { pattern, exclude, prefer } of CITY_EXCLUSION_PATTERNS) {
+          if (pattern.test(message.text)) {
+            if (!context.evitarCiudades) {
+              context.evitarCiudades = [];
+            }
+            if (!context.evitarCiudades.includes(exclude)) {
+              context.evitarCiudades.push(exclude);
+              context.extractedFromMessages.push(`evitarCiudad: ${exclude}`);
+            }
+            // Si piden "fuera de Bogotá", establecer ciudad como "Cerca a Bogotá"
+            if (!context.ciudad) {
+              context.ciudad = prefer;
+              context.extractedFromMessages.push(`ciudad (por exclusión): ${prefer}`);
+            }
+            break;
+          }
+        }
+
+        // Extraer ciudad (solo si no se estableció por exclusión)
         if (!context.ciudad) {
           for (const { pattern, ciudad } of CIUDAD_PATTERNS) {
             if (pattern.test(message.text)) {

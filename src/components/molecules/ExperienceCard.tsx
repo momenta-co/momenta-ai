@@ -14,7 +14,9 @@ interface ExperienceCardProps {
 const formatPrice = (price: RecommendationData['price']) => {
   if (!price) return 'Consultar';
   const amount = parseInt(price.amount).toLocaleString('es-CO');
-  return `${amount}`;
+  // Issue #1: Show "Desde" prefix if available to indicate minimum price
+  const prefix = price.prefix ? `${price.prefix} ` : '';
+  return `${prefix}${amount}`;
 };
 
 export default function ExperienceCard({ recommendation, index }: ExperienceCardProps) {
