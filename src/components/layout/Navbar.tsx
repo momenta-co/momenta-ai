@@ -40,7 +40,7 @@ export function Navbar() {
           : "bg-transparent"
       )}
     >
-      <nav className="mx-auto max-w-7xl px-6 lg:px-8">
+      <nav className="mx-auto max-w-7xl px-2 lg:px-8">
         {/* Desktop Header - 3 Column Grid */}
         <div className="hidden md:grid md:grid-cols-3 md:items-center h-20">
           {/* Left - Catálogo Link */}

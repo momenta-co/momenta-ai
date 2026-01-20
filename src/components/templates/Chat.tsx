@@ -45,9 +45,9 @@ export function Chat({ onMessagesChange }: ChatProps) {
   return (
     <>
       <Conversation>
-        <ConversationContent>
+        <ConversationContent className={messages.length === 0 ? "h-full justify-center" : ""}>
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-between flex-1 gap-6 lg:gap-8">
+            <div className="flex flex-col items-center justify-center gap-10 lg:gap-8">
               {/* Title */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
@@ -68,18 +68,17 @@ export function Chat({ onMessagesChange }: ChatProps) {
                 transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
                 className="text-neutral-1000 leading-tight tracking-tighter font-serif font-normal text-center w-full text-lg max-w-[70%] lg:max-w-full"
               >
-                Descubre experiencias increíbles con mi ayuda. Solo escribe qué tipo de actividad buscas y te mostraré las mejores opciones!
+                Descubre experiencias increíbles con mi ayuda. Escribe qué buscas y te mostraré las mejores opciones!
               </motion.p>
 
-              {/* 3D Sphere */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="relative w-48 lg:w-52 h-48 lg:h-52 -ml-4"
-              >
-                <VoiceSphere />
-              </motion.div>
+              <div className="p-2 md:p-0 w-full mx-auto flex flex-col gap-2">
+                <ChatInputBar
+                  isLoading={isLoading}
+                  messageCount={messages.length}
+                  onSubmit={handleSubmit}
+                  disabled={isChatDisabled}
+                />
+              </div>
             </div>
           ) : (
             messages.map((message) => (
@@ -239,16 +238,22 @@ export function Chat({ onMessagesChange }: ChatProps) {
         </ConversationContent>
       </Conversation>
 
-      <div>
-        <div className="max-w-3xl mx-auto">
-          <ChatInputBar
-            isLoading={isLoading}
-            messageCount={messages.length}
-            onSubmit={handleSubmit}
-            disabled={isChatDisabled}
-          />
+      {/* Chat Input Bar */}
+      {messages.length > 0 && (
+        <div>
+          <div className="p-2 md:p-0 max-w-3xl mx-auto flex flex-col gap-2">
+            <ChatInputBar
+              isLoading={isLoading}
+              messageCount={messages.length}
+              onSubmit={handleSubmit}
+              disabled={isChatDisabled}
+            />
+            <p className="text-center text-neutral-400 text-xs tracking-tight">
+              Momenta está en beta, todo feedback que nos puedas dar es súper valioso para mejorar!
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

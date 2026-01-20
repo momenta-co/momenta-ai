@@ -1,11 +1,11 @@
 'use client';
 
+import { Loader } from '@/components/ai-elements/loader';
 import {
   PromptInput,
   PromptInputTextarea,
   type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input';
-import { Loader } from '@/components/ai-elements/loader';
 import RotatingPlaceholder from '@/components/atoms/RotatingPlaceholder';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -61,17 +61,12 @@ export default function ChatInputBar({
         onSubmit={handleSubmit}
         className={cn(
           'relative bg-white/95 backdrop-blur-xl rounded-3xl',
-          'border transition-all duration-500',
+          'border-2 transition-all duration-300',
           '*:data-[slot=input-group]:rounded-3xl *:data-[slot=input-group]:border-0 *:data-[slot=input-group]:shadow-none min-h-16',
           isFocused
-            ? 'border-primary-700/40 shadow-2xl shadow-primary-700/20 scale-[1.01]'
-            : 'border-neutral-300/50 shadow-xl shadow-neutral-900/8'
+            ? 'border-primary-700'
+            : 'border-primary-700/60'
         )}
-        style={{
-          boxShadow: isFocused
-            ? '0 20px 60px -15px rgba(30, 58, 95, 0.25), 0 10px 30px -10px rgba(30, 58, 95, 0.15)'
-            : '0 15px 45px -10px rgba(31, 41, 55, 0.12), 0 8px 20px -5px rgba(31, 41, 55, 0.08)',
-        }}
       >
         <PromptInputTextarea
           ref={textareaRef}
@@ -102,13 +97,13 @@ export default function ChatInputBar({
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <button
             type="submit"
-            disabled={!input.trim() || isLoading || disabled}
+            disabled={isLoading || disabled}
             className={cn(
-              'shrink-0 w-11 h-11 rounded-full',
-              'bg-neutral-300/80 text-neutral-600',
+              'shrink-0 w-10 h-10 rounded-full',
+              'bg-primary-700/40 text-neutral-600',
               'flex items-center justify-center',
               'cursor-pointer',
-              'hover:bg-neutral-400/80 hover:scale-105',
+              'hover:bg-primary-700/60 hover:scale-105',
               'disabled:opacity-30 disabled:cursor-not-allowed',
               'transition-all duration-300',
               'active:scale-95'
