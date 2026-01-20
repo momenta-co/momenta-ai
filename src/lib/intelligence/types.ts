@@ -79,6 +79,7 @@ export interface Experience {
     amount: string;
     currency: string;
     unit: string;
+    prefix?: string; // "Desde" to indicate minimum price
   } | null;
   duration: string | null;
   minPeople: number | null;
